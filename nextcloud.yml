@@ -4,6 +4,5 @@
   become: true
 
   roles:
-#  - geerlingguy.postgresql
+  - postgresql
   - redmine
-#  - aalaesar.install_nextcloud

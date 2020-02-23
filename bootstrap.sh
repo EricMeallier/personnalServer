@@ -20,11 +20,9 @@ install_using_yum() {
   sudo yum install -y ansible
 }
 
-install_using_apt() {
-  sudo apt-get install -y software-properties-common
-  sudo apt-add-repository -y ppa:ansible/ansible
-  sudo apt-get update
-  sudo apt-get install -y sshpass python-netaddr ansible
+install_using_apt() {  
+  sudo apt -y install sshpass python3 python3-pip python3-setuptools
+  pip3 install ansible
 }
 
 install_sshpass_using_apt() {
@@ -81,15 +79,24 @@ if [[ ! -f ~/.ssh/${server_user} ]]; then
   ansible-vault encrypt --vault-id=user@~/.personnalVault "${dir}/group_vars/encryptSshKey"
 fi
 
+
 # run ansible
 if [ -z ${server_initial_key} ]; then
-  ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
+  ANSIBLE_FORCE_COLOR=true \
+    ANSIBLE_HOST_KEY_CHECKING=false \
+    ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
+    ANSIBLE_CONFIG="${dir}/ansible.cfg" \
     ansible-playbook -i "${inventoryFile}" -l "targetServer" --user "${server_initial_root}" \
+    --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml" --ask-pass
 else
-  ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_SSH_ARGS="${_ssh_options}" \
+  ANSIBLE_FORCE_COLOR=true \
+    ANSIBLE_HOST_KEY_CHECKING=false \
+    ANSIBLE_SSH_ARGS="${_ssh_options}" \
+    ANSIBLE_CONFIG="${dir}/ansible.cfg" \
     ansible-playbook -i "${inventoryFile}" -l "targetServer" --user "${server_initial_root}" \
     --private-key="${server_initial_key}" \
+    --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml"
 fi
 checkForError "Setup failed"

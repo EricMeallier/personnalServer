@@ -1,0 +1,8 @@
+# PostgreSQL configuration example
+production:
+  adapter: postgresql
+  database: {{ postgresql.redmine.database }}
+  host: localhost
+  username: {{ postgresql.redmine.username }}
+  password: {{ postgresql.redmine.password }}
+  

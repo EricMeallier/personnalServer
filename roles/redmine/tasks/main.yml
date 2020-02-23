@@ -7,15 +7,24 @@
     - gnupg2
     - libcurl4-openssl-dev
     - libmagickwand-dev
+    - postgresql-client-11
+    - postgresql-server-dev-11
+    - unzip
     state: present
 
 - name: adding gpgs2 key for rvm
   shell: gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 
+- name: check is rvm already installed
+  stat:
+    path: /usr/local/rvm
+  register: rvmExists
+  
 - name: install rvm
   shell: \curl -sSL https://get.rvm.io | bash -s stable
+  when: not rvmExists.stat.isdir is defined or not rvmExists.stat.isdir
 
-- name: Adding user root
+- name: Adding user root to rvm users
   user: name=root
         group=rvm
         append=yes
@@ -27,4 +36,79 @@
   shell: /usr/local/rvm/bin/rvm --default use 2.6.3
 
 - name: install bundler
-  shell: /usr/local/rvm/rubies/ruby-2.6.3/bin/gem install bundler
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install bundler -v '2.1.4'
+
+- name: install pg client
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install pg -v '1.2.2'
+
+- name: install rmagick
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install rmagick -v '4.0.0'
+
+- name: install passenger
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install passenger -v '6.0.4'
+
+- name: Ensure group "redmine" exists
+  group:
+    name: redmine
+    state: present
+
+- name: Add the user 'redmine'
+  user:
+    name: redmine
+    group: redmine
+
+- name: Adding user redmine to rvm users
+  user: name=redmine
+    group=rvm
+    append=yes
+
+- name: Download redmine files
+  get_url:
+    url: https://www.redmine.org/releases/redmine-4.1.0.tar.gz
+    dest: /tmp/redmine-4.1.0.tar.gz
+    checksum: md5:32c7b9ce4c419092da439b540cbc1dbf
+
+- name: Extract redmine files into /opt
+  unarchive:
+    src: /tmp/redmine-4.1.0.tar.gz
+    dest: /opt
+    remote_src: 'yes'
+    owner: redmine
+    group: redmine
+
+- name: check if nginx already exists
+  stat: 
+    path: /usr/sbin/nginx
+  register: nginx_exists
+
+- name: install nginx with passenger
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; passenger-install-nginx-module --auto --auto-download --prefix=/usr --languages ruby
+  args:
+    chdir: '/opt/redmine-4.1.0/'
+  when: not nginx_exists.stat.exists
+
+- name: Copy database configuration file
+  template:
+    src: database.yml
+    dest: /opt/redmine-4.1.0/config/database.yml
+    owner: redmine
+    group: redmine
+    mode: '0644'
+
+- name: retreive dependencies for redmine
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; bundle install --path=.
+  args:
+    chdir: '/opt/redmine-4.1.0/'
+  become_user: redmine
+
+- name: generate redmine token
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; bin/rake generate_secret_token
+  args:
+    chdir: '/opt/redmine-4.1.0/'
+  become_user: redmine
+
+- name: migrate redmine database
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; RAILS_ENV=production bin/rake db:migrate
+  args:
+    chdir: '/opt/redmine-4.1.0/'
+  become_user: redmine

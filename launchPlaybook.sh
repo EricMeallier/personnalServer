@@ -21,10 +21,14 @@ inventoryFile=$(mktemp -t ansible_inventoryXXXXXX)
 echo '[remote]' > "${inventoryFile}"
 echo "targetServer  ansible_ssh_host=${server_ip} ansible_ssh_port=${server_sshport}" >> "${inventoryFile}"
 
-ANSIBLE_FORCE_COLOR=true ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i "${inventoryFile}" \
+ANSIBLE_FORCE_COLOR=true \
+ANSIBLE_HOST_KEY_CHECKING=false \
+ANSIBLE_SSH_ARGS="${_ssh_options}" \
+ANSIBLE_CONFIG="${dir}/ansible.cfg" \
+ansible-playbook -i "${inventoryFile}" \
   -l "targetServer" --user "${server_user}" \
   --private-key="~/.ssh/${server_user}" "${dir}/${1}.yml" \
-  -vvv
+  --vault-id=user@~/.personnalVault
 checkForError "Setup failed"
 
 # cleanup

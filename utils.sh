@@ -13,7 +13,7 @@ set -o nounset  # fail on unset variables
   _ssh_options='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=10'
   _ssh_options_light='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10'
 
-if [[ -z ${UseVagrant} ]]; then
+if [[ -z ${UseVagrant+x} ]]; then
   # Remote physical server
   export server_initial_root='root'
   export server_initial_key=''
