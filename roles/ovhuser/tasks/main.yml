@@ -1,0 +1,30 @@
+---
+#
+# Add ovhuser user
+#
+
+- name: user ovhuser
+  user:
+    name: 'ovhuser'
+    system: 'true'
+    home: '/home/ovhuser'
+    shell: '/bin/bash'
+    state: 'present'
+
+- name: user ovhuser authorized_keys
+  authorized_key:
+    user: 'ovhuser'
+    key: '{{ ovhuser.pubkey }}'
+    exclusive: 'yes'
+    state: 'present'
+    path: '/home/ovhuser/.ssh/authorized_keys'
+    manage_dir: 'yes'
+
+- name: user ovhuser sudoer
+  lineinfile: dest=/etc/sudoers.d/ovhuser regexp="{{ item.regexp }}" line="{{ item.line }}"
+              create=true state=present owner=root group=root mode=440
+  with_items:
+    - {line: 'ovhuser ALL=(ALL) NOPASSWD: ALL', regexp: '^ovhuser ALL=\(ALL\) NOPASSWD: ALL' }
+
+- name: user ovhuser sudo witout tty
+  replace: dest=/etc/sudoers regexp='^#?Defaults(\s+)requiretty$' replace='Defaults !requiretty'

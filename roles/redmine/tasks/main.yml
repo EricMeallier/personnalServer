@@ -1,0 +1,30 @@
+---
+
+- name: install redmine pre requisites
+  apt: 
+    name:
+    - curl
+    - gnupg2
+    - libcurl4-openssl-dev
+    - libmagickwand-dev
+    state: present
+
+- name: adding gpgs2 key for rvm
+  shell: gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+
+- name: install rvm
+  shell: \curl -sSL https://get.rvm.io | bash -s stable
+
+- name: Adding user root
+  user: name=root
+        group=rvm
+        append=yes
+
+- name: install ruby 2.6.3
+  shell: /usr/local/rvm/bin/rvm install 2.6.3
+
+- name: use 2.6.3 ruby version
+  shell: /usr/local/rvm/bin/rvm --default use 2.6.3
+
+- name: install bundler
+  shell: /usr/local/rvm/rubies/ruby-2.6.3/bin/gem install bundler

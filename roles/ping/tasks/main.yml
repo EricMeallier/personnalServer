@@ -1,0 +1,13 @@
+---
+
+
+#
+# Maven
+#
+
+- name: Maven, check version
+  shell: >
+    which mvn && mvn --version | grep Maven | grep -o '\([0-9\.]*\)'
+  failed_when: false
+  register: maven_version_ok
+  changed_when: maven_version_ok.rc!=0 or maven_version_ok.stdout_lines[1] | version_compare(maven.version, '<')

@@ -1,0 +1,115 @@
+---
+- name: "[NGINX] -  Required and recommended packages are installed."
+  package: "name={{ nginx_deps + php_pkg_spe }} state=present"
+  vars:
+    nginx_deps:
+      - nginx
+      - smbclient
+      - "php{{ php_ver }}-fpm"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-imap"
+      - "php{{ php_ver }}-json"
+      - "php{{ php_ver }}-curl"
+      - "php{{ php_ver }}-intl"
+  notify: [ "start nginx", "start php-fpm" ]
+
+- name: "[NGINX] -  APCu is installed."
+  package: "name={{ php_pkg_apcu }} state=present"
+  when: ansible_distribution_release not in [ "trusty" ]
+
+- block:
+  # load APCu from backports as the default version for trusty is obsolete.
+  - name: "[NGINX] -  Configure trusty backports."
+    apt_repository:
+      repo: "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse"
+      state: present
+      update_cache: yes
+  - name: "[NGINX] -  Install APCu from backports."
+    apt: "name={{ php_pkg_apcu }} state=present default_release=trusty-backports"
+  when: ansible_distribution_release == "trusty"
+
+- name: "[NGINX] - the server is running"
+  service:
+    name: nginx
+    state: started
+
+- name: "[NGINX] -  remove some commented line in php-fpm conf"
+  lineinfile:
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
+    regexp: '^\;env'
+    state: absent
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+
+- name: "[NGINX] -  Add path variable to php-fpm"
+  blockinfile:
+    dest: "{{ php_dir }}/fpm/pool.d/www.conf"
+    insertafter: '^; Default Value: clean env$'
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      env[HOSTNAME] = $HOSTNAME
+      env[PATH] = $PATH
+      env[TMP] = /tmp
+      env[TMPDIR] = /tmp
+      env[TEMP] = /tmp
+  notify: reload php-fpm
+
+- name: "[NGINX] -  enable APC for php CLI"
+  lineinfile:
+    dest: "{{ php_dir }}/cli/php.ini"
+    line: "apc.enable_cli = 1"
+    insertbefore: "^; End:$"
+    state: present
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+
+- name: "[NGINX] -  enable PHP OPcache for php.ini"
+  lineinfile:
+    dest: "{{ php_dir }}/fpm/php.ini"
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: 'opcache.enable=0', line: 'opcache.enable=1' }
+    - { regexp: 'opcache.enable_cli', line: 'opcache.enable_cli=1' }
+    - { regexp: 'opcache.interned_strings_buffer', line: 'opcache.interned_strings_buffer=8' }
+    - { regexp: 'opcache.max_accelerated_files', line: 'opcache.max_accelerated_files=10000' }
+    - { regexp: 'opcache.memory_consumption', line: 'opcache.memory_consumption=128' }
+    - { regexp: 'opcache.save_comments', line: 'opcache.save_comments=1' }
+    - { regexp: 'opcache.revalidate_freq', line: 'opcache.revalidate_freq=1' }
+    # validate: "/usr/sbin/{{ php_bin }} -t #%s"
+  notify: reload php-fpm
+
+
+- name: "[NGINX] -  Public Diffie-Hellman Parameter are generated. This might take a while."
+  command: "openssl dhparam -out {{ nextcloud_tls_dhparam }} 2048"
+  args:
+    creates: "{{ nextcloud_tls_dhparam }}"
+
+- name: "[NGINX] -  php handler configuration is present."
+  template:
+    dest: /etc/nginx/sites-available/php_handler.cnf
+    src: templates/nginx_php_handler.j2
+  notify: reload nginx
+
+- name: "[NGINX] -  php handler is enabled"
+  file:
+    path: /etc/nginx/sites-enabled/php_handler
+    src: /etc/nginx/sites-available/php_handler.cnf
+    state: link
+  notify: reload nginx
+
+- name: "[NGINX] -  generate Nextcloud configuration for nginx"
+  template:
+    dest: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
+    src: "{{ nextcloud_websrv_template }}"
+  notify: reload nginx
+
+- name: "[NGINX] -  Enable Nextcloud in nginx conf"
+  file:
+    path: /etc/nginx/sites-enabled/nc_{{ nextcloud_instance_name }}
+    src: /etc/nginx/sites-available/nc_{{ nextcloud_instance_name }}.cnf
+    state: link
+  notify: reload nginx

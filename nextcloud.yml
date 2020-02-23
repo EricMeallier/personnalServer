@@ -1,0 +1,9 @@
+---
+- hosts: all
+
+  become: true
+
+  roles:
+#  - geerlingguy.postgresql
+  - redmine
+#  - aalaesar.install_nextcloud

@@ -1,0 +1,57 @@
+---
+# vars for environment
+
+
+ovhuser:
+  pubkey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDNshuZjaQw9cacznQdO/TksqNjBSNvyGzPhgaoCOYbYyIMnF+PQXzecJk9T3fMCR7LREB980CZHBv6B8ciRUHaxpETE58pyck7ZWcFPudhgsGl3oqe6d1gUumavqBP5nuCjCuYS3cohmFy5RfkudxiJmEW7EcDZjDyazAM7S6Nxh+3vj1xTexLbN0rwLHcKyITr7HENMJuqGtNB4qAx3TxPZiigTkaspBcQaZD8JzftnQi7mGtk0CoCT/F/2rvwr7KiAClC+jFpI04T8xzPzHfGZU/+RNFmhQcc6M8g14xADb6Ld9y0IUZXanZSn6yCiASHjNzXRAFS7a7rNCNv6gbDQ5CCfE948FsEaqO2iXKy8fwRViu7DQoGnEenIniTiCr9fUbqxw1+vXJAi79LV0B9zAYaJB8rrzDEshKFD1wYZo0CT+RiUKrtgXw2hhe75yXYv6YwmjjP/sKfHV/oTmsOE0FJ91oeOTwDmVFL/V9MlJeokmYGj8ELz18AN7o/Lizziffzn7C3dPetu9wibA3JwUrYQQ3yFd4RAWUlPB5K2NXKlAlqqGb5GAMC8ta3P0jRiqltWJkyb/3QWekr36t/7d5D7mfqu+21rtnE7fPZrQDjhCr4iOl1pacoPgv18b3H+omebiXhPi81kI+2QrKMmt4MFezENLGPgKZ2J8DDw=='
+
+
+postgresql_hba_entries:
+  - {type: local, database: all, user: postgres, auth_method: peer}
+  - {type: local, database: nextcloud, user: all, auth_method: md5}
+  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5}
+  - {type: host, database: all, user: all, address: '::1/128', auth_method: md5}
+  - {type: host, database: all, user: all, address: '10.0.0.0/8', auth_method: md5}
+
+postgresql_databases:
+ - name: redmine
+   owner: redmine
+
+postgresql_users:
+ - name: redmine
+   password: redmine
+   encrypted: yes
+
+nextcloud_version_channel: "releases"
+nextcloud_get_latest: true
+nextcloud_version_major: 17  
+nextcloud_install_websrv: true
+nextcloud_websrv: 'nginx'
+nextcloud_admin_name: 'admin'
+nextcloud_admin_pwd: 'password'
+nextcloud_install_db: false
+nextcloud_db_host: '127.0.0.1'
+nextcloud_db_backend: 'pgsql'
+nextcloud_db_name: 'nextcloud'
+nextcloud_db_admin: 'nextcloud'
+nextcloud_db_pwd: 'nextcloud'
+php_version: '7.3'
+php_custom: yes
+php_ver: "{{ php_version }}"
+php_dir: "/etc/php/{{ php_version }}"
+php_bin: "php-fpm{{ php_version }}"
+php_pkg_apcu: "php-apcu"
+php_pkg_spe:
+  - "php{{ php_version }}-imap"
+  - "php{{ php_version }}-imagick"
+  - "php{{ php_version }}-xml"
+  - "php{{ php_version }}-zip"
+  - "php{{ php_version }}-mbstring"
+  - "php{{ php_version }}-pgsql"
+  - "php-redis"
+php_socket: "/run/php/{{ php_version }}-fpm.sock"
+
+nextcloud_trusted_domain:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_default_ipv4.address }}"
+  - www.meallier.fr
