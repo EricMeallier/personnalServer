@@ -112,3 +112,12 @@
   args:
     chdir: '/opt/redmine-4.1.0/'
   become_user: redmine
+
+- name: Copy nginx configuration file
+  template:
+    src: redmine.conf
+    dest: /usr/conf/nginx.conf
+
+- name: Start nginx
+  shell: '/usr/sbin/nginx'
+  
