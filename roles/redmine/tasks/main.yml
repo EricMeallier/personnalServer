@@ -82,7 +82,7 @@
   register: nginx_exists
 
 - name: install nginx with passenger
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; passenger-install-nginx-module --auto --auto-download --prefix=/usr --languages ruby
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
   args:
     chdir: '/opt/redmine-4.1.0/'
   when: not nginx_exists.stat.exists
@@ -116,8 +116,8 @@
 - name: Copy nginx configuration file
   template:
     src: redmine.conf
-    dest: /usr/conf/nginx.conf
+    dest: /opt/nginx/conf/nginx.conf
 
 - name: Start nginx
-  shell: '/usr/sbin/nginx'
+  shell: '/opt/nginx/sbin/nginx'
   
