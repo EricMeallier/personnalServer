@@ -113,11 +113,19 @@
     chdir: '/opt/redmine-4.1.0/'
   become_user: redmine
 
-- name: Copy nginx configuration file
-  template:
-    src: redmine.conf
-    dest: /opt/nginx/conf/nginx.conf
+- name: Install nginx service script
+  copy:
+    src: nginx.service
+    dest: /etc/systemd/system/nginx.service
+    owner: root
+    group: root
+    mode: '0644'
 
-- name: Start nginx
-  shell: '/opt/nginx/sbin/nginx'
-  
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
+      

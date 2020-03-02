@@ -1,7 +1,0 @@
----
-
-- name: install certobot wth dependencies
-  apt: 
-    name:
-    - certbot
-    state: present

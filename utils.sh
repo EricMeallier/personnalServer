@@ -9,22 +9,20 @@ set -o nounset  # fail on unset variables
 # Properties
 #
 
-  server_user='ovhuser'
-  _ssh_options='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=10'
-  _ssh_options_light='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10'
+server_user='ovhuser'
+_ssh_options='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=10'
+_ssh_options_light='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10'
 
 if [[ -z ${UseVagrant+x} ]]; then
   # Remote physical server
-  export server_initial_root='root'
-  export server_initial_key=''
-  export server_ip='51.178.25.89'
-  export server_sshport='22'
+  targetServer='ovh'
+  server_initial_root='root'
+  server_initial_key=''
 else
   # Vagrant
+  targetServer='vagrant'
   server_initial_root='vagrant'
   server_initial_key="${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
-  server_ip='127.0.0.1'
-  server_sshport='2222'
 fi
 
 #

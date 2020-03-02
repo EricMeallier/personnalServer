@@ -1,0 +1,52 @@
+---
+
+
+- name: Copy minimal nginx configuration file
+  copy:
+    src: redmine.conf
+    dest: /opt/nginx/conf/nginx.conf
+
+- name: Copy empty nginx ssl configuration file
+  file:
+    path: /opt/nginx/conf/redmineSSL.conf
+    state: 'touch'
+  
+- name: Nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+# certbot installation
+- name: install certobot wth dependencies
+  apt: 
+    name:
+    - certbot
+    state: present
+
+- name: create acme challenge folder
+  file:
+    path: /opt/nginx/html/.well-known/acme-challenge
+    state: directory
+    recurse: yes
+    owner: redmine
+    group: redmine
+    mode: u+rxw,g+rw,o+rw
+
+- name: generate redmine certificate
+  shell: /usr/bin/certbot certonly -d redmine.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html
+
+- name: generate Secure Diffie-Hellman
+  shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
+
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  copy:
+    src: redmineSSL.conf
+    dest: /opt/nginx/conf/redmineSSL.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted

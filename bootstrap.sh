@@ -65,18 +65,13 @@ checkForError "Install Ansible failed"
 # run setup
 _info "Setup environment and tools using Ansible"
 
-# fake inventory (to gain config as a jenkins slave)
-inventoryFile=$(mktemp -t ansible_inventoryXXXXXX)
-echo '[remote]' > "${inventoryFile}"
-echo "targetServer  ansible_ssh_host=${server_ip} ansible_ssh_port=${server_sshport}" >> "${inventoryFile}"
-
 # ssh key generation
 # ssh-keygen -b 4096 -f ~/.ssh/${server_user} -N ''
 if [[ ! -f ~/.ssh/${server_user} ]]; then
-  ansible-vault decrypt --vault-id=user@~/.personnalVault "${dir}/group_vars/encryptSshKey"
-  cp "${dir}/group_vars/encryptSshKey" ~/.ssh/${server_user}
+  ansible-vault decrypt --vault-id=user@~/.personnalVault "${dir}/encryptSshKey"
+  cp "${dir}/encryptSshKey" ~/.ssh/${server_user}
   chmod 600 ~/.ssh/${server_user}
-  ansible-vault encrypt --vault-id=user@~/.personnalVault "${dir}/group_vars/encryptSshKey"
+  ansible-vault encrypt --vault-id=user@~/.personnalVault "${dir}/encryptSshKey"
 fi
 
 
@@ -86,7 +81,7 @@ if [ -z ${server_initial_key} ]; then
     ANSIBLE_HOST_KEY_CHECKING=false \
     ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
     ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-    ansible-playbook -i "${inventoryFile}" -l "targetServer" --user "${server_initial_root}" \
+    ansible-playbook -i "${dir}/inventory/inventory" -l "${targetServer}" --user "${server_initial_root}" \
     --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml" --ask-pass
 else
@@ -94,12 +89,9 @@ else
     ANSIBLE_HOST_KEY_CHECKING=false \
     ANSIBLE_SSH_ARGS="${_ssh_options}" \
     ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-    ansible-playbook -i "${inventoryFile}" -l "targetServer" --user "${server_initial_root}" \
+    ansible-playbook -i "${dir}/inventory/inventory" -l "${targetServer}" --user "${server_initial_root}" \
     --private-key="${server_initial_key}" \
     --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml"
 fi
 checkForError "Setup failed"
-
-# cleanup
-rm -f "${inventoryFile}"
