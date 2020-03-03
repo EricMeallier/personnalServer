@@ -10,6 +10,7 @@
     - postgresql-client-11
     - postgresql-server-dev-11
     - unzip
+    - imagemagick
     state: present
 
 - name: adding gpgs2 key for rvm
