@@ -1,23 +1,5 @@
 ---
 
-
-- name: Copy minimal nginx configuration file
-  copy:
-    src: redmine.conf
-    dest: /opt/nginx/conf/nginx.conf
-
-- name: Copy empty nginx ssl configuration file
-  file:
-    path: /opt/nginx/conf/redmineSSL.conf
-    state: 'touch'
-  
-- name: Nginx service reload/start
-  systemd:
-    name: 'nginx'
-    daemon_reload: true
-    state: started
-    enabled: true
-
 # certbot installation
 - name: install certobot wth dependencies
   apt: 
@@ -35,7 +17,7 @@
     mode: u+rxw,g+rw,o+rw
 
 - name: generate redmine certificate
-  shell: /usr/bin/certbot certonly -d redmine.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html
+  shell: /usr/bin/certbot certonly -d redmine.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
 
 - name: generate Secure Diffie-Hellman
   shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
@@ -44,7 +26,7 @@
 - name: Copy full nginx ssl configuration file
   copy:
     src: redmineSSL.conf
-    dest: /opt/nginx/conf/redmineSSL.conf
+    dest: /opt/nginx/conf/server/redmineSSL.conf
 
 - name: Nginx service restart with full configuration
   systemd:

@@ -79,7 +79,7 @@
 
 - name: check if nginx already exists
   stat: 
-    path: /usr/sbin/nginx
+    path: /opt/nginx/sbin/nginx
   register: nginx_exists
 
 - name: install nginx with passenger
@@ -121,6 +121,24 @@
     owner: root
     group: root
     mode: '0644'
+
+- name: Copy minimal nginx configuration file
+  copy:
+    src: minimal.conf
+    dest: /opt/nginx/conf/nginx.conf
+
+- name: Create external configuration for nginx
+  file:
+    path: /opt/nginx/conf/server
+    state: 'directory'
+    mode: 755
+  
+- name: Nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
 
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml
