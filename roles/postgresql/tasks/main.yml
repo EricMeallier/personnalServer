@@ -26,8 +26,34 @@
   become_user: 'postgres'
   when: databaseExists.stdout.find('found') != 1
 
-- name: Tuning of access
+- name: Tuning of access for redmine
   lineinfile:
     dest: /etc/postgresql/11/main/pg_hba.conf
     regexp: "redmine"
     line: "local {{postgresql.redmine.database}} {{ postgresql.redmine.username }} md5"
+
+- name: does the postgreql user '{{ postgresql.gogs.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.gogs.username }}'"
+  register: userExists
+  become_user: 'postgres'
+
+- name: create postgreql user '{{ postgresql.gogs.username }}'
+  shell: psql -c "CREATE ROLE {{ postgresql.gogs.username }} PASSWORD '{{ postgresql.gogs.password }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
+  become_user: 'postgres'
+  when: userExists.stdout.find('found') != 1
+
+- name: does the database '{{ postgresql.gogs.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_database WHERE datname='{{ postgresql.gogs.database }}'"
+  register: databaseExists
+  become_user: 'postgres'
+
+- name: create '{{ postgresql.gogs.username }}' database
+  shell: psql -c "CREATE DATABASE {{ postgresql.gogs.database }} OWNER {{ postgresql.gogs.username }}"
+  become_user: 'postgres'
+  when: databaseExists.stdout.find('found') != 1
+
+- name: Tuning of access for '{{ postgresql.gogs.username }}'
+  lineinfile:
+    dest: /etc/postgresql/11/main/pg_hba.conf
+    regexp: "gogs"
+    line: "local {{postgresql.gogs.database}} {{ postgresql.gogs.username }} md5"

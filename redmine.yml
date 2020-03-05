@@ -4,5 +4,6 @@
   become: true
 
   roles:
-  - postgresql
-  - redmine
+   - postgresql
+   - redmine
+   - gogs

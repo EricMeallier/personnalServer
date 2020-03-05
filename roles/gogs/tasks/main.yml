@@ -1,0 +1,68 @@
+---
+
+- name: install gogs pre requisites
+  apt: 
+    name:
+    - git
+    state: present
+
+- name: Ensure group "gogs" exists
+  group:
+    name: gogs
+    state: present
+
+- name: Add the user 'gogs'
+  user:
+    name: gogs
+    group: gogs
+
+- name: Download gogs files
+  get_url:
+    url: https://dl.gogs.io/{{ gogs.version }}/gogs_{{ gogs.version }}_linux_amd64.zip
+    dest: '/tmp/gogs-{{ gogs.version }}.zip'
+
+- name: Extract gogs files into /opt
+  unarchive:
+    src: '/tmp/gogs-{{ gogs.version }}.zip'
+    dest: /opt
+    remote_src: 'yes'
+    owner: gogs
+    group: gogs
+
+- name: Configuration folder creation
+  file:
+    path: '/opt/gogs/custom/conf'
+    state: 'directory'
+    owner: gogs
+    group: gogs
+
+- name: Copy database configuration file
+  template:
+    src: app.ini
+    dest: /opt/gogs/custom/conf/app.ini
+    owner: gogs
+    group: gogs
+    mode: '0644'
+  
+- name: Make executable gogs
+  file:
+    path: '/opt/gogs/gogs'
+    mode: u+rxw,g+rx,o+rx
+
+- name: Install gogs service script
+  copy:
+    src: gogs.service
+    dest: /etc/systemd/system/gogs.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
+
+  

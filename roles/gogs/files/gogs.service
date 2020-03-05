@@ -1,0 +1,17 @@
+[Unit]
+Description=Gogs
+After=syslog.target
+After=network.target
+After=postgresql.service
+
+[Service]
+Type=simple
+User=gogs
+Group=gogs
+WorkingDirectory=/opt/gogs
+ExecStart=/opt/gogs/gogs web
+Restart=always
+Environment=USER=gogs HOME=/home/gogs
+
+[Install]
+WantedBy=multi-user.target
