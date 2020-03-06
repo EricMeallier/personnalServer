@@ -1,0 +1,53 @@
+---
+
+- name: install gogs pre requisites
+  apt: 
+    name:
+    - php7.3-fpm
+    - php7.3-common
+    - php7.3-gd
+    - php7.3-pgsql
+    - php7.3-curl
+    - php7.3-mbstring
+    - php7.3-xml
+    - php7.3-zip
+    state: present
+
+- name: Download next files
+  get_url:
+    url: https://download.nextcloud.com/server/releases/nextcloud-{{nextcloud.version}}.zip
+    dest: '/tmp/nextcloud-{{nextcloud.version}}.zip'
+
+- name: Extract nextcloud files into /opt
+  unarchive:
+    src: '/tmp/nextcloud-{{nextcloud.version}}.zip'
+    dest: /opt
+    remote_src: 'yes'
+    owner: nobody
+    group: nogroup
+
+- name: Copy php FPM configuration file
+  copy:
+    src: www.conf
+    dest: /etc/php/7.3/fpm/pool.d/www.conf
+
+- name: Copy database configuration file
+  template:
+    src: config.php
+    dest: /opt/nextcloud/config/config.php
+    owner: nobody
+    group: nogroup
+    mode: '0640'
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
+
+- name: PHP-FPM service restart
+  systemd:
+    name: 'php7.3-fpm'
+    state: restarted
