@@ -31,13 +31,13 @@
     src: www.conf
     dest: /etc/php/7.3/fpm/pool.d/www.conf
 
-- name: Copy database configuration file
-  template:
-    src: config.php
-    dest: /opt/nextcloud/config/config.php
-    owner: nobody
-    group: nogroup
-    mode: '0640'
+#- name: Copy database configuration file
+#  template:
+#    src: config.php
+#    dest: /opt/nextcloud/config/config.php
+#    owner: nobody
+#    group: nogroup
+#    mode: '0640'
 
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml

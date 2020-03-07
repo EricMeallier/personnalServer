@@ -48,6 +48,19 @@
 - name: install passenger
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install passenger -v '6.0.4'
 
+- name: check if nginx already exists
+  stat: 
+    path: /opt/nginx/sbin/nginx
+  register: nginx_exists
+
+- name: install nginx with passenger
+  shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
+  environment:
+    GEM_PATH: '/usr/local/rvm/gems/ruby-2.6.3:/usr/local/rvm/gems/ruby-2.6.3@global'
+    GEM_HOME: '/usr/local/rvm/gems/ruby-2.6.3'
+    PATH: '/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3@global/bin:/usr/local/rvm/rubies/ruby-2.6.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
+  when: not nginx_exists.stat.exists
+
 - name: Ensure group "redmine" exists
   group:
     name: redmine
@@ -76,17 +89,6 @@
     remote_src: 'yes'
     owner: redmine
     group: redmine
-
-- name: check if nginx already exists
-  stat: 
-    path: /opt/nginx/sbin/nginx
-  register: nginx_exists
-
-- name: install nginx with passenger
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
-  args:
-    chdir: '/opt/redmine-4.1.0/'
-  when: not nginx_exists.stat.exists
 
 - name: Copy database configuration file
   template:
@@ -131,7 +133,7 @@
   file:
     path: /opt/nginx/conf/server
     state: 'directory'
-    mode: 755
+    mode: '0755'
   
 - name: Nginx service reload/start
   systemd:
