@@ -1,0 +1,1 @@
+10 10 * * 0 /usr/bin/certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" >> /var/log/certbot.log

@@ -38,3 +38,14 @@
   systemd:
     name: 'nginx'
     state: restarted
+
+- name: Install renew certificate in crontab
+  copy: 
+    src: crontab
+    dest: /etc/cron.d/certbotRenew
+
+- name: Ensure default certbot renew is disabled
+  file:
+    path: /etc/cron.d/certbot
+    state: absent
+

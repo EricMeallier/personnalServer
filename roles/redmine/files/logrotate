@@ -1,0 +1,17 @@
+/opt/redmine-4.1.0/log/production.log {
+    su redmine redmine
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}
+/var/log/*.nginx.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}

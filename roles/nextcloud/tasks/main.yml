@@ -51,3 +51,8 @@
   systemd:
     name: 'php7.3-fpm'
     state: restarted
+
+- name: Install empty recyclebin with crontab
+  copy: 
+    src: crontab
+    dest: /etc/cron.d/emptyNextcloudTrashbin
