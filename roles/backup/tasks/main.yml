@@ -1,0 +1,24 @@
+---
+
+- name: install backup pre requisites
+  apt: 
+    name:
+    - jq
+    state: present
+
+- name: Backup folder creation
+  file:
+    path: '/backup'
+    state: 'directory'
+    mode: '0777'
+
+- name: Copy backup script
+  copy:
+    src: backup.sh
+    dest: /opt/backup.sh
+    mode: 'a+x'
+
+- name: Copy crontab expression for backup
+  copy:
+    src: crontab
+    dest: /etc/cron.d/backup
