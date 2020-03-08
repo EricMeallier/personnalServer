@@ -116,6 +116,21 @@
     chdir: '/opt/redmine-4.1.0/'
   become_user: redmine
 
+- name: directory for files under /data
+  file:
+    path: /data/redmine-files
+    state: 'directory'
+    owner: 'redmine'
+    group: 'redmine'
+
+- name: link to data directory
+  file:
+    src: /data/redmine-files
+    dest: /opt/redmine-4.1.0/files
+    state: 'link'
+    owner: 'redmine'
+    group: 'redmine'
+  
 - name: Install nginx service script
   copy:
     src: nginx.service
