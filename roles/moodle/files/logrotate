@@ -1,0 +1,16 @@
+/opt/gogs/log/hooks/*.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}
+/opt/gogs/log/*.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}
