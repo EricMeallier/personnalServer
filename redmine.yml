@@ -5,4 +5,8 @@
 
   roles:
   - postgresql
+  - redmine
+  - gogs
+  - nextcloud
+  - backup
   - moodle
