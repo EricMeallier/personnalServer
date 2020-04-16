@@ -73,14 +73,40 @@
   register: databaseExists
   become_user: 'postgres'
 
-- name: create '{{ postgresql.nextcloud.username }}' database
-  shell: psql -c "CREATE DATABASE {{ postgresql.nextcloud.database }} OWNER {{ postgresql.nextcloud.username }}"
-  become_user: 'postgres'
-  when: databaseExists.stdout.find('found') != 1
-
 - name: Tuning of access for '{{ postgresql.nextcloud.username }}'
   lineinfile:
     dest: /etc/postgresql/11/main/pg_hba.conf
     regexp: "nextcloud"
     line: "local {{postgresql.nextcloud.database}} {{ postgresql.nextcloud.username }} md5"
+
+- name: create '{{ postgresql.nextcloud.username }}' database
+  shell: psql -c "CREATE DATABASE {{ postgresql.nextcloud.database }} OWNER {{ postgresql.nextcloud.username }}"
+  become_user: 'postgres'
+  when: databaseExists.stdout.find('found') != 1
+
+- name: does the postgreql user '{{ postgresql.moodle.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.moodle.username }}'"
+  register: userExists
+  become_user: 'postgres'
+
+- name: create postgreql user '{{ postgresql.moodle.username }}'
+  shell: psql -c "CREATE ROLE {{ postgresql.moodle.username }} PASSWORD '{{ postgresql.moodle.password }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
+  become_user: 'postgres'
+  when: userExists.stdout.find('found') != 1
+
+- name: does the database '{{ postgresql.moodle.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_database WHERE datname='{{ postgresql.moodle.database }}'"
+  register: databaseExists
+  become_user: 'postgres'
+
+- name: create '{{ postgresql.moodle.username }}' database
+  shell: psql -c "CREATE DATABASE {{ postgresql.moodle.database }} OWNER {{ postgresql.moodle.username }}"
+  become_user: 'postgres'
+  when: databaseExists.stdout.find('found') != 1
+
+- name: Tuning of access for '{{ postgresql.moodle.username }}'
+  lineinfile:
+    dest: /etc/postgresql/11/main/pg_hba.conf
+    regexp: "moodle"
+    line: "local {{postgresql.moodle.database}} {{ postgresql.moodle.username }} md5"
   

@@ -23,7 +23,8 @@ ANSIBLE_CONFIG="${dir}/ansible.cfg" \
 ansible-playbook -i "${dir}/inventory" \
   -l "${targetServer}" --user "${server_user}" \
   --private-key="~/.ssh/${server_user}" "${dir}/${1}.yml" \
-  --vault-id=user@~/.personnalVault
+  --vault-id=user@~/.personnalVault \
+  -v
 checkForError "Setup failed"
 
 displayDuration
