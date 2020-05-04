@@ -21,7 +21,7 @@ install_using_yum() {
 }
 
 install_using_apt() {  
-  sudo apt -y install sshpass python3 python3-pip python3-setuptools
+  sudo apt install -y sshpass python3 python3-pip python3-setuptools
   pip3 install ansible
 }
 

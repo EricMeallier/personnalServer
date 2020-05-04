@@ -5,7 +5,7 @@
     name:
     - postgresql-11
     state: present
-
+##################### Redmine
 - name: does the postgreql user redmine exists ?
   shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.redmine.username }}'"
   register: userExists
@@ -32,6 +32,7 @@
     regexp: "redmine"
     line: "local {{postgresql.redmine.database}} {{ postgresql.redmine.username }} md5"
 
+##################### Gogs
 - name: does the postgreql user '{{ postgresql.gogs.username }}' exists ?
   shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.gogs.username }}'"
   register: userExists
@@ -58,6 +59,7 @@
     regexp: "gogs"
     line: "local {{postgresql.gogs.database}} {{ postgresql.gogs.username }} md5"
 
+##################### Nextcloud
 - name: does the postgreql user '{{ postgresql.nextcloud.username }}' exists ?
   shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.nextcloud.username }}'"
   register: userExists
@@ -84,6 +86,7 @@
   become_user: 'postgres'
   when: databaseExists.stdout.find('found') != 1
 
+##################### Moodle
 - name: does the postgreql user '{{ postgresql.moodle.username }}' exists ?
   shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.moodle.username }}'"
   register: userExists
@@ -109,4 +112,30 @@
     dest: /etc/postgresql/11/main/pg_hba.conf
     regexp: "moodle"
     line: "local {{postgresql.moodle.database}} {{ postgresql.moodle.username }} md5"
-  
+
+##################### Etherpad
+- name: does the postgreql user '{{ postgresql.etherpad.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.etherpad.username }}'"
+  register: userExists
+  become_user: 'postgres'
+
+- name: create postgreql user '{{ postgresql.etherpad.username }}'
+  shell: psql -c "CREATE ROLE {{ postgresql.etherpad.username }} PASSWORD '{{ postgresql.etherpad.password }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
+  become_user: 'postgres'
+  when: userExists.stdout.find('found') != 1
+
+- name: does the database '{{ postgresql.etherpad.username }}' exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_database WHERE datname='{{ postgresql.etherpad.database }}'"
+  register: databaseExists
+  become_user: 'postgres'
+
+- name: create '{{ postgresql.etherpad.username }}' database
+  shell: psql -c "CREATE DATABASE {{ postgresql.etherpad.database }} OWNER {{ postgresql.etherpad.username }}"
+  become_user: 'postgres'
+  when: databaseExists.stdout.find('found') != 1
+
+- name: Tuning of access for '{{ postgresql.etherpad.username }}'
+  lineinfile:
+    dest: /etc/postgresql/11/main/pg_hba.conf
+    regexp: "etherpad"
+    line: "local {{postgresql.etherpad.database}} {{ postgresql.etherpad.username }} md5"

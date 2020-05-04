@@ -1,0 +1,59 @@
+---
+
+- name: install etherpad pre requisites
+  apt: 
+    name:
+    - nodejs
+    - npm
+    state: present
+
+- name: Ensure group "etherpad" exists
+  group:
+    name: etherpad
+    state: present
+
+- name: Add the user 'etherpad'
+  user:
+    name: etherpad
+    group: etherpad
+
+- name: Download etherpad files
+  get_url:
+    url: https://github.com/ether/etherpad-lite/archive/{{ etherpad.version }}.zip
+    dest: '/tmp/etherpad-{{ etherpad.version }}.zip'
+
+- name: Extract etherpad files into /opt
+  unarchive:
+    src: '/tmp/etherpad-{{ etherpad.version }}.zip'
+    dest: /opt
+    remote_src: 'yes'
+    owner: etherpad
+    group: etherpad
+
+- name: Copy database configuration file
+  template:
+    src: settings.json
+    dest: /opt/etherpad-lite-{{ etherpad.version }}/settings.json
+    owner: etherpad
+    group: etherpad
+    mode: '0644'
+
+- name: retrieve dependencies
+  shell: /opt/etherpad-lite-{{ etherpad.version }}/bin/installDeps.sh
+  become_user: 'etherpad'
+
+- name: Install etherpad service script
+  copy:
+    src: etherpad.service
+    dest: /etc/systemd/system/etherpad.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
