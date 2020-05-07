@@ -1,0 +1,69 @@
+scp -P 2323 root@92.222.25.212:/backup/*20200307*
+
+*******************************
+
+cd /opt/redmine-4.1.0/files
+sudo tar zxvf /tmp/redmine-*-files.tar.gz
+cd data/redmine-files/
+sudo mv * ../..
+cd ../..
+sudo rm -rf data/ delete.me
+
+cd /tmp
+sudo gunzip redmine-*.dmp.gz
+sudo su - postgres
+dropdb redmine
+psql -c "create database redmine owner redmine"
+psql redmine < /tmp/redmine-*.dmp
+exit
+
+# generate secret Token for redmine
+sudo su - redmine
+cd /opt/redmine-4.1.0/
+PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin
+bin/rake generate_secret_token
+
+# db:migrate
+RAILS_ENV=production bin/rake db:migrate
+
+*****************************
+sudo mkdir -p /data/gogs-repositories
+cd /data/gogs-repositories
+sudo tar zxvf /tmp/gogs-20200307_0946-data.tar.gz
+cd data/gogs-repositories/
+sudo mv * ../..
+cd ../..
+sudo rm -rf data/ delete.me
+sudo chown -R gogs:gogs /data/gogs-repositories
+
+cd /tmp
+sudo gunzip gogs-*.dmp.gz
+sudo su - postgres
+dropdb gogs
+psql -c "create database gogs owner gogs"
+psql gogs < /tmp/gogs-*.dmp
+exit
+
+*****************************
+sudo mkdir -p /data/nextcloud
+sudo chown nobody:nogroup /data/nextcloud
+
+operations manuelles dans l'IHM
+  configuration generale au premier demarrage
+  creation utilisateurs
+  premieres connexions obligatoires pour chacun
+
+sudo scp -r -P 2323 root@92.222.25.212:/opt/owncloud-data/caro/files/* /data/nextcloud/caro/files/
+sudo scp -r -P 2323 root@92.222.25.212:/opt/owncloud-data/rickou_412/files/* /data/nextcloud/rickou_412/files/
+sudo chown -R nobody:nogroup /data/nextcloud/caro/files
+sudo chown -R nobody:nogroup /data/nextcloud/rickou_412/files
+cd /opt/nextcloud
+sudo -u nobody php7.3 occ files:scan caro
+sudo -u nobody "cd /opt/nextcloud; php7.3 occ files:scan rickou_412"
+
+*****************************
+
+10 02 * * 0 /usr/bin/certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" >> /var/log/certbot.log
+10 04 10 01 ? cd /opt/nextcloud; sudo -u nobody /usr/bin/php7.3 occ trashbin:cleanup rickou_412
+
+
