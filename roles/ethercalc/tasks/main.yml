@@ -1,0 +1,40 @@
+---
+
+- name: install ethercalc pre requisites
+  apt: 
+    name:
+    - nodejs
+    - npm
+    state: present
+
+- name: Ensure group "ethercalc" exists
+  group:
+    name: ethercalc
+    state: present
+
+- name: Add the user 'ethercalc'
+  user:
+    name: ethercalc
+    group: ethercalc
+
+- name: Download ethercalc files
+  npm:
+    name: ethercalc
+    global: yes
+    state: present
+
+- name: Install ethercalc service script
+  copy:
+    src: ethercalc.service
+    dest: /etc/systemd/system/ethercalc.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
