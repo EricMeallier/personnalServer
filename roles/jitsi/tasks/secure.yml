@@ -5,7 +5,14 @@
 
 - name: Jitsi service reload/start
   systemd:
-    name: 'jitsi-videobridge'
+    name: 'jitsi-videobridge2'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: Jicofo service reload/start
+  systemd:
+    name: 'jicofo'
     daemon_reload: true
     state: started
     enabled: true
