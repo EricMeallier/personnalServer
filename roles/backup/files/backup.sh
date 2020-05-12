@@ -34,3 +34,7 @@ curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targe
 sudo su - postgres -c "pg_dump etherpad > ${targetDir}/etherpad-${timestamp=}.dmp"
 gzip -f ${targetDir}/etherpad-${timestamp=}.dmp
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/etherpad-${timestamp=}.dmp.gz
+
+# ethercalc
+cp /var/lib/redis/dump.rdb ${targetDir}/ethercalc-${timestamp=}.rdb
+curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/ethercalc-${timestamp=}.rdb
