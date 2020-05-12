@@ -5,6 +5,7 @@
     name:
     - nodejs
     - npm
+    - redis
     state: present
 
 - name: Ensure group "ethercalc" exists
