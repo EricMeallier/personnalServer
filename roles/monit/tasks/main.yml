@@ -1,0 +1,29 @@
+---
+- name: monit installation
+  apt: 
+    name:
+    - monit
+    state: present
+
+- name: settings.cfg
+  copy:
+    src:  config/settings.cfg
+    dest: /etc/monit/conf.d/settings.cfg
+
+- name: system.cfg
+  copy:
+    src:  config/system.cfg
+    dest: /etc/monit/conf.d/system.cfg
+
+- name: Monit service restart with full configuration
+  systemd:
+    name: 'monit'
+    state: restarted
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
