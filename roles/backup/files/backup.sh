@@ -10,6 +10,7 @@ auth=$(curl -s "https://api.pcloud.com/userinfo?getauth=1&username=eric@meallier
 tar zcvf ${targetDir}/gogs-${timestamp=}-data.tar.gz /data/gogs-repositories
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/gogs-${timestamp=}-data.tar.gz
 
+sudo su - postgres -c "pg_dump gogs > ${targetDir}/gogs-${timestamp=}.dmp"
 gzip -f ${targetDir}/gogs-${timestamp=}.dmp
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/gogs-${timestamp=}.dmp.gz
 
@@ -37,4 +38,5 @@ curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targe
 
 # ethercalc
 cp /var/lib/redis/dump.rdb ${targetDir}/ethercalc-${timestamp=}.rdb
-curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/ethercalc-${timestamp=}.rdb
+gzip -f ${targetDir}/ethercalc-${timestamp=}.rdb
+curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/ethercalc-${timestamp=}.rdb.gz

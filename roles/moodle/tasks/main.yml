@@ -53,8 +53,3 @@
 - name: 'Secure configuration (for Internet)'
   include: secure.yml
   when: not redmine_unsecured
-
-- name: logrotate configuration
-  copy:
-    src: logrotate
-    dest: /etc/logrotate.d/moodle  
