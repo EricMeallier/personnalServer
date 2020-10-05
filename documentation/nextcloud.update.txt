@@ -1,30 +1,32 @@
-export NEW_VERSION=18.0.4
-export OLD_VERSION=18.0.1
+export NEW_VERSION=19.0.3
+export OLD_VERSION=18.0.9
 
 cd /opt/nextcloud
 sudo -u nobody php7.3 occ maintenance:mode --on
 
 cd /opt
-# backup old version
-mv nextcloud nextcloud-${OLD_VERSION}
+# remove current link version
+sudo rm nextcloud
 
 # unzip new verion
-wget  https://download.nextcloud.com/server/releases/nextcloud-${NEW_VERSION}.zip
-unzip nextcloud-${NEW_VERSION}.zip
-chown -R nobody:nogroup nextcloud/
+sudo wget  https://download.nextcloud.com/server/releases/nextcloud-${NEW_VERSION}.zip
+sudo unzip nextcloud-${NEW_VERSION}.zip
+
+# link update
+sudo mv nextcloud nextcloud-${NEW_VERSION}
+sudo ln -s /opt/nextcloud-${NEW_VERSION} /opt/nextcloud
+sudo chown -R nobody:nogroup nextcloud/
 
 # move configuration from old installation
-cp -a nextcloud-${OLD_VERSION}/config/config.php nextcloud/config
-cp -a nextcloud-${OLD_VERSION}/apps/bookmarks nextcloud/apps
-cp -a nextcloud-${OLD_VERSION}/apps/spreed nextcloud/apps
-cp -a nextcloud-${OLD_VERSION}/apps/deck nextcloud/apps
-cp -a nextcloud-${OLD_VERSION}/apps/mail nextcloud/apps
-cp -a nextcloud-${OLD_VERSION}/apps/ownpad nextcloud/apps
-
+sudo cp -a nextcloud-${OLD_VERSION}/config/config.php nextcloud/config
+sudo cp -a nextcloud-${OLD_VERSION}/apps/bookmarks nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/spreed nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/deck nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/mail nextcloud/apps
 
 # restart services
-systemctl restart nginx
-systemctl restart php7.3-fpm
+sudo systemctl restart nginx
+sudo systemctl restart php7.3-fpm
 
 # disable maintenance mode
 cd /opt/nextcloud
