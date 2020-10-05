@@ -1,0 +1,26 @@
+export OLD=4.1.0
+export NEW=4.1.1
+
+cd /opt
+rm redmine
+wget http://www.redmine.org/releases/redmine-${NEW}.tar.gz
+tar zxvf redmine-${NEW}.tar.gz
+ln -s /opt/redmine-${NEW} /opt/redmine
+
+cd /opt/redmine
+export PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3@global/bin
+
+export CONFIGURE_ARGS="with-pg-include=/usr/include/postgresql";gem install pg -v '0.18.4'
+bundle install --without development test
+
+sudo cp -a /opt/redmine-${OLD}/config/configuration.yml /opt/redmine/config/
+sudo cp -a /opt/redmine-${OLD}/config/database.yml /opt/redmine/config/
+
+RAILS_ENV=production rake db:migrate
+rake generate_secret_token
+
+sudo chown -R root:rvm redmine
+sudo chown -R root:rvm redmine-${NEW}
+
+rm -rf /opt/redmine/files
+ln -s /data/redmine-files /opt/redmine/files
