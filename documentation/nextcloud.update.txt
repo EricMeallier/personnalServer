@@ -1,5 +1,5 @@
-export NEW_VERSION=19.0.3
-export OLD_VERSION=18.0.9
+export NEW_VERSION=20.0.3
+export OLD_VERSION=19.0.6
 
 cd /opt/nextcloud
 sudo -u nobody php7.3 occ maintenance:mode --on
@@ -23,6 +23,7 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/bookmarks nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/spreed nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/deck nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/mail nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/twofactor_totp nextcloud/apps
 
 # restart services
 sudo systemctl restart nginx
