@@ -1,0 +1,6 @@
+[Unit]
+Description=Backup all data
+
+[Service]
+Type=simple
+ExecStart=/opt/backup.sh

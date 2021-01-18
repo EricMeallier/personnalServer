@@ -1,0 +1,8 @@
+[Unit]
+Description=Run backup.service every week
+
+[Timer]
+OnCalendar=*-*-01 02:00:00
+
+[Install]
+WantedBy=timers.target

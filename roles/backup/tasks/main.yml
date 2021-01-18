@@ -18,7 +18,28 @@
     dest: /opt/backup.sh
     mode: 'a+x'
 
-- name: Copy crontab expression for backup
+- name: Copy backup service
   copy:
-    src: crontab
-    dest: /etc/cron.d/backup
+    src: backup.service
+    dest: /etc/systemd/system/backup.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy backup timer
+  copy:
+    src: backup.timer
+    dest: /etc/systemd/system/backup.timer
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Backup service enabling
+  systemd:
+    name: 'backup.timer'
+    enabled: yes
+
+#- name: Copy crontab expression for backup
+#  copy:
+#    src: crontab
+#    dest: /etc/cron.d/backup
