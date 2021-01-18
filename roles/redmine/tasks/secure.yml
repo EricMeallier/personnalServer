@@ -39,13 +39,14 @@
     name: 'nginx'
     state: restarted
 
-- name: Install renew certificate in crontab
-  copy: 
-    src: crontab
-    dest: /etc/cron.d/certbotRenew
+- name: certbot pre hook
+  copy:
+    src: stopNginx.sh
+    dest: /etc/letsencrypt/renewal-hooks/pre/stopNginx.sh
+    mode: '0644'
 
-- name: Ensure default certbot renew is disabled
-  file:
-    path: /etc/cron.d/certbot
-    state: absent
-
+- name: certbot post hook
+  copy:
+    src: startNginx.sh
+    dest: /etc/letsencrypt/renewal-hooks/post/startNginx.sh
+    mode: '0644'

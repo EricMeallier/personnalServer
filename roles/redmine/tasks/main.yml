@@ -26,9 +26,10 @@
   when: not rvmExists.stat.isdir is defined or not rvmExists.stat.isdir
 
 - name: Adding user root to rvm users
-  user: name=root
-        group=rvm
-        append=yes
+  user:
+    name: 'root'
+    group: 'rvm'
+    append: yes
 
 - name: install ruby 2.6.3
   shell: /usr/local/rvm/bin/rvm install 2.6.3
@@ -72,9 +73,10 @@
     group: redmine
 
 - name: Adding user redmine to rvm users
-  user: name=redmine
-    group=rvm
-    append=yes
+  user:
+    name: 'redmine'
+    group: 'rvm'
+    append: yes
 
 - name: Download redmine files
   get_url:
