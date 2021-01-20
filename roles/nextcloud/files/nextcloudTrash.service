@@ -1,0 +1,6 @@
+[Unit]
+Description=Nextcloud Trash
+
+[Service]
+Type=simple
+ExecStart=/opt/nextcloudTrash.sh

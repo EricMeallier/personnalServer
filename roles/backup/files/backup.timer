@@ -1,5 +1,5 @@
 [Unit]
-Description=Run backup.service every week
+Description=Run backup.service every month
 
 [Timer]
 OnCalendar=*-*-01 02:00:00

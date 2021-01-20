@@ -1,0 +1,8 @@
+[Unit]
+Description=Certbot every week
+
+[Timer]
+OnCalendar=Sun *-*-* 01:00:00
+
+[Install]
+WantedBy=timers.target

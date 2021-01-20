@@ -38,8 +38,3 @@
   systemd:
     name: 'backup.timer'
     enabled: yes
-
-#- name: Copy crontab expression for backup
-#  copy:
-#    src: crontab
-#    dest: /etc/cron.d/backup
