@@ -79,3 +79,8 @@
   systemd:
     name: 'nextcloudTrash.timer'
     enabled: yes
+
+- name: logrotate configuration
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/nextcloud
