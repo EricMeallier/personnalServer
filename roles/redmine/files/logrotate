@@ -1,4 +1,4 @@
-/opt/redmine-4.1.0/log/production.log {
+/opt/redmine/log/production.log {
     su redmine redmine
     weekly
     rotate 5

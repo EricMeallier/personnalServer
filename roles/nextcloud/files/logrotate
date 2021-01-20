@@ -1,0 +1,9 @@
+/data/nextcloud/nextcloud.log {
+    su nobody nogroup
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}
