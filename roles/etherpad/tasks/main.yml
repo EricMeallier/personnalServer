@@ -30,16 +30,24 @@
     owner: etherpad
     group: etherpad
 
+- name: link to current version
+  file:
+    src: /opt/etherpad-lite-{{ etherpad.version }}
+    dest: /opt/etherpad-lite
+    state: 'link'
+    owner: 'redmine'
+    group: 'redmine'
+
 - name: Copy database configuration file
   template:
     src: settings.json
-    dest: /opt/etherpad-lite-{{ etherpad.version }}/settings.json
+    dest: /opt/etherpad-lite/settings.json
     owner: etherpad
     group: etherpad
     mode: '0644'
 
 - name: retrieve dependencies
-  shell: /opt/etherpad-lite-{{ etherpad.version }}/bin/installDeps.sh
+  shell: /opt/etherpad-lite/bin/installDeps.sh
   become_user: 'etherpad'
 
 - name: Install etherpad service script
