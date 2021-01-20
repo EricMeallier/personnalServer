@@ -53,7 +53,29 @@
     name: 'php7.3-fpm'
     state: restarted
 
-- name: Install empty recyclebin with crontab
-  copy: 
-    src: crontab
-    dest: /etc/cron.d/emptyNextcloudTrashbin
+- name: Copy emptyTrash script
+  copy:
+    src: nextcloudTrash.sh
+    dest: /opt/nextcloudTrash.sh
+    mode: 'a+x'
+
+- name: Copy emptyTrash service
+  copy:
+    src: nextcloudTrash.service
+    dest: /etc/systemd/system/nextcloudTrash.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy emptyTrash timer
+  copy:
+    src: nextcloudTrash.timer
+    dest: /etc/systemd/system/nextcloudTrash.timer
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enabling emptyTrash timer
+  systemd:
+    name: 'nextcloudTrash.timer'
+    enabled: yes
