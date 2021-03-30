@@ -1,0 +1,16 @@
+# persistant configuration for Debian 10
+
+sudo vi /etc/network/interfaces.d/50-cloud-init-ipv6.cfg
+
+iface eth0 inet6 static
+address 2001:41d0:305:2100:0:0:0:9b46
+netmask 128
+autoconf 0
+gateway 2001:41d0:0305:2100:0000:0000:0000:0001
+
+
+# manuel configuration
+
+sudo ip addr add 2001:41d0:305:2100:0:0:0:9b46/128 dev eth0
+sudo ip -6 route add 2001:41d0:0305:2100:0000:0000:0000:0001 dev eth0
+sudo ip -6 route add default via 2001:41d0:0305:2100:0000:0000:0000:0001 dev eth0
