@@ -1,5 +1,7 @@
-export OLD=4.1.0
-export NEW=4.1.1
+sudo su -
+
+export OLD=4.1.2
+export NEW=4.2.0
 
 cd /opt
 rm redmine
@@ -16,11 +18,13 @@ bundle install --without development test
 sudo cp -a /opt/redmine-${OLD}/config/configuration.yml /opt/redmine/config/
 sudo cp -a /opt/redmine-${OLD}/config/database.yml /opt/redmine/config/
 
-RAILS_ENV=production rake db:migrate
 rake generate_secret_token
+RAILS_ENV=production rake db:migrate
 
+cd /opt
 sudo chown -R root:rvm redmine
 sudo chown -R root:rvm redmine-${NEW}
+sudo chown -R nobody:nogroup /data/redmine-files
 
 rm -rf /opt/redmine/files
 ln -s /data/redmine-files /opt/redmine/files
