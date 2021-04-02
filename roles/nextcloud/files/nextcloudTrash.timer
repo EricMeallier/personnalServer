@@ -1,5 +1,5 @@
 [Unit]
-Description=Certbot every week
+Description=Nextcloud trash every week
 
 [Timer]
 OnCalendar=Sun *-*-* 01:00:00

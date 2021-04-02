@@ -39,14 +39,8 @@
     name: 'nginx'
     state: restarted
 
-- name: certbot pre hook
+- name: certbot deploy hook
   copy:
-    src: stopNginx.sh
-    dest: /etc/letsencrypt/renewal-hooks/pre/stopNginx.sh
-    mode: '0644'
-
-- name: certbot post hook
-  copy:
-    src: startNginx.sh
-    dest: /etc/letsencrypt/renewal-hooks/post/startNginx.sh
+    src: restartNginx.sh
+    dest: /etc/letsencrypt/renewal-hooks/deploy/restartNginx.sh
     mode: '0644'
