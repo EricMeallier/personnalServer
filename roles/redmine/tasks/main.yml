@@ -41,7 +41,7 @@
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install bundler -v '2.1.4'
 
 - name: install pg client
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install pg -v '1.2.2'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install pg -v '1.2.3'
 
 - name: install rmagick
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin; gem install rmagick -v '4.0.0'
