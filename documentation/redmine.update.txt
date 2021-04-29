@@ -1,7 +1,7 @@
 sudo su -
 
-export OLD=4.1.2
-export NEW=4.2.0
+export OLD=4.2.0
+export NEW=4.2.1
 
 cd /opt
 rm redmine
@@ -10,9 +10,9 @@ tar zxvf redmine-${NEW}.tar.gz
 ln -s /opt/redmine-${NEW} /opt/redmine
 
 cd /opt/redmine
-export PATH=$PATH:/usr/local/rvm/rubies/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3@global/bin
+export PATH=/usr/local/rvm/rubies/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3@global/bin:$PATH
 
-export CONFIGURE_ARGS="with-pg-include=/usr/include/postgresql";gem install pg -v '0.18.4'
+export CONFIGURE_ARGS="with-pg-include=/usr/include/postgresql";gem install pg -v '1.2.3'
 bundle install --without development test
 
 sudo cp -a /opt/redmine-${OLD}/config/configuration.yml /opt/redmine/config/
