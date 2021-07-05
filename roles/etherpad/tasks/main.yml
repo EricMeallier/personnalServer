@@ -1,10 +1,12 @@
 ---
 
+- name: install nodejs v12 dedicated repo
+  shell: '/usr/bin/curl -fsSL https://deb.nodesource.com/setup_1.x | sudo -E bash -'
+
 - name: install etherpad pre requisites
   apt: 
     name:
     - nodejs
-    - npm
     state: present
 
 - name: Ensure group "etherpad" exists
