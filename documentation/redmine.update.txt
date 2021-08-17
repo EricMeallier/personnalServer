@@ -1,7 +1,7 @@
 sudo su -
 
-export OLD=4.2.0
-export NEW=4.2.1
+export OLD=4.2.1
+export NEW=4.2.2
 
 cd /opt
 rm redmine
@@ -28,3 +28,5 @@ sudo chown -R nobody:nogroup /data/redmine-files
 
 rm -rf /opt/redmine/files
 ln -s /data/redmine-files /opt/redmine/files
+
+sudo chmod -R 777 /opt/redmine/public/plugin_assets
