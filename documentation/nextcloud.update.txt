@@ -1,5 +1,5 @@
-export NEW_VERSION=21.0.3
-export OLD_VERSION=21.0.2
+export NEW_VERSION=22.1.0
+export OLD_VERSION=21.0.3
 
 cd /opt/nextcloud
 sudo -u nobody php7.3 occ maintenance:mode --on
@@ -29,7 +29,9 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/twofactor_totp nextcloud/apps
 sudo systemctl restart nginx
 sudo systemctl restart php7.3-fpm
 
-# disable maintenance mode
+# upgrade to version
 cd /opt/nextcloud
 sudo -u nobody php7.3 occ upgrade
+
+# disable maintenance mode
 sudo -u nobody php7.3 occ maintenance:mode --off
