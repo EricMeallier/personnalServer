@@ -1,5 +1,5 @@
-export NEW_VERSION=22.1.1
-export OLD_VERSION=22.1.0
+export NEW_VERSION=22.2.0
+export OLD_VERSION=22.1.1
 
 cd /opt/nextcloud
 sudo -u nobody php7.3 occ maintenance:mode --on
