@@ -47,3 +47,8 @@ cp /var/lib/redis/dump.rdb ${targetDir}/ethercalc-${timestamp=}.rdb
 gzip -f ${targetDir}/ethercalc-${timestamp=}.rdb
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/ethercalc-${timestamp=}.rdb.gz
 rm -f ${targetDir}/ethercalc-${timestamp=}.rdb.gz
+
+# picocms
+tar zcvf ${targetDir}/picocms-${timestamp=}-data.tgz /data/picocms
+curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/picocms-${timestamp=}-data.tgz
+rm -f ${targetDir}/picocms-${timestamp=}-data.tgz
