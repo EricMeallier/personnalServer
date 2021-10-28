@@ -1,0 +1,74 @@
+---
+
+- name: install pre requisites
+  apt: 
+    name:
+    - php7.3-dom
+    - php7.3-mbstring
+    state: present
+
+- name: Download files
+  get_url:
+    url: https://github.com/picocms/Pico/releases/download/v{{pico.version}}/pico-release-v{{pico.version}}.tar.gz
+    dest: '/tmp/pico-{{pico.version}}.tar.gz'
+
+- name: Configuration folder creation
+  file:
+    path: '/opt/pico-{{pico.version}}'
+    state: 'directory'
+    owner: nobody
+    group: nogroup
+
+- name: Extract pico files into /opt
+  unarchive:
+    src: '/tmp/pico-{{pico.version}}.tar.gz'
+    dest: /opt/pico-{{pico.version}}
+    remote_src: 'yes'
+    owner: nobody
+    group: nogroup
+
+- name: link to current version
+  file:
+    src: /opt/pico-{{pico.version}}
+    dest: /opt/pico
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: directory for files under /data
+  file:
+    path: /data/picocms
+    state: 'directory'
+    owner: nobody
+    group: nogroup
+
+- name: remove old directory
+  file:
+    path: /opt/pico/content
+    state: 'absent'
+
+- name: link to data directory
+  file:
+    src: /data/picocms
+    dest: /opt/pico/content
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: Copy php FPM configuration file
+  copy:
+    src: pico.conf
+    dest: /etc/php/7.3/fpm/pool.d/pico.conf
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
+
+- name: PHP-FPM service restart
+  systemd:
+    name: 'php7.3-fpm'
+    state: restarted
