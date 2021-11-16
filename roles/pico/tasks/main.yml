@@ -35,22 +35,44 @@
     owner: nobody
     group: nogroup
 
-- name: directory for files under /data
+- name: directory content for files under /data
   file:
-    path: /data/picocms
+    path: /data/picocms/content
     state: 'directory'
+    recurse: yes
     owner: nobody
     group: nogroup
 
-- name: remove old directory
+- name: directory assets for files under /data
+  file:
+    path: /data/picocms/assets
+    state: 'directory'
+    recurse: yes
+    owner: nobody
+    group: nogroup
+
+- name: remove old directory content
   file:
     path: /opt/pico/content
     state: 'absent'
 
-- name: link to data directory
+- name: remove old directory assets
   file:
-    src: /data/picocms
+    path: /opt/pico/assets
+    state: 'absent'
+
+- name: link to data directory content
+  file:
+    src: /data/picocms/content
     dest: /opt/pico/content
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: link to data directory assets
+  file:
+    src: /data/picocms/assets
+    dest: /opt/pico/assets
     state: 'link'
     owner: nobody
     group: nogroup
