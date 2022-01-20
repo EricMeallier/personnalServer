@@ -1,0 +1,15 @@
+export OLD=0.12.3
+export NEW=0.12.4
+cd /opt
+sudo wget https://dl.gogs.io/${NEW}/gogs_${NEW}_linux_amd64.zip
+sudo rm -f gogs
+sudo unzip gogs_${NEW}_linux_amd64.zip
+sudo mv gogs gogs-${NEW}
+sudo cp -a gogs-${OLD}/custom gogs-${NEW}
+sudo cp -a gogs-${OLD}/data /opt/gogs-${NEW}/data
+sudo ln -s /opt/gogs-${NEW} /opt/gogs
+sudo chown -R gogs:gogs gogs
+sudo chown -R gogs:gogs gogs-${NEW}
+sudo chmod a+x gogs/gogs
+
+sudo systemctl restart gogs
