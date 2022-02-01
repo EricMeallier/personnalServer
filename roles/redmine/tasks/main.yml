@@ -133,6 +133,12 @@
     owner: 'redmine'
     group: 'redmine'
   
+- name: permission to tmp directory
+  file:
+    path: /data/redmine-4.1.0/tmp
+    state: 'touch'
+    mode: '777'
+
 - name: Install nginx service script
   copy:
     src: nginx.service
