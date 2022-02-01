@@ -25,6 +25,7 @@ cd /opt
 sudo chown -R root:rvm redmine
 sudo chown -R root:rvm redmine-${NEW}
 sudo chown -R nobody:nogroup /data/redmine-files
+sudo chmod 777 redmine/tmp
 
 rm -rf /opt/redmine/files
 ln -s /data/redmine-files /opt/redmine/files
