@@ -1,0 +1,58 @@
+---
+
+- name: install check pre requisites
+  apt: 
+    name:
+    - mutt
+    state: present
+
+- name: Mail personnal folder
+  file:
+    path: '/home/ovhuser/mail'
+    state: 'directory'
+    owner: ovhuser
+    group: ovhuser
+    mode: '0755'
+
+- name: Mail global spool folder
+  file:
+    path: '/var/spool/mail/'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Configuraiton mutt
+  copy:
+    src: muttrc
+    dest: /home/ovhuser/.muttrc
+    owner: ovhuser
+    group: ovhuser
+    mode: '0644'
+
+- name: Check version script
+  copy:
+    src: checkVersion.sh
+    dest: /opt/checkVersion.sh
+    mode: 'a+x'
+
+- name: Check version service
+  copy:
+    src: checkVersion.service
+    dest: /etc/systemd/system/checkVersion.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Check version timer
+  copy:
+    src: checkVersion.timer
+    dest: /etc/systemd/system/checkVersion.timer
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Check version enabling
+  systemd:
+    name: 'checkVersion.timer'
+    enabled: yes

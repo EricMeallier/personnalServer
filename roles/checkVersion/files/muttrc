@@ -1,0 +1,28 @@
+#### CONFIGURATION MUTT
+# Adresse électronique de l'expéditeur
+set from="service@meallier.fr"
+
+# Nom complet de l'expéditeur
+set realname = "Service"
+
+# Génération du champs from
+set use_from = yes
+
+# Définition des dossiers de travail de Mutt
+set spoolfile = /var/spool/mail/$USER
+set folder    = ~/mail
+# set tmpdir    = ~/tmp
+
+# Vim comme éditeur
+set editor = "vim -c 'set tw=72' -c 'set wrap'"
+
+### CONFIGURATION POP3
+# set pop_user = "test@unixmail.fr"
+# set pop_pass = "votre mot de passe POP"
+# set pop_delete = yes # On ne garde pas les mails sur le serveur
+# set pop_host = "pops://pop.unixmail.fr:995" #inutile de tester, c'est faux :)
+# set pop_last = yes / no INUTILE vu que pop_delete à yes
+
+### CONFIGURATION SMTP
+set smtp_pass = "M9ZFiYEmevb9rL7W"
+set smtp_url = "smtp://service@meallier.fr@mail.gandi.net:587"

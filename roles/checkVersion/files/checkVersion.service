@@ -1,0 +1,9 @@
+[Unit]
+Description=checkVersion
+
+[Service]
+Type=simple
+ExecStart=/opt/checkVersion.sh
+User=ovhuser
+
+
