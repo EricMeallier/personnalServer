@@ -8,10 +8,10 @@
 
 - name: Mail personnal folder
   file:
-    path: '/home/ovhuser/mail'
+    path: '/root/mail'
     state: 'directory'
-    owner: ovhuser
-    group: ovhuser
+    owner: root
+    group: root
     mode: '0755'
 
 - name: Mail global spool folder
@@ -25,9 +25,9 @@
 - name: Configuraiton mutt
   template:
     src: muttrc
-    dest: /home/ovhuser/.muttrc
-    owner: ovhuser
-    group: ovhuser
+    dest: /root/.muttrc
+    owner: root
+    group: root
     mode: '0644'
 
 - name: Check version script
