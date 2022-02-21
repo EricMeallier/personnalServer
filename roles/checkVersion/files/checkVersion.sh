@@ -24,7 +24,7 @@ REDMINE_VERSION=`curl -s https://redmine.org/ | grep "Download\" class=\"wiki-pa
 check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
 
 GOGS_CURRENT_VERSION=`ls -l /opt/gogs | sed -e 's/.*gogs-\(.*\)/\1/'`
-GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href="\.\/[0-9]' | tail -1 | sed -e 's/.*\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/'`
+GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href="\.\/[0-9]' | tail -1 | sed -e 's/.*\([0-9]\.[0-9]*\.[0-9]*\).*/\1/'`
 check_delta "Gogs" $GOGS_CURRENT_VERSION $GOGS_VERSION
 
 NEXTCLOUD_CURRENT_VERSION=`ls -l /opt/nextcloud | sed -e 's/.*nextcloud-\(.*\)/\1/'`

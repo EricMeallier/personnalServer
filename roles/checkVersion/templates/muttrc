@@ -24,5 +24,5 @@ set editor = "vim -c 'set tw=72' -c 'set wrap'"
 # set pop_last = yes / no INUTILE vu que pop_delete à yes
 
 ### CONFIGURATION SMTP
-set smtp_pass = "M9ZFiYEmevb9rL7W"
-set smtp_url = "smtp://service@meallier.fr@mail.gandi.net:587"
+set smtp_pass = "{{ mail.smtp.password }}"
+set smtp_url = "smtp://{{ mail.smtp.username }}@{{ mail.smtp.address }}:{{ mail.smtp.port }}"
