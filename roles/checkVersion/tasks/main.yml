@@ -23,7 +23,7 @@
     mode: '0644'
 
 - name: Configuraiton mutt
-  copy:
+  template:
     src: muttrc
     dest: /home/ovhuser/.muttrc
     owner: ovhuser
