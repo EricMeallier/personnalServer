@@ -38,3 +38,9 @@ check_delta "PicoCMS" $PICOCMS_CURRENT_VERSION $PICOCMS_VERSION
 ETHERPAD_CURRENT_VERSION=`ls -l /opt/etherpad-lite | sed -e 's/.*etherpad-lite-\(.*\)/\1/'`
 ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad-lite/releases/latest | grep "tag/" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
 check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
+
+
+IS_APT_UP_TODATE=`apt update | grep "can be upgraded" | wc -l`
+if [ "${IS_APT_UP_TODATE}" != "0" ]; then
+    envoi_mail "SYSTEM" "De nouvelles mises à jour sont disponibles pour apt"
+fi
