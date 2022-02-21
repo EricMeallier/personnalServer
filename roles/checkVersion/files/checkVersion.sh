@@ -5,33 +5,36 @@ envoi_mail () {
     mutt -s "Alerte Version $1: $2"  eric@meallier.fr < /dev/null
 }
 
+check_delta () {
+    app_name=$1
+    current_version=$2
+    available_version=$3
 
+    echo "$app_name avalaible in ${available_version} and is ${current_version}"
+
+    if [ "${available_version}" != "${current_version}" ]; then
+        envoi_mail ${app_name} "Nouvelle version ${available_version} pour remplacer ${current_version}"
+    fi
+
+
+}
 
 REDMINE_CURRENT_VERSION=`ls -l /opt/redmine | sed -e 's/.*redmine-\(.*\)/\1/'`
-REDMINE_VERSION=`curl -s https://redmine.org/ | grep "Download\" class=\"wiki-page\"" | sed -e "s/.*wiki-page\">\([0-9]\.[0-9]\.[0-9]\)\ .*wiki-page.*/\1/"`
-echo "Redmine avalaible version: ${REDMINE_VERSION} (${REDMINE_CURRENT_VERSION})"
-
-if [ "${REDMINE_VERSION}" != "${REDMINE_CURRENT_VERSION}" ]; then 
-    envoi_mail "Redmine" "il faut changer"
-fi
-
-
+REDMINE_VERSION=`curl -s https://redmine.org/ | grep "Download\" class=\"wiki-page\"" | sed -e "s/.*wiki-page\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*wiki-page.*/\1/"`
+check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
 
 GOGS_CURRENT_VERSION=`ls -l /opt/gogs | sed -e 's/.*gogs-\(.*\)/\1/'`
-GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href="\.\/[0-9]' | tail -1 | sed -e 's/.*\([0-9]\.[0-9]*\.[0-9]*\).*/\1/'`
-echo "Gogs avalaible version: ${GOGS_VERSION} (${GOGS_CURRENT_VERSION})"
-
-if [ "${GOGS_VERSION}" != "${GOGS_CURRENT_VERSION}" ]; then 
-    envoi_mail "Gogs" "il faut changer"
-fi
-
-
+GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href="\.\/[0-9]' | tail -1 | sed -e 's/.*\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/'`
+check_delta "Gogs" $GOGS_CURRENT_VERSION $GOGS_VERSION
 
 NEXTCLOUD_CURRENT_VERSION=`ls -l /opt/nextcloud | sed -e 's/.*nextcloud-\(.*\)/\1/'`
 NEXTCLOUD_VERSION=`curl -s https://nextcloud.com/install/#instructions-server | grep 'archive' | grep 'Latest stable version' | sed -e 's/.*Latest stable version:\ *\([^ ]*\)\ .*/\1/'`
-echo "Nextcloud avalaible version: ${NEXTCLOUD_VERSION} (${NEXTCLOUD_CURRENT_VERSION})"
+check_delta "Nextcloud" $NEXTCLOUD_CURRENT_VERSION $NEXTCLOUD_VERSION
 
-if [ "${NEXTCLOUD_VERSION}" != "${NEXTCLOUD_CURRENT_VERSION}" ]; then 
-    envoi_mail "Nextcloud" "il faut changer"
-fi
+PICOCMS_CURRENT_VERSION=`ls -l /opt/pico | sed -e 's/.*pico-\(.*\)/\1/'`
+PICOCMS_VERSION=`curl -sL https://github.com/picocms/Pico/releases/latest | grep "tag/v*" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
+check_delta "PicoCMS" $PICOCMS_CURRENT_VERSION $PICOCMS_VERSION
 
+ETHERPAD_CURRENT_VERSION=`ls -l /opt/etherpad-lite | sed -e 's/.*etherpad-lite-\(.*\)/\1/'`
+ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad-lite/releases/latest | grep "tag/" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
+check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
