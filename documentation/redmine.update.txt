@@ -1,11 +1,11 @@
 sudo su -
 
-export OLD=4.2.2
-export NEW=4.2.3
+export OLD=4.2.3
+export NEW=4.2.4
 
 cd /opt
 rm redmine
-wget http://www.redmine.org/releases/redmine-${NEW}.tar.gz
+wget http://www.redmine.org/attachments/download/28862/redmine-${NEW}.tar.gz
 tar zxvf redmine-${NEW}.tar.gz
 ln -s /opt/redmine-${NEW} /opt/redmine
 
@@ -30,4 +30,8 @@ sudo chmod 777 redmine/tmp
 rm -rf /opt/redmine/files
 ln -s /data/redmine-files /opt/redmine/files
 
-sudo chmod -R 777 /opt/redmine/public/plugin_assets
+chmod -R 777 /opt/redmine/public/plugin_assets
+
+systemctl restart nginx
+
+exit
