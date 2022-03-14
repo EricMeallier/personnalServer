@@ -8,9 +8,10 @@
   - redmine
   - gogs
   - nextcloud
-  - backup
-  - moodle
   - etherpad
   - ethercalc
+  - jitsi
+  - picocms
+  - backup
   - monit
   - checkVersion

@@ -37,8 +37,8 @@
     src: /opt/etherpad-lite-{{ etherpad.version }}
     dest: /opt/etherpad-lite
     state: 'link'
-    owner: 'redmine'
-    group: 'redmine'
+    owner: 'etherpad'
+    group: 'etherpad'
 
 - name: Copy database configuration file
   template:

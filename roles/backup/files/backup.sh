@@ -6,6 +6,14 @@ targetDir='/backup'
 
 auth=$(curl -s "https://api.pcloud.com/userinfo?getauth=1&username=eric@meallier.fr&password=XXXXX" | jq -r '.auth')
 
+systemctl stop nginx
+systemctl stop etherpad
+systemctl stop ethercalc
+systemctl stop gogs
+systemctl stop jicofo.service
+systemctl stop jitsi-videobridge2.service
+systemctl stop prosody.service
+
 ## gogs
 tar zcvf ${targetDir}/gogs-${timestamp=}-data.tar.gz /data/gogs-repositories
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/gogs-${timestamp=}-data.tar.gz
@@ -52,3 +60,13 @@ rm -f ${targetDir}/ethercalc-${timestamp=}.rdb.gz
 tar zcvf ${targetDir}/picocms-${timestamp=}-data.tgz /data/picocms
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/picocms-${timestamp=}-data.tgz
 rm -f ${targetDir}/picocms-${timestamp=}-data.tgz
+
+# restart
+systemctl restart postgresql
+systemctl start etherpad
+systemctl start ethercalc
+systemctl start gogs
+systemctl start jicofo.service
+systemctl start jitsi-videobridge2.service
+systemctl start prosody.service
+systemctl start nginx
