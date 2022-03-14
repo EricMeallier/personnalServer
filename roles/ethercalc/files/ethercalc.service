@@ -8,7 +8,7 @@ After=postgresql.service
 Type=simple
 User=ethercalc
 Group=ethercalc
-ExecStart=/usr/local/bin/ethercalc
+ExecStart=/usr/bin/ethercalc
 Restart=always
 
 [Install]

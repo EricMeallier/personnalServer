@@ -57,6 +57,13 @@
     group: root
     mode: '0644'
 
+- name: Gogs service reload/start
+  systemd:
+    name: 'gogs'
+    daemon_reload: true
+    state: started
+    enabled: true
+
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml
   when: redmine_unsecured

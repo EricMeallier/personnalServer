@@ -2,12 +2,12 @@
 
 - name: Copy unsecured nginx configuration file
   copy:
-    src: nextcloudUnsecured.conf
-    dest: /opt/nginx/conf/server/nextcloudUnsecured.conf
+    src: picoUnsecured.conf
+    dest: /opt/nginx/conf/server/picoUnsecured.conf
 
 - name: Nginx service reload/start
   systemd:
     name: 'nginx'
     daemon_reload: true
-    state: started
+    state: restarted
     enabled: true

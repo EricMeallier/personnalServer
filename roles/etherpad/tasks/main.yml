@@ -1,9 +1,18 @@
 ---
 
-- name: install nodejs v12 dedicated repo
-  shell: '/usr/bin/curl -fsSL https://deb.nodesource.com/setup_1.x | sudo -E bash -'
+- name: install nodejs pre requisites
+  apt: 
+    name:
+    - dirmngr
+    - apt-transport-https
+    - lsb-release
+    - ca-certificates
+    state: present
 
-- name: install etherpad pre requisites
+- name: install nodejs v12 dedicated repo
+  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -'
+
+- name: install nodejs v12
   apt: 
     name:
     - nodejs
@@ -60,6 +69,13 @@
     group: root
     mode: '0644'
 
+- name: etherpad service reload/start
+  systemd:
+    name: 'etherpad'
+    daemon_reload: true
+    state: started
+    enabled: true
+  
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml
   when: redmine_unsecured
