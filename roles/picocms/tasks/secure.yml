@@ -1,12 +1,5 @@
 ---
 
-- name: pico service reload/start
-  systemd:
-    name: 'nginx'
-    daemon_reload: true
-    state: started
-    enabled: true
-
 - name: generate certificate
   shell: /usr/bin/certbot certonly -d pico.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
       

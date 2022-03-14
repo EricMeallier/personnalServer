@@ -3,13 +3,6 @@
 - name: generate etherpad certificate
   shell: /usr/bin/certbot certonly -d etherpad.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
 
-- name: etherpad service reload/start
-  systemd:
-    name: 'etherpad'
-    daemon_reload: true
-    state: started
-    enabled: true
-  
 # finish installation with ssl termination
 - name: Copy full nginx ssl configuration file
   copy:
