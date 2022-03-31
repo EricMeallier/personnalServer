@@ -1,11 +1,11 @@
 sudo su -
 
-export OLD=4.2.3
-export NEW=4.2.4
+export OLD=4.2.4
+export NEW=4.2.5
 
 cd /opt
 rm redmine
-wget http://www.redmine.org/attachments/download/28862/redmine-${NEW}.tar.gz
+wget https://www.redmine.org/releases/redmine-${NEW}.tar.gz
 tar zxvf redmine-${NEW}.tar.gz
 ln -s /opt/redmine-${NEW} /opt/redmine
 
