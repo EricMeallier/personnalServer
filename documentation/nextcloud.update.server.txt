@@ -1,4 +1,4 @@
-export NEW_VERSION=23.0.4
+export NEW_VERSION=24.0.0
 export OLD_VERSION=23.0.3
 
 cd /opt/nextcloud
@@ -28,11 +28,11 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/notes nextcloud/notes
 
 # restart services
 sudo systemctl restart nginx
-sudo systemctl restart php7.3-fpm
+sudo systemctl restart php8.0-fpm
 
 # upgrade to version
 cd /opt/nextcloud
-sudo -u nobody php7.3 occ upgrade
+sudo -u nobody php8.0 occ upgrade
 
 # disable maintenance mode
-sudo -u nobody php7.3 occ maintenance:mode --off
+sudo -u nobody php8.0 occ maintenance:mode --off
