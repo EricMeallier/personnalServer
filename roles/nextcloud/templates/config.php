@@ -9,7 +9,7 @@ $CONFIG = array (
   ),
   'datadirectory' => '/opt/nextcloud/data',
   'dbtype' => 'pgsql',
-  'version' => '18.0.1.3',
+  'version' => '24.0.0',
   'overwrite.cli.url' => 'https://nextcloud.meallier.fr',
   'dbname' => '{{postgresql.nextcloud.database}}',
   'dbhost' => 'localhost',

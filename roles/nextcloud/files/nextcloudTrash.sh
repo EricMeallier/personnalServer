@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cd /opt/nextcloud; sudo -u nobody /usr/bin/php7.3 occ trashbin:cleanup rickou_412
+cd /opt/nextcloud; sudo -u nobody /usr/bin/php8.0 occ trashbin:cleanup rickou_412
