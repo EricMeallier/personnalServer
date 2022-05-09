@@ -1,5 +1,5 @@
-export OLD=0.12.5
-export NEW=0.12.6
+export OLD=0.12.6
+export NEW=0.12.7
 cd /opt
 sudo wget https://dl.gogs.io/${NEW}/gogs_${NEW}_linux_amd64.zip
 sudo rm -f gogs
