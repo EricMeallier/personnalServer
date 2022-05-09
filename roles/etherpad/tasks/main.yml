@@ -73,7 +73,7 @@
   systemd:
     name: 'etherpad'
     daemon_reload: true
-    state: started
+    state: restarted
     enabled: true
   
 - name: 'Insecure configuration (for Vagrant)'
