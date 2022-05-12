@@ -35,7 +35,7 @@ curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targe
 rm -f ${targetDir}/redmine-${timestamp=}.dmp.gz
 
 # nextcloud
-tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tgz /data/nextcloud
+GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tgz --exclude={"nextcloud.log*","*A_Trier"} /data/nextcloud
 curl -X POST "https://api.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/nextcloud-${timestamp=}-data.tgz
 rm -f ${targetDir}/nextcloud-${timestamp=}-data.tgz
 
