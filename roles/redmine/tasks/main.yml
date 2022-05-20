@@ -7,14 +7,17 @@
     - gnupg2
     - libcurl4-openssl-dev
     - libmagickwand-dev
-    - postgresql-client-11
-    - postgresql-server-dev-11
+    - postgresql-client-13
+    - postgresql-server-dev-13
     - unzip
     - imagemagick
     state: present
 
-- name: adding gpg key for rvm
-  shell: gpg --keyserver hkp://pgp.mit.edu:80  --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+- name: adding gpg key for rvm mpapis
+  shell: curl -sSL https://rvm.io/mpapis.asc | gpg --import -
+  
+- name: adding gpg key for rvm pkuczynski
+  shell: curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
   
 - name: check is rvm already installed
   stat:
@@ -31,23 +34,23 @@
     group: 'rvm'
     append: yes
 
-- name: install ruby 2.7.5
-  shell: /usr/local/rvm/bin/rvm install 2.7.5
+- name: install ruby {{ruby.version}}
+  shell: /usr/local/rvm/bin/rvm install {{ruby.version}}
 
-- name: use 2.7.5 ruby version
-  shell: /usr/local/rvm/bin/rvm --default use 2.7.5
-
-- name: install bundler
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; gem install bundler -v '2.3.8'
+- name: use {{ruby.version}} ruby version
+  shell: /usr/local/rvm/bin/rvm --default use {{ruby.version}}
 
 - name: install pg client
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; gem install pg -v '1.3.3'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '1.4.3'
 
 - name: install rmagick
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; gem install rmagick -v '4.2.4'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '4.2.6'
 
 - name: install passenger
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; gem install passenger -v '6.0.12'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '6.0.15'
+
+- name: install strscan
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '3.0.4'
 
 - name: check if nginx already exists
   stat: 
@@ -57,9 +60,9 @@
 - name: install nginx with passenger
   shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
   environment:
-    GEM_PATH: '/usr/local/rvm/gems/ruby-2.7.5:/usr/local/rvm/gems/ruby-2.7.5@global'
-    GEM_HOME: '/usr/local/rvm/gems/ruby-2.7.5'
-    PATH: '/usr/local/rvm/gems/ruby-2.7.5/bin:/usr/local/rvm/gems/ruby-2.7.5@global/bin:/usr/local/rvm/rubies/ruby-2.7.5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
+    GEM_PATH: '/usr/local/rvm/gems/ruby-{{ruby.version}}:/usr/local/rvm/gems/ruby-{{ruby.version}}@global'
+    GEM_HOME: '/usr/local/rvm/gems/ruby-{{ruby.version}}'
+    PATH: '/usr/local/rvm/gems/ruby-{{ruby.version}}/bin:/usr/local/rvm/gems/ruby-{{ruby.version}}@global/bin:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
   when: not nginx_exists.stat.exists
 
 - name: Ensure group "redmine" exists
@@ -80,67 +83,75 @@
 
 - name: Download redmine files
   get_url:
-    url: https://www.redmine.org/releases/redmine-4.2.4.tar.gz
-    dest: /tmp/redmine-4.2.4.tar.gz
-    checksum: sha256:cf649f5d4ff783582f82bebd4a5099ef63acb3d5573bbe6b4bf64f293c61c9ce
+    url: https://www.redmine.org/releases/redmine-{{redmine.version}}.tar.gz
+    dest: /tmp/redmine-{{redmine.version}}.tar.gz
+    checksum: sha256:{{redmine.checksum.sha256}}
     
 - name: Extract redmine files into /opt
   unarchive:
-    src: /tmp/redmine-4.2.4.tar.gz
+    src: /tmp/redmine-{{redmine.version}}.tar.gz
     dest: /opt
     remote_src: 'yes'
-    owner: redmine
-    group: redmine
+    owner: 'root'
+    group: 'rvm'
+
+- name: link to current version
+  file:
+    src: /opt/redmine-{{redmine.version}}
+    dest: /opt/redmine
+    state: 'link'
+    owner: 'root'
+    group: 'rvm'
 
 - name: Copy database configuration file
   template:
     src: database.yml
-    dest: /opt/redmine-4.2.4/config/database.yml
-    owner: redmine
-    group: redmine
+    dest: /opt/redmine/config/database.yml
+    owner: 'root'
+    group: 'rvm'
     mode: '0644'
 
 - name: retreive dependencies for redmine
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; bundle install --path=.
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install --path=.
   args:
-    chdir: '/opt/redmine-4.2.4/'
+    chdir: '/opt/redmine/'
   become_user: redmine
 
 - name: generate redmine token
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; bin/rake generate_secret_token
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bin/rake generate_secret_token
   args:
-    chdir: '/opt/redmine-4.2.4/'
+    chdir: '/opt/redmine/'
   become_user: redmine
 
 - name: migrate redmine database
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-2.7.5/bin; RAILS_ENV=production bin/rake db:migrate
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; RAILS_ENV=production bin/rake db:migrate
   args:
-    chdir: '/opt/redmine-4.2.4/'
+    chdir: '/opt/redmine/'
   become_user: redmine
 
 - name: directory for files under /data
   file:
     path: /data/redmine-files
     state: 'directory'
-    owner: 'redmine'
-    group: 'redmine'
+    owner: 'nobody'
+    group: 'nogroup'
 
 - name: remove default files directory
   file:
-    path: /opt/redmine-4.2.4/files
+    path: /opt/redmine-{{redmine.version}}/files
     state: 'absent'
 
 - name: link to data directory
   file:
     src: /data/redmine-files
-    dest: /opt/redmine-4.2.4/files
+    dest: /opt/redmine-{{redmine.version}}/files
     state: 'link'
-    owner: 'redmine'
-    group: 'redmine'
+    owner: 'nobody'
+    group: 'nogroup'
   
 - name: permission to tmp directory
   file:
-    path: /opt/redmine-4.2.4/tmp
+    path: /opt/redmine-{{redmine.version}}/tmp
     state: 'touch'
     mode: '777'
 
@@ -153,9 +164,12 @@
     mode: '0644'
 
 - name: Copy minimal nginx configuration file
-  copy:
+  template:
     src: minimal.conf
     dest: /opt/nginx/conf/nginx.conf
+    owner: 'root'
+    group: 'rvm'
+    mode: '0644'
 
 - name: Create external configuration for nginx
   file:

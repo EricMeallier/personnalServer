@@ -1,0 +1,16 @@
+---
+
+ruby:
+  version: 3.1.2
+  reducedversion: 3.1.0
+  gems:
+    passenger: 6.0.15
+    rmagick: 4.2.6
+    pg: 1.4.3
+    strscan: 3.0.4
+
+redmine:
+  version: 5.0.2
+  checksum: 
+    sha256: 4e718f44ba33716faf58c8fabf5d5f55b33c93426b7a33a83b5fc1b880585d57
+  package: tar.gz
