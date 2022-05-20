@@ -3,7 +3,7 @@
 - name: install postgresql server
   apt: 
     name:
-    - postgresql-11
+    - postgresql-13
     state: present
 ##################### Redmine
 - name: does the postgreql user redmine exists ?
@@ -28,7 +28,7 @@
 
 - name: Tuning of access for redmine
   lineinfile:
-    dest: /etc/postgresql/11/main/pg_hba.conf
+    dest: /etc/postgresql/13/main/pg_hba.conf
     regexp: "redmine"
     line: "local {{postgresql.redmine.database}} {{ postgresql.redmine.username }} md5"
 
@@ -55,7 +55,7 @@
 
 - name: Tuning of access for '{{ postgresql.gogs.username }}'
   lineinfile:
-    dest: /etc/postgresql/11/main/pg_hba.conf
+    dest: /etc/postgresql/13/main/pg_hba.conf
     regexp: "gogs"
     line: "local {{postgresql.gogs.database}} {{ postgresql.gogs.username }} md5"
 
@@ -75,16 +75,16 @@
   register: databaseExists
   become_user: 'postgres'
 
-- name: Tuning of access for '{{ postgresql.nextcloud.username }}'
-  lineinfile:
-    dest: /etc/postgresql/11/main/pg_hba.conf
-    regexp: "nextcloud"
-    line: "local {{postgresql.nextcloud.database}} {{ postgresql.nextcloud.username }} md5"
-
 - name: create '{{ postgresql.nextcloud.username }}' database
   shell: psql -c "CREATE DATABASE {{ postgresql.nextcloud.database }} OWNER {{ postgresql.nextcloud.username }}"
   become_user: 'postgres'
   when: databaseExists.stdout.find('found') != 1
+  
+- name: Tuning of access for '{{ postgresql.nextcloud.username }}'
+  lineinfile:
+    dest: /etc/postgresql/13/main/pg_hba.conf
+    regexp: "nextcloud"
+    line: "local {{postgresql.nextcloud.database}} {{ postgresql.nextcloud.username }} md5"
 
 ##################### Moodle
 - name: does the postgreql user '{{ postgresql.moodle.username }}' exists ?
@@ -109,7 +109,7 @@
 
 - name: Tuning of access for '{{ postgresql.moodle.username }}'
   lineinfile:
-    dest: /etc/postgresql/11/main/pg_hba.conf
+    dest: /etc/postgresql/13/main/pg_hba.conf
     regexp: "moodle"
     line: "local {{postgresql.moodle.database}} {{ postgresql.moodle.username }} md5"
 
@@ -136,6 +136,6 @@
 
 - name: Tuning of access for '{{ postgresql.etherpad.username }}'
   lineinfile:
-    dest: /etc/postgresql/11/main/pg_hba.conf
+    dest: /etc/postgresql/13/main/pg_hba.conf
     regexp: "etherpad"
     line: "local {{postgresql.etherpad.database}} {{ postgresql.etherpad.username }} md5"
