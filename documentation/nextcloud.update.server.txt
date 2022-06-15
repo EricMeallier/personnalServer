@@ -1,8 +1,8 @@
-export NEW_VERSION=24.0.0
-export OLD_VERSION=23.0.3
+export NEW_VERSION=24.0.1
+export OLD_VERSION=24.0.0
 
 cd /opt/nextcloud
-sudo -u nobody php7.3 occ maintenance:mode --on
+sudo -u nobody php8.0 occ maintenance:mode --on
 
 cd /opt
 # remove current link version
