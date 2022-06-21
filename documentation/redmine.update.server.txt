@@ -1,7 +1,7 @@
 sudo su -
 
-export OLD=4.2.5
-export NEW=4.2.6
+export OLD=5.0.1
+export NEW=5.0.2
 
 cd /opt
 rm redmine
@@ -13,10 +13,11 @@ cd /opt/redmine
 export PATH=/usr/local/rvm/rubies/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3/bin:/usr/local/rvm/gems/ruby-2.6.3@global/bin:$PATH
 
 export CONFIGURE_ARGS="with-pg-include=/usr/include/postgresql";gem install pg -v '1.2.3'
-bundle install --without development test
 
 sudo cp -a /opt/redmine-${OLD}/config/configuration.yml /opt/redmine/config/
 sudo cp -a /opt/redmine-${OLD}/config/database.yml /opt/redmine/config/
+
+bundle install --without development test
 
 rake generate_secret_token
 RAILS_ENV=production rake db:migrate
