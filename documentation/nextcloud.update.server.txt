@@ -36,3 +36,7 @@ sudo -u nobody php8.0 occ upgrade
 
 # disable maintenance mode
 sudo -u nobody php8.0 occ maintenance:mode --off
+
+# sweep old versions
+sudo mv nextcloud-${OLD_VERSION} toBeRemoved
+sudo rm nextcloud-${NEW_VERSION}.zip

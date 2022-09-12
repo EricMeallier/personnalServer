@@ -35,4 +35,7 @@ chmod -R 777 /opt/redmine/public/plugin_assets
 
 systemctl restart nginx
 
+mv /opt/redmine-${OLD} /opt/toBeRemoved
+rm /opt/redmine-${NEW}.tar.gz
+
 exit
