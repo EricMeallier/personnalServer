@@ -5,6 +5,8 @@
     name:
     - postgresql-13
     state: present
+    update_cache: yes
+
 ##################### Redmine
 - name: does the postgreql user redmine exists ?
   shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='{{ postgresql.redmine.username }}'"

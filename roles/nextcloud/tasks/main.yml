@@ -1,6 +1,14 @@
 ---
 
-- name: install gogs pre requisites
+- name: adding php repository
+  shell: 'echo deb https://packages.sury.org/php/ bullseye main > /etc/apt/sources.list.d/php.list'
+
+- name: adding php repository gpg key
+  get_url:
+    url: https://packages.sury.org/php/apt.gpg
+    dest: /etc/apt/trusted.gpg.d/php.gpg
+
+- name: install nextcloud pre requisites
   apt: 
     name:
     - php8.0-fpm
@@ -13,7 +21,9 @@
     - php8.0-intl
     - php8.0-zip
     - php8.0-gmp
+    - php8.0-redis
     state: present
+    update_cache: yes
 
 - name: Download next files
   get_url:
@@ -33,13 +43,19 @@
     src: www.conf
     dest: /etc/php/8.0/fpm/pool.d/www.conf
 
-#- name: Copy database configuration file
-#  template:
-#    src: config.php
-#    dest: /opt/nextcloud/config/config.php
-#    owner: nobody
-#    group: nogroup
-#    mode: '0640'
+- name: Configure database (config/config.php)
+  shell: 'sudo -u nobody php8.0 occ maintenance:install --install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/opt/nextcloud/data"'
+
+- name: Configure trusted domains (config/config.php)
+  shell: 'sudo -u nobody php8.0 occ  config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
+
+- name: Configure secure url overwrite (config/config.php)
+  shell: 'sudo -u nobody php8.0 occ  config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
+  when: redmine_unsecured
+
+- name: Configure url overwrite (config/config.php)
+  shell: 'sudo -u nobody php8.0 occ  config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
+  when: not redmine_unsecured
 
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml
