@@ -38,23 +38,42 @@
     owner: nobody
     group: nogroup
 
+- name: rename default folder name
+  command: 'mv /opt/nextcloud /opt/nextcloud-{{nextcloud.version}}'
+
+- name: link to current version
+  file:
+    src: /opt/nextcloud-{{ nextcloud.version }}
+    dest: /opt/nextcloud
+    state: 'link'
+    owner: 'nobody'
+    group: 'nogroup'
+
 - name: Copy php FPM configuration file
   copy:
     src: www.conf
     dest: /etc/php/8.0/fpm/pool.d/www.conf
 
 - name: Configure database (config/config.php)
-  shell: 'sudo -u nobody php8.0 occ maintenance:install --install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/opt/nextcloud/data"'
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/opt/nextcloud/data"'
+    chdir: '/opt/nextcloud'
 
 - name: Configure trusted domains (config/config.php)
-  shell: 'sudo -u nobody php8.0 occ  config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
+    chdir: '/opt/nextcloud'
 
 - name: Configure secure url overwrite (config/config.php)
-  shell: 'sudo -u nobody php8.0 occ  config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
+    chdir: '/opt/nextcloud'
   when: redmine_unsecured
 
 - name: Configure url overwrite (config/config.php)
-  shell: 'sudo -u nobody php8.0 occ  config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
+    chdir: '/opt/nextcloud'
   when: not redmine_unsecured
 
 - name: 'Insecure configuration (for Vagrant)'
@@ -101,3 +120,8 @@
   copy:
     src: logrotate
     dest: /etc/logrotate.d/nextcloud
+
+- name: PHP-FPM service restart
+  systemd:
+    name: 'php8.0-fpm'
+    state: restarted

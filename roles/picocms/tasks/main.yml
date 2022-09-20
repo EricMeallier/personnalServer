@@ -3,6 +3,8 @@
 - name: install pre requisites
   apt: 
     name:
+    - php7.3-fpm
+    - php7.3-common
     - php7.3-dom
     - php7.3-mbstring
     state: present
