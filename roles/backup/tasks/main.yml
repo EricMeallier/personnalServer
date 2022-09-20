@@ -13,10 +13,12 @@
     mode: '0777'
 
 - name: Copy backup script
-  copy:
+  template:
     src: backup.sh
     dest: /opt/backup.sh
-    mode: 'a+x'
+    owner: root
+    group: root
+    mode: '0600'
 
 - name: Copy backup service
   copy:

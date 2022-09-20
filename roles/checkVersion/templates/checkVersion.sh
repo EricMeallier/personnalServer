@@ -2,7 +2,7 @@
 
 
 envoi_mail () {
-    mutt -s "Alerte Version $1: $2"  eric@meallier.fr < /dev/null
+    mutt -s "Alerte Version $1: $2"  {{ mail.smtp.alertingTo }} < /dev/null
 }
 
 check_delta () {

@@ -4,7 +4,7 @@ timestamp=`date +%Y%m%d_%H%M`
 timestamp='last'
 targetDir='/backup'
 
-auth=$(curl -s "https://api.pcloud.com/userinfo?getauth=1&username=eric@meallier.fr&password=XXXXX" | jq -r '.auth')
+auth=$(curl -s "https://api.pcloud.com/userinfo?getauth=1&username={{ pcloud.username }}&password={{ pcloud.password }}" | jq -r '.auth')
 
 systemctl stop nginx
 systemctl stop etherpad

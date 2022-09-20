@@ -1,8 +1,8 @@
 <?php
 $CONFIG = array (
-  'instanceid' => 'oc0xrmtxnmop',
-  'passwordsalt' => 'XV94wQglyUSGZdNRxdgSRGrqt7zsj9',
-  'secret' => 'QuBmfni3gRxejJmT28GlzsDmXAX+E4w2jITaMLSfq9Lm3gZT',
+  'instanceid' => '{{ nextcloud.instanceid }}',
+  'passwordsalt' => '{{ nextcloud.passwordsalt }}',
+  'secret' => '{{ nextcloud.secret }}',
   'trusted_domains' => 
   array (
     0 => 'nextcloud.meallier.fr',
