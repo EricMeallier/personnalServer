@@ -10,8 +10,8 @@
   - nextcloud
   - etherpad
   - ethercalc
-  - jitsi
-  - picocms
+#  - jitsi
+#  - picocms
   - backup
   - monit
   - checkVersion
