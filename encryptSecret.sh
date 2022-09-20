@@ -17,15 +17,7 @@ if [ ! -r "${_utilities}" ]; then
 fi
 . "${_utilities}"
 
-ANSIBLE_FORCE_COLOR=true \
-ANSIBLE_HOST_KEY_CHECKING=false \
-ANSIBLE_SSH_ARGS="${_ssh_options}" \
-ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-ansible-playbook -i "${dir}/inventory" \
-  -l "${targetServer}" --user "${server_user}" \
-  --private-key="~/.ssh/${server_user}" "${dir}/${playbook}" \
-  --vault-id=user@~/.personnalVault \
-  -v
+ansible-vault encrypt --vault-id=user@~/.personnalVault ${dir}/inventory/group_vars/all/vault_business.yml
 checkForError "Setup failed"
 
 displayDuration
