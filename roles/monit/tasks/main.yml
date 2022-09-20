@@ -9,11 +9,17 @@
   copy:
     src:  config/settings.cfg
     dest: /etc/monit/conf.d/settings.cfg
+    owner: root
+    group: root
+    mode: '0600'
 
 - name: system.cfg
-  copy:
-    src:  config/system.cfg
+  template:
+    src:  system.cfg
     dest: /etc/monit/conf.d/system.cfg
+    owner: root
+    group: root
+    mode: '0600'
 
 - name: Monit service restart with full configuration
   systemd:

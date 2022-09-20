@@ -31,10 +31,12 @@
     mode: '0644'
 
 - name: Check version script
-  copy:
+  template:
     src: checkVersion.sh
     dest: /opt/checkVersion.sh
-    mode: 'a+x'
+    owner: root
+    group: root
+    mode: '0744'
 
 - name: Check version service
   copy:
