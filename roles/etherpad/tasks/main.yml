@@ -9,10 +9,10 @@
     - ca-certificates
     state: present
 
-- name: install nodejs v12 dedicated repo
-  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -'
+- name: install nodejs v16 dedicated repo
+  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -'
 
-- name: install nodejs v12
+- name: install nodejs
   apt: 
     name:
     - nodejs
@@ -32,6 +32,7 @@
   get_url:
     url: https://github.com/ether/etherpad-lite/archive/{{ etherpad.version }}.zip
     dest: '/tmp/etherpad-{{ etherpad.version }}.zip'
+    timeout: 30
 
 - name: Extract etherpad files into /opt
   unarchive:

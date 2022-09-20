@@ -9,8 +9,8 @@
     - ca-certificates
     state: present
 
-- name: install nodejs v12 dedicated repo
-  shell: '/usr/bin/curl -fsSL https://deb.nodesource.com/setup_1.x | sudo -E bash -'
+- name: install nodejs v16 dedicated repo
+  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -'
 
 - name: install ethercalc pre requisites
   apt: 

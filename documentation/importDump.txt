@@ -58,12 +58,12 @@ sudo scp -r -P 2323 root@92.222.25.212:/opt/owncloud-data/rickou_412/files/* /da
 sudo chown -R nobody:nogroup /data/nextcloud/caro/files
 sudo chown -R nobody:nogroup /data/nextcloud/rickou_412/files
 cd /opt/nextcloud
-sudo -u nobody php7.3 occ files:scan caro
-sudo -u nobody "cd /opt/nextcloud; php7.3 occ files:scan rickou_412"
+sudo -u nobody php8.0 occ files:scan caro
+sudo -u nobody "cd /opt/nextcloud; php8.0 occ files:scan rickou_412"
 
 *****************************
 
 10 02 * * 0 /usr/bin/certbot renew --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" >> /var/log/certbot.log
-10 04 10 01 ? cd /opt/nextcloud; sudo -u nobody /usr/bin/php7.3 occ trashbin:cleanup rickou_412
+10 04 10 01 ? cd /opt/nextcloud; sudo -u nobody /usr/bin/php8.0 occ trashbin:cleanup rickou_412
 
 
