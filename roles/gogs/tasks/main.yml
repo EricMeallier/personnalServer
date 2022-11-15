@@ -16,6 +16,16 @@
     name: gogs
     group: gogs
 
+- name: Is already installed ?
+  stat:
+    path: "/opt/gogs/custom/conf/app.ini"
+  register: already_installed
+
+- name: Is already downloaded ?
+  stat:
+    path: "'/tmp/gogs-{{gogs.version}}.zip'"
+  register: already_zip
+
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
@@ -23,11 +33,28 @@
   - pg_username: '{{ postgresql.gogs.username }}'
   - pg_password: '{{ postgresql.gogs.password }}'
   - pg_database: '{{ postgresql.gogs.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Download gogs files
   get_url:
     url: https://dl.gogs.io/{{ gogs.version }}/gogs_{{ gogs.version }}_linux_amd64.zip
     dest: '/tmp/gogs-{{ gogs.version }}.zip'
+  when: not already_zip.stat.exists is defined or not already_zip.stat.exists
+
+- name: Backup old installation, if needed
+  copy:
+    remote_src: true
+    src: '/opt/gogs/custom/conf/app.ini'
+    dest: '/opt/app.ini'
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Cleanup target folder
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+  - '/opt/gogs-{{gogs.version}}'
+  - '/opt/gogs'
 
 - name: Extract gogs files into /opt
   unarchive:
@@ -37,12 +64,34 @@
     owner: gogs
     group: gogs
 
+- name: rename default folder name
+  command: 'mv /opt/gogs /opt/gogs-{{gogs.version}}'
+
+- name: link to current version
+  file:
+    src: /opt/gogs-{{gogs.version}}
+    dest: /opt/gogs
+    state: 'link'
+    owner: 'gogs'
+    group: 'gogs'
+
 - name: Configuration folder creation
   file:
     path: '/opt/gogs/custom/conf'
     state: 'directory'
     owner: gogs
     group: gogs
+
+- name: Data folder creation
+  file:
+    path: '/data/gogs-repositories'
+    state: 'directory'
+    owner: gogs
+    group: gogs
+
+- name: Restore old configuration, if needed
+  command: mv /opt/app.ini /opt/gogs/custom/conf/app.ini
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Copy database configuration file
   template:
@@ -51,6 +100,7 @@
     owner: gogs
     group: gogs
     mode: '0644'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
   
 - name: Make executable gogs
   file:
@@ -69,8 +119,13 @@
   systemd:
     name: 'gogs'
     daemon_reload: true
-    state: started
+    state: restarted
     enabled: true
+
+- name: Create admin user
+  command: '/opt/gogs/gogs admin create-user --name {{ gogs.admin.username }} -password {{ gogs.admin.password }} --email {{ gogs.admin.email }} --admin'
+  become_user: 'gogs'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: 'Insecure configuration (for Vagrant)'
   include: unsecure.yml

@@ -7,38 +7,39 @@ targetDir='/backup'
 auth=$(curl -s "https://eapi.pcloud.com/userinfo?getauth=1&username={{ pcloud.username }}&password={{ pcloud.password }}" | jq -r '.auth')
 
 systemctl stop nginx
-systemctl stop etherpad
-systemctl stop ethercalc
+#systemctl stop etherpad
+#systemctl stop ethercalc
 systemctl stop gogs
+systemctl stop php8.0-fpm.service
 
 ## gogs
 tar zcvf ${targetDir}/gogs-${timestamp=}-data.tar.gz /data/gogs-repositories
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/gogs-${timestamp=}-data.tar.gz
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gogs-${timestamp=}-data.tar.gz
 rm -f ${targetDir}/gogs-${timestamp=}-data.tar.gz
 
 sudo su - postgres -c "pg_dump gogs > ${targetDir}/gogs-${timestamp=}.dmp"
 gzip -f ${targetDir}/gogs-${timestamp=}.dmp
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/gogs-${timestamp=}.dmp.gz
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gogs-${timestamp=}.dmp.gz
 rm -f ${targetDir}/gogs-${timestamp=}.dmp.gz
 
 # redmine
 tar zcvf ${targetDir}/redmine-${timestamp=}-files.tar.gz /data/redmine-files
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/redmine-${timestamp=}-files.tar.gz
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/redmine-${timestamp=}-files.tar.gz
 rm -f ${targetDir}/redmine-${timestamp=}-files.tar.gz
 
 sudo su - postgres -c "pg_dump redmine > ${targetDir}/redmine-${timestamp=}.dmp"
 gzip -f ${targetDir}/redmine-${timestamp=}.dmp
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/redmine-${timestamp=}.dmp.gz
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/redmine-${timestamp=}.dmp.gz
 rm -f ${targetDir}/redmine-${timestamp=}.dmp.gz
 
 # nextcloud
-GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tgz --exclude={"nextcloud.log*","*A_Trier","*BackupPC"} /data/nextcloud
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/nextcloud-${timestamp=}-data.tgz
-rm -f ${targetDir}/nextcloud-${timestamp=}-data.tgz
+GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tgz --exclude={"nextcloud.log*"} /data/nextcloud
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/nextcloud-${timestamp=}-data.tar.gz
+rm -f ${targetDir}/nextcloud-${timestamp=}-data.tar.gz
 
 sudo su - postgres -c "pg_dump nextcloud > ${targetDir}/nextcloud-${timestamp=}.dmp"
 gzip -f ${targetDir}/nextcloud-${timestamp=}.dmp
-curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}" -F update=@${targetDir}/nextcloud-${timestamp=}.dmp.gz
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/nextcloud-${timestamp=}.dmp.gz
 rm -f ${targetDir}/nextcloud-${timestamp=}.dmp.gz
 
 # etherpad
@@ -63,4 +64,5 @@ systemctl restart postgresql
 #systemctl start etherpad
 #systemctl start ethercalc
 systemctl start gogs
+systemctl start php8.0-fpm.service
 systemctl start nginx

@@ -36,7 +36,7 @@
     dest: /opt/checkVersion.sh
     owner: root
     group: root
-    mode: '0744'
+    mode: '0700'
 
 - name: Check version service
   copy:

@@ -1,0 +1,29 @@
+---
+
+- name: Getting auth token
+  shell: curl -s "https://eapi.pcloud.com/userinfo?getauth=1&username={{ pcloud.username }}&password={{ pcloud.password }}" | jq -r '.auth'
+  register: auth
+
+- name: Getting fileid
+  shell: curl -s -X GET "https://eapi.pcloud.com/listfolder?auth={{ auth.stdout }}&folderid={{ pcloud.folder.id }}" | jq -r --arg filename "{{ filename }}" '.metadata.contents[] | select(.name | test($filename)) | .fileid'
+  register: fileid
+
+- name: Getting path of file
+  shell: curl -X GET "https://eapi.pcloud.com/getfilelink?auth={{ auth.stdout }}&fileid={{ fileid.stdout }}" | jq -r '.path'
+  register: path
+
+- name: Getting host hosting the file
+  shell: curl -X GET "https://eapi.pcloud.com/getfilelink?auth={{ auth.stdout }}&fileid={{ fileid.stdout }}" | jq -r '.hosts[0]'
+  register: host
+
+- name: Declaring UrlToDownload
+  set_fact:
+    urltodownload: "https://{{ host.stdout }}{{ path.stdout }}"
+
+- name: Download the file
+  get_url:
+    url: '{{ urltodownload }}'
+    dest: '{{ foldername }}/{{ filename }}.gz'
+
+- name: Extract files
+  command: 'gunzip -f {{foldername }}/{{ filename }}.gz'
