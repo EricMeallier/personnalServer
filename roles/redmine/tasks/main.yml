@@ -12,6 +12,16 @@
     - imagemagick
     state: present
 
+- name: Is already installed ?
+  stat:
+    path: "/opt/redmine/config/database.yml"
+  register: already_installed
+
+- name: Is already downloaded ?
+  stat:
+    path: "'/tmp/redmine-{{redmine.version}}.tar.gz'"
+  register: already_zip
+
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
@@ -19,6 +29,7 @@
   - pg_username: '{{ postgresql.redmine.username }}'
   - pg_password: '{{ postgresql.redmine.password }}'
   - pg_database: '{{ postgresql.redmine.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: adding gpg key for rvm mpapis
   shell: curl -sSL https://rvm.io/mpapis.asc | gpg --import -
@@ -41,6 +52,11 @@
     group: 'rvm'
     append: yes
 
+- name: check if nginx already exists
+  stat: 
+    path: /opt/nginx/sbin/nginx
+  register: nginx_exists
+
 - name: install ruby {{ruby.version}}
   shell: /usr/local/rvm/bin/rvm install {{ruby.version}}
 
@@ -48,21 +64,17 @@
   shell: /usr/local/rvm/bin/rvm --default use {{ruby.version}}
 
 - name: install pg client
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '1.4.3'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '{{ ruby.gems.pg }}'
 
 - name: install rmagick
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '4.2.6'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '{{ ruby.gems.rmagick }}'
 
 - name: install passenger
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '6.0.15'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '{{ ruby.gems.passenger }}'
+  when: not nginx_exists.stat.exists
 
 - name: install strscan
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '3.0.4'
-
-- name: check if nginx already exists
-  stat: 
-    path: /opt/nginx/sbin/nginx
-  register: nginx_exists
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '{{ ruby.gems.strscan }}'
 
 - name: install nginx with passenger
   shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
@@ -88,12 +100,32 @@
     group: 'rvm'
     append: yes
 
+- name: Backup old installation, if needed
+  copy:
+    remote_src: true
+    src: '/opt/redmine/config/{{ item }}'
+    dest: '/opt/{{ item }}'
+  ignore_errors: true
+  loop: 
+  - 'configuration.yml'
+  - 'database.yml'
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Cleanup target folder
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+  - '/opt/redmine-{{redmine.version}}'
+  - '/opt/redmine'
+
 - name: Download redmine files
   get_url:
     url: https://www.redmine.org/releases/redmine-{{redmine.version}}.tar.gz
     dest: /tmp/redmine-{{redmine.version}}.tar.gz
     checksum: sha256:{{redmine.checksum.sha256}}
-    
+  when: not already_zip.stat.exists is defined or not already_zip.stat.exists
+
 - name: Extract redmine files into /opt
   unarchive:
     src: /tmp/redmine-{{redmine.version}}.tar.gz
@@ -117,8 +149,23 @@
     owner: 'root'
     group: 'rvm'
     mode: '0644'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
-- name: retreive dependencies for redmine
+- name: Restore old configuration, if needed
+  command: mv /opt/{{ item }} /opt/redmine/config/{{ item }}
+  loop:
+    - 'configuration.yml'
+    - 'database.yml'
+  ignore_errors: true
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: configure bundle tools
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle config set --local without 'development test'
+  args:
+    chdir: '/opt/redmine/'
+  become_user: redmine
+
+- name: retrieve dependencies for redmine
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install --path=.
   args:
     chdir: '/opt/redmine/'
@@ -164,7 +211,7 @@
 - name: permission to tmp directory
   file:
     path: /opt/redmine-{{redmine.version}}/tmp
-    state: 'touch'
+    state: 'directory'
     mode: '777'
 
 - name: Install nginx service script

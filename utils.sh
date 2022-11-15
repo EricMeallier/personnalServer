@@ -19,10 +19,17 @@ if [[ -z ${UseVagrant+x} ]]; then
   server_initial_root='root'
   server_initial_key=''
 else
-  # Vagrant
-  targetServer='vagrant'
-  server_initial_root='vagrant'
-  server_initial_key="${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
+  if [[ ${UseVagrant} = "local" ]]; then
+    # Vagrant
+    targetServer='vagrant'
+    server_initial_root='vagrant'
+    server_initial_key="${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
+  else
+    # Remote physical server
+    targetServer='vultr'
+    server_initial_root='root'
+    server_initial_key=''
+  fi
 fi
 
 #

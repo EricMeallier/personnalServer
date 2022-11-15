@@ -1,0 +1,25 @@
+---
+
+- name: Restore files from pcloud
+  include_role:
+    name : pcloud_restore_file
+  vars:
+  - foldername: '/tmp'
+  - filename: '{{ pg_filename }}'
+
+- name: delete existing database
+  shell: psql -c "DROP DATABASE {{ pg_database }}"
+  become_user: 'postgres'
+
+- name: create database
+  shell: psql -c "CREATE DATABASE {{ pg_database }} OWNER {{ pg_username }}"
+  become_user: 'postgres'
+
+- name: import database
+  shell : psql {{ pg_database }} < /tmp/{{ pg_filename }}
+  become_user: 'postgres'
+
+- name: remove imported file
+  file:
+    path: /tmp/{{ pg_filename }}
+    state: absent

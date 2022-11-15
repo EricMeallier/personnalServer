@@ -27,6 +27,11 @@
     state: present
     update_cache: yes
 
+- name: Is already installed ?
+  stat:
+    path: "/opt/nextcloud/config/config.php"
+  register: already_installed
+
 - name: Is already downloaded ?
   stat:
     path: "'/tmp/nextcloud-{{nextcloud.version}}.zip'"
@@ -36,14 +41,32 @@
   get_url:
     url: https://download.nextcloud.com/server/releases/nextcloud-{{nextcloud.version}}.zip
     dest: '/tmp/nextcloud-{{nextcloud.version}}.zip'
-  when: not nextcloud_zip.stat.exists is defined or not nextcloud_zip.stat.exists    
+  when: not nextcloud_zip.stat.exists is defined or not nextcloud_zip.stat.exists
+
+- name: Backup old installation (config), if needed
+  copy:
+    remote_src: true
+    src: '/opt/nextcloud/config/config.php'
+    dest: '/opt/config.php'
+  ignore_errors: true
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Backup old installation (apps), if needed
+  copy:
+    remote_src: true
+    src: '/opt/nextcloud/apps/{{ item }}'
+    dest: '/opt/{{ item }}'
+  ignore_errors: true
+  loop: "{{ nextcloud.appsToRestore }}"
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Cleanup target folder
   file:
-    path:
-    - '/opt/nextcloud-{{nextcloud.version}}'
-    - '/opt/nextcloud'
+    path: '{{ item }}'
     state: absent
+  loop:
+  - '/opt/nextcloud-{{nextcloud.version}}'
+  - '/opt/nextcloud'
 
 - name: Extract nextcloud files into /opt
   unarchive:
@@ -77,6 +100,16 @@
     owner: 'nobody'
     group: 'nogroup'
 
+- name: Restore old configuration, if needed
+  command: mv /opt/config.php /opt/nextcloud/config/config.php
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Restore old apps, if needed
+  command: mv /opt/{{ item }} /opt/nextcloud/apps/{{ item }}
+  ignore_errors: true
+  loop: "{{ nextcloud.appsToRestore }}"
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
@@ -84,31 +117,48 @@
   - pg_username: '{{ postgresql.nextcloud.username }}'
   - pg_password: '{{ postgresql.nextcloud.password }}'
   - pg_database: '{{ postgresql.nextcloud.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/data/nextcloud"'
+    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}" --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Force owner of config file
+  file:
+    path: '/opt/nextcloud/config/config.php'
+    owner: 'nobody'
+    group: 'nogroup'
+
+- name: Mise à jour de l'environnement occ
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ upgrade'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
 
 - name: Configure database (Missing-indices)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ db:add-missing-indices'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-primary keys)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ db:add-missing-primary-keys'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-columns)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ db:add-missing-columns'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (convert-filecache-bigint)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ db:convert-filecache-bigint'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure trusted domains (in config/config.php)
   shell: 

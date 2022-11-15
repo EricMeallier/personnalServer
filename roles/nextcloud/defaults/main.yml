@@ -1,4 +1,10 @@
 ---
 
 nextcloud:
-  version: 25.0.1
+  version: 25.0.3
+  appsToRestore:
+  - 'bookmarks'
+  - 'spreed'
+  - 'deck'
+  - 'mail'
+  - 'notes'
