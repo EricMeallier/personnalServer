@@ -22,13 +22,28 @@
     - php8.0-zip
     - php8.0-gmp
     - php8.0-redis
+    - php8.0-bcmath
+    - php8.0-imagick
     state: present
     update_cache: yes
 
-- name: Download next files
+- name: Is already downloaded ?
+  stat:
+    path: "'/tmp/nextcloud-{{nextcloud.version}}.zip'"
+  register: nextcloud_zip
+
+- name: Download nextcloud files
   get_url:
     url: https://download.nextcloud.com/server/releases/nextcloud-{{nextcloud.version}}.zip
     dest: '/tmp/nextcloud-{{nextcloud.version}}.zip'
+  when: not nextcloud_zip.stat.exists is defined or not nextcloud_zip.stat.exists    
+
+- name: Cleanup target folder
+  file:
+    path:
+    - '/opt/nextcloud-{{nextcloud.version}}'
+    - '/opt/nextcloud'
+    state: absent
 
 - name: Extract nextcloud files into /opt
   unarchive:
@@ -54,26 +69,62 @@
     src: www.conf
     dest: /etc/php/8.0/fpm/pool.d/www.conf
 
+- name: create data directory
+  file:
+    path: /data/nextcloud
+    state: directory
+    recurse: yes
+    owner: 'nobody'
+    group: 'nogroup'
+
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+  - pg_username: '{{ postgresql.nextcloud.username }}'
+  - pg_password: '{{ postgresql.nextcloud.password }}'
+  - pg_database: '{{ postgresql.nextcloud.database }}'
+
 - name: Configure database (config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/opt/nextcloud/data"'
-    chdir: '/opt/nextcloud'
+    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}"  --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin_username}}" --admin-pass "{{nextcloud.admin_password}}" --data-dir "/data/nextcloud"'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
 
-- name: Configure trusted domains (config/config.php)
+- name: Configure database (Missing-indices)
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ db:add-missing-indices'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+
+- name: Configure database (Missing-primary keys)
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ db:add-missing-primary-keys'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+
+- name: Configure database (Missing-columns)
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ db:add-missing-columns'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+
+- name: Configure database (convert-filecache-bigint)
+  shell: 
+    cmd: 'sudo -u nobody php8.0 occ db:convert-filecache-bigint'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+
+- name: Configure trusted domains (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
 
-- name: Configure secure url overwrite (config/config.php)
+- name: Configure secure url overwrite (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: redmine_unsecured
 
-- name: Configure url overwrite (config/config.php)
+- name: Configure url overwrite (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not redmine_unsecured
 
 - name: 'Insecure configuration (for Vagrant)'

@@ -9,6 +9,14 @@
     - ca-certificates
     state: present
 
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+  - pg_username: '{{ postgresql.etherpad.username }}'
+  - pg_password: '{{ postgresql.etherpad.password }}'
+  - pg_database: '{{ postgresql.etherpad.database }}'
+
 - name: install nodejs v16 dedicated repo
   shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -'
 

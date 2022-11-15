@@ -31,14 +31,13 @@ NEXTCLOUD_CURRENT_VERSION=`ls -l /opt/nextcloud | sed -e 's/.*nextcloud-\(.*\)/\
 NEXTCLOUD_VERSION=`curl -sL https://github.com/nextcloud/server/releases/latest | grep "tag/" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort -u | head -1`
 check_delta "Nextcloud" $NEXTCLOUD_CURRENT_VERSION $NEXTCLOUD_VERSION
 
-PICOCMS_CURRENT_VERSION=`ls -l /opt/pico | sed -e 's/.*pico-\(.*\)/\1/'`
-PICOCMS_VERSION=`curl -sL https://github.com/picocms/Pico/releases/latest | grep "tag/v*" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
-check_delta "PicoCMS" $PICOCMS_CURRENT_VERSION $PICOCMS_VERSION
+#PICOCMS_CURRENT_VERSION=`ls -l /opt/pico | sed -e 's/.*pico-\(.*\)/\1/'`
+#PICOCMS_VERSION=`curl -sL https://github.com/picocms/Pico/releases/latest | grep "tag/v*" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
+#check_delta "PicoCMS" $PICOCMS_CURRENT_VERSION $PICOCMS_VERSION
 
-ETHERPAD_CURRENT_VERSION=`ls -l /opt/etherpad-lite | sed -e 's/.*etherpad-lite-\(.*\)/\1/'`
-ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad-lite/releases/latest | grep "tag/" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
-check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
-
+#ETHERPAD_CURRENT_VERSION=`ls -l /opt/etherpad-lite | sed -e 's/.*etherpad-lite-\(.*\)/\1/'`
+#ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad-lite/releases/latest | grep "tag/" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
+#check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
 
 IS_APT_UP_TODATE=`apt update | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then

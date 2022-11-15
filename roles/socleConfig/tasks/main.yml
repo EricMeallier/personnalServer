@@ -1,0 +1,16 @@
+---
+
+- name: install socle packages
+  apt: 
+    name:
+    - unzip
+    state: present
+    update_cache: yes
+
+- name: Data folder creation
+  file:
+    path: '/data'
+    state: 'directory'
+    mode: '0777'
+    owner: root
+    group: root

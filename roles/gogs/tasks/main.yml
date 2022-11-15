@@ -16,6 +16,14 @@
     name: gogs
     group: gogs
 
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+  - pg_username: '{{ postgresql.gogs.username }}'
+  - pg_password: '{{ postgresql.gogs.password }}'
+  - pg_database: '{{ postgresql.gogs.database }}'
+
 - name: Download gogs files
   get_url:
     url: https://dl.gogs.io/{{ gogs.version }}/gogs_{{ gogs.version }}_linux_amd64.zip
