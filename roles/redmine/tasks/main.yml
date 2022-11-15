@@ -9,9 +9,16 @@
     - libmagickwand-dev
     - postgresql-client-13
     - postgresql-server-dev-13
-    - unzip
     - imagemagick
     state: present
+
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+  - pg_username: '{{ postgresql.redmine.username }}'
+  - pg_password: '{{ postgresql.redmine.password }}'
+  - pg_database: '{{ postgresql.redmine.database }}'
 
 - name: adding gpg key for rvm mpapis
   shell: curl -sSL https://rvm.io/mpapis.asc | gpg --import -

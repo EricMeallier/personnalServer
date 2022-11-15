@@ -4,14 +4,15 @@
   become: true
 
   roles:
+  - socleConfig
   - postgresql
   - redmine
   - gogs
   - nextcloud
-  - etherpad
-  - ethercalc
+#  - etherpad
+#  - ethercalc
 #  - jitsi
-#  - picocms
+#  - picocms    
   - backup
   - monit
   - checkVersion
