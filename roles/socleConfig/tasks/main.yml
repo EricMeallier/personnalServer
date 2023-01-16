@@ -14,3 +14,8 @@
     mode: '0777'
     owner: root
     group: root
+
+- name: Disable Root Login and Password
+  copy:
+    src: disable_root_login.conf
+    dest: /etc/ssh/ssh_config.d/disable_root_login.conf 
