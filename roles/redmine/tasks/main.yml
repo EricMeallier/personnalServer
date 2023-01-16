@@ -143,6 +143,11 @@
     owner: 'nobody'
     group: 'nogroup'
 
+- name: directory for logs
+  file:
+    path: /var/log/nginx
+    state: 'directory'
+
 - name: remove default files directory
   file:
     path: /opt/redmine-{{redmine.version}}/files

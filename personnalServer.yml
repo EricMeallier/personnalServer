@@ -12,7 +12,8 @@
 #  - etherpad
 #  - ethercalc
 #  - jitsi
-#  - picocms    
+#  - picocms
+  - fail2ban
   - backup
   - monit
   - checkVersion
