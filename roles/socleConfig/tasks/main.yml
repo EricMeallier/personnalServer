@@ -4,6 +4,7 @@
   apt: 
     name:
     - unzip
+    - systemd-timesyncd
     state: present
     update_cache: yes
 
@@ -18,4 +19,25 @@
 - name: Disable Root Login and Password
   copy:
     src: disable_root_login.conf
-    dest: /etc/ssh/ssh_config.d/disable_root_login.conf 
+    dest: /etc/ssh/ssh_config.d/disable_root_login.conf
+
+- name: Remove ntp daemon if present
+  apt:
+    name:
+    - ntp
+    state: absent
+
+- name: Configure systemd timesync for Europe pool
+  copy:
+    src: 'timesyncd.conf'
+    dest: '/etc/systemd/timesyncd.conf'
+
+- name: Enable Time synchronization
+  command: '/usr/bin/timedatectl set-ntp true'
+
+- name: Restart Time synchronization service
+  systemd:
+    name: 'systemd-timesyncd'
+    daemon_reload: true
+    state: 'restarted'
+    enabled: true
