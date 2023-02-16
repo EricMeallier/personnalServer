@@ -7,7 +7,7 @@ ruby:
     passenger: 6.0.17
     rmagick: 4.2.6
     pg: 1.4.5
-    strscan: 3.0.5
+    strscan: 3.0.6
 
 redmine:
   version: 5.0.4

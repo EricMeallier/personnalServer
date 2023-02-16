@@ -33,7 +33,7 @@ curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud
 rm -f ${targetDir}/redmine-${timestamp=}.dmp.gz
 
 # nextcloud
-GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tgz --exclude={"nextcloud.log*"} /data/nextcloud
+GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tar.gz --exclude={"nextcloud.log*"} /data/nextcloud
 curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/nextcloud-${timestamp=}-data.tar.gz
 rm -f ${targetDir}/nextcloud-${timestamp=}-data.tar.gz
 
