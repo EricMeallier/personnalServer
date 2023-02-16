@@ -41,3 +41,29 @@
     daemon_reload: true
     state: 'restarted'
     enabled: true
+
+- name: Ouverture firewall entrant (ssh, http, https)
+  ufw:
+    rule: 'allow'
+    proto: 'tcp'
+    port: '{{ item }}'
+  loop:
+  - '22'
+  - '80'
+  - '443'
+
+- name: Ouverture firewall sortant (https, smtps, dns, ntp)
+  ufw:
+    rule: 'allow'
+    direction: 'out'
+    port: '{{ item }}'
+  loop:
+  - '443'
+  - '465'
+  - '53'
+  - '123'
+
+- name: Deny by default for outgoing
+  ufw:
+    default: 'deny'
+    direction: 'outgoing'
