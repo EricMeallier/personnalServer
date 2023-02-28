@@ -28,7 +28,7 @@ else
     # Remote physical server
     targetServer='vultr'
     server_initial_root='root'
-    server_initial_key='~/.ssh/ovhuser'
+    server_initial_key='~/.ssh/${server_user}'
   fi
 fi
 
