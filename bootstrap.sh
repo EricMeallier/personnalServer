@@ -81,7 +81,7 @@ if [ -z ${server_initial_key} ]; then
     ANSIBLE_HOST_KEY_CHECKING=false \
     ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
     ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-    ansible-playbook -i "${dir}/inventory/inventory" -l "${targetServer}" --user "${server_initial_root}" \
+    ansible-playbook -i "${dir}/inventory" -l "${targetServer}" --user "${server_initial_root}" \
     --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml" --ask-pass
 else
@@ -89,7 +89,7 @@ else
     ANSIBLE_HOST_KEY_CHECKING=false \
     ANSIBLE_SSH_ARGS="${_ssh_options}" \
     ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-    ansible-playbook -i "${dir}/inventory/inventory" -l "${targetServer}" --user "${server_initial_root}" \
+    ansible-playbook -i "${dir}/inventory" -l "${targetServer}" --user "${server_initial_root}" \
     --private-key="${server_initial_key}" \
     --vault-id=user@~/.personnalVault \
     "${dir}/bootstrapPlaybook.yml"

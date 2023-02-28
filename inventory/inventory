@@ -11,10 +11,3 @@ ovh
 [remote:vars]
 ansible_ssh_host=redmine.meallier.fr
 ansible_ssh_port=22022
-
-[testing]
-vultr
-
-[testing:vars]
-ansible_ssh_host=95.179.196.14
-ansible_ssh_port=22
