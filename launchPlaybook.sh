@@ -17,6 +17,30 @@ if [ ! -r "${_utilities}" ]; then
 fi
 . "${_utilities}"
 
+usage() {
+  echo "Usage: $0 [-s <target server>]" 1>&2;
+  echo "Prerequisite file: ~/.personnalVault must contains the ansible_vault key" 1>&2;
+  exit 1;
+}
+
+targetServer=""
+
+
+while getopts ":s:" option; do
+    case "${option}" in
+        s)
+            targetServer=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+if [ -z "${targetServer}" ] || ! [ -f ~/.personnalVault ]; then
+    usage
+fi
+
 ANSIBLE_FORCE_COLOR=true \
 ANSIBLE_HOST_KEY_CHECKING=false \
 ANSIBLE_SSH_ARGS="${_ssh_options}" \
