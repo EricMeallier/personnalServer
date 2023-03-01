@@ -13,9 +13,11 @@ fi
 . "${_utilities}"
 
 
-export UseVagrant='testing'
+cd ${dir}/vm
+vagrant up
 
-cd ${dir}/terraform
-terraform destroy -auto-approve -var "vultr_api_key=${VULTR_API_KEY}"
+
+cd ${dir}
+./bootstrapVMAuthent.sh -a 127.0.0.1 -p 2222 -u 'vagrant' -k "${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
 
 displayDuration

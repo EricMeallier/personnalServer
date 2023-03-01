@@ -13,12 +13,9 @@ fi
 . "${_utilities}"
 
 
-export UseVagrant='testing'
-
 cd ${dir}/terraform
-terraform apply -auto-approve -var "vultr_api_key=${VULTR_API_KEY}"
-cd ${dir}
-./bootstrap.sh
-./launchPlaybook.sh
+terraform destroy -auto-approve -var "vultr_api_key=${VULTR_API_KEY}"
+cd ${dir}/vm
+vagrant destroy -f
 
 displayDuration

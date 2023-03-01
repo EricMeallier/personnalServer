@@ -9,28 +9,8 @@ set -o nounset  # fail on unset variables
 # Properties
 #
 
-server_user='ovhuser'
 _ssh_options='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=10'
 _ssh_options_light='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10'
-
-if [[ -z ${UseVagrant+x} ]]; then
-  # Remote physical server
-  targetServer='ovh'
-  server_initial_root='root'
-  server_initial_key=''
-else
-  if [[ ${UseVagrant} = "local" ]]; then
-    # Vagrant
-    targetServer='vagrant'
-    server_initial_root='vagrant'
-    server_initial_key="${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
-  else
-    # Remote physical server
-    targetServer='vultr'
-    server_initial_root='root'
-    server_initial_key='~/.ssh/${server_user}'
-  fi
-fi
 
 #
 # Utilities
@@ -106,3 +86,16 @@ displayDuration() {
   local _seconds=$(($_diff % 60))
   _info "Duration : $_minutes m $_seconds s"
 }
+
+# ssh key retrieved from ansible_vault
+server_user='ovhuser'
+_info "Retrieve ssh secret key from vault"
+# ssh-keygen -b 4096 -f ~/.ssh/${server_user} -N ''
+if [[ ! -f ~/.ssh/${server_user} ]]; then
+  ansible-vault decrypt --vault-id=user@~/.personnalVault "${dir}/encryptSshKey"
+  cp "${dir}/encryptSshKey" ~/.ssh/${server_user}
+  ssh-keygen -y -f ~/.ssh/${server_user} > ~/.ssh/${server_user}.pub
+  chmod 600 ~/.ssh/${server_user}
+  ansible-vault encrypt --vault-id=user@~/.personnalVault "${dir}/encryptSshKey"
+fi
+
