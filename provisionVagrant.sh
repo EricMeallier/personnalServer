@@ -18,6 +18,6 @@ vagrant up
 
 
 cd ${dir}
-./bootstrapVMAuthent.sh -a 127.0.0.1 -p 2222 -u 'vagrant' -k "${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
+./bootstrapVMAuthent.sh -t vagrantHosts -u 'vagrant' -k "${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
 
 displayDuration

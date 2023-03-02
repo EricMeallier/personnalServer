@@ -13,11 +13,10 @@ fi
 . "${_utilities}"
 
 
-cd ${dir}/terraform
-terraform destroy -auto-approve -var "vultr_api_key=${VULTR_API_KEY}"
-cd ${dir}/vm
-vagrant destroy -f
 cd ${dir}/docker
-docker compose -f docker-compose.yml -p test kill
+docker-compose -f docker-compose.yml -p test up --scale "app=3" --build -d
+
+cd ${dir}
+./bootstrapVMAuthent.sh -t dockerHosts -u admin
 
 displayDuration

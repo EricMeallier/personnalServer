@@ -8,7 +8,6 @@ set -o nounset  # fail on unset variables
 #
 # Properties
 #
-
 _ssh_options='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o IdentitiesOnly=yes -o ConnectTimeout=10'
 _ssh_options_light='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10'
 
