@@ -52,7 +52,7 @@ if command -v apt-get >/dev/null 2>&1 ; then
 }
 
 usage() {
-  echo "Usage: $0 [-a <initial_address>] [-p <initial_port>] [-u <initial_user, root ?>] [-k <initial_ssh_key_path>]" 1>&2;
+  echo "Usage: $0 [-a <initial_address>] [-p <initial_port>] [-u <initial_user, root ?>] [-k <initial_ssh_key_path>] [-t <server target>]" 1>&2;
   echo "Prerequisite file: ~/.personnalVault must containts the ansible_vault key" 1>&2;
   exit 1;
 }
@@ -70,18 +70,20 @@ checkForError "Install Ansible failed"
 #
 # Default values
 #
-server_initial_address=""
+server_initial_address=''
 server_initial_port=22
-server_initial_root=root
+server_initial_root='root'
 server_initial_key=""
+server_target=""
 
 #
 # Check arguments
 #
-while getopts ":a:u:k:p:" option; do
+while getopts ":a:u:k:p:t:" option; do
     case "${option}" in
         a)
             server_initial_address=${OPTARG}
+            server_target="initial_server"
             ;;
         u)
             server_initial_root=${OPTARG}
@@ -92,13 +94,16 @@ while getopts ":a:u:k:p:" option; do
         p)
             server_initial_port=${OPTARG}
             ;;
+        t)
+            server_target=${OPTARG}
+            ;;
         *)
             usage
             ;;
     esac
 done
 shift $((OPTIND-1))
-if [ -z "${server_initial_address}" ] || ! [ -f ~/.personnalVault ]; then
+if [ -z "${server_target}" ] && [ -z "${server_initial_address}" ] || ! [ -f ~/.personnalVault ]; then
     usage
 fi
 
@@ -106,7 +111,7 @@ temp_file_inventory=$(mktemp)
 trap 'rm -f "${temp_file_inventory}"' EXIT
 cat <<EOF > ${temp_file_inventory}
 [initial]
-intitial_server
+initial_server
 
 [initial:vars]
 ansible_ssh_host=${server_initial_address}
@@ -121,7 +126,7 @@ if [ -z ${server_initial_key} ]; then
   ANSIBLE_HOST_KEY_CHECKING=false \
   ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
   ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "intitial_server" --user "${server_initial_root}" \
+  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
   --vault-id=user@~/.personnalVault \
   "${dir}/bootstrapPlaybook.yml" --ask-pass
 else
@@ -129,7 +134,7 @@ else
   ANSIBLE_HOST_KEY_CHECKING=false \
   ANSIBLE_SSH_ARGS="${_ssh_options}" \
   ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "intitial_server" --user "${server_initial_root}" \
+  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
   --private-key="${server_initial_key}" \
   --vault-id=user@~/.personnalVault \
   "${dir}/bootstrapPlaybook.yml"

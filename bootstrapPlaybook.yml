@@ -1,7 +1,9 @@
 ---
 - hosts: all
+  gather_facts: no
 
   become: true
 
   roles:
+  - waitForSSH
   - ovhuser

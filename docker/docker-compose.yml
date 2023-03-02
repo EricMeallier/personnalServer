@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "22"
+    shm_size: 1500M
+    ipc: host
+    extra_hosts:
+      - "printer:10.0.0.15"

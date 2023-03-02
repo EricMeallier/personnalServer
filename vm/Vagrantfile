@@ -47,4 +47,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     echo "VM tartup finish !"
   SHELL
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "../pingPlaybook.yml"
+  end
 end
