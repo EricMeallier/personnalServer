@@ -7,7 +7,7 @@
     missingok
     notifempty
 }
-/var/log/*.nginx.log {
+/var/log/nginx/*.log {
     weekly
     rotate 5
     copytruncate
