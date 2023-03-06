@@ -92,6 +92,12 @@
     src: www.conf
     dest: /etc/php/8.0/fpm/pool.d/www.conf
 
+- name: Configure php FPM to set the memory allowed
+  replace:
+    dest: '/etc/php/8.0/fpm/php.ini'
+    regexp: '^memory_limit = .*$'
+    replace: 'memory_limit = 512M'
+
 - name: create data directory
   file:
     path: /data/nextcloud
