@@ -13,3 +13,8 @@ sudo chown -R gogs:gogs gogs-${NEW}
 sudo chmod a+x gogs/gogs
 
 sudo systemctl restart gogs
+
+# sweep old versions
+cd /opt
+sudo mv gogs-${OLD} toBeRemoved
+sudo rm gogs_${NEW}_linux_amd64.zip
