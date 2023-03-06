@@ -48,6 +48,13 @@
     dest: '/opt/app.ini'
   when: already_installed.stat.exists is defined and already_installed.stat.exists
 
+- name: Backup old installation data, if needed
+  copy:
+    remote_src: true
+    src: '/opt/gogs/data'
+    dest: '/opt/data'
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
 - name: Cleanup target folder
   file:
     path: '{{ item }}'
@@ -91,6 +98,10 @@
 
 - name: Restore old configuration, if needed
   command: mv /opt/app.ini /opt/gogs/custom/conf/app.ini
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Restore old configuration data, if needed
+  command: mv /opt/data /opt/gogs/data
   when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Copy database configuration file
