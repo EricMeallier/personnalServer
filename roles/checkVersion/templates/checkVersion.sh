@@ -20,7 +20,7 @@ check_delta () {
 }
 
 REDMINE_CURRENT_VERSION=`ls -l /opt/redmine | sed -e 's/.*redmine-\(.*\)/\1/'`
-REDMINE_VERSION=`curl -s https://redmine.org/ | grep "Download\" class=\"wiki-page\"" | sed -e "s/.*wiki-page\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*wiki-page.*/\1/"`
+REDMINE_VERSION=`curl -s https://redmine.org/ | grep "wiki-page" | grep "Download\"" | sed -e "s/.*Download\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*wiki-page.*/\1/"`
 check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
 
 GOGS_CURRENT_VERSION=`ls -l /opt/gogs | sed -e 's/.*gogs-\(.*\)/\1/'`
