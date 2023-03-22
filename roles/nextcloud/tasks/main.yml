@@ -11,19 +11,19 @@
 - name: install nextcloud pre requisites
   apt: 
     name:
-    - php8.0-fpm
-    - php8.0-common
-    - php8.0-gd
-    - php8.0-pgsql
-    - php8.0-curl
-    - php8.0-mbstring
-    - php8.0-xml
-    - php8.0-intl
-    - php8.0-zip
-    - php8.0-gmp
-    - php8.0-redis
-    - php8.0-bcmath
-    - php8.0-imagick
+    - php{{ php.version }}-fpm
+    - php{{ php.version }}-common
+    - php{{ php.version }}-gd
+    - php{{ php.version }}-pgsql
+    - php{{ php.version }}-curl
+    - php{{ php.version }}-mbstring
+    - php{{ php.version }}-xml
+    - php{{ php.version }}-intl
+    - php{{ php.version }}-zip
+    - php{{ php.version }}-gmp
+    - php{{ php.version }}-redis
+    - php{{ php.version }}-bcmath
+    - php{{ php.version }}-imagick
     state: present
     update_cache: yes
 
@@ -88,13 +88,13 @@
     group: 'nogroup'
 
 - name: Copy php FPM configuration file
-  copy:
+  template:
     src: www.conf
-    dest: /etc/php/8.0/fpm/pool.d/www.conf
+    dest: /etc/php/{{ php.version }}/fpm/pool.d/www.conf
 
 - name: Configure php FPM to set the memory allowed
   replace:
-    dest: '/etc/php/8.0/fpm/php.ini'
+    dest: '/etc/php/{{ php.version }}/fpm/php.ini'
     regexp: '^memory_limit = .*$'
     replace: 'memory_limit = 512M'
 
@@ -127,7 +127,7 @@
 
 - name: Configure database (config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}" --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
+    cmd: 'sudo -u nobody php{{ php.version }} occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}" --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
@@ -137,49 +137,56 @@
     owner: 'nobody'
     group: 'nogroup'
 
+- name: Add basics applications, if fresh install
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:install {{ item }}'
+    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+  loop: "{{ nextcloud.appsToRestore }}"
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
 - name: Mise à jour de l'environnement occ
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ upgrade'
+    cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
 
 - name: Configure database (Missing-indices)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ db:add-missing-indices'
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-indices'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-primary keys)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ db:add-missing-primary-keys'
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-primary-keys'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-columns)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ db:add-missing-columns'
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-columns'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (convert-filecache-bigint)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ db:convert-filecache-bigint'
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:convert-filecache-bigint'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure trusted domains (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
 
 - name: Configure secure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: redmine_unsecured
 
 - name: Configure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
     chdir: '/opt/nextcloud-{{nextcloud.version}}'
   when: not redmine_unsecured
 
@@ -193,11 +200,11 @@
 
 - name: PHP-FPM service restart
   systemd:
-    name: 'php8.0-fpm'
+    name: 'php{{ php.version }}-fpm'
     state: restarted
 
 - name: Copy emptyTrash script
-  copy:
+  template:
     src: nextcloudTrash.sh
     dest: /opt/nextcloudTrash.sh
     mode: 'a+x'
@@ -230,5 +237,5 @@
 
 - name: PHP-FPM service restart
   systemd:
-    name: 'php8.0-fpm'
+    name: 'php{{ php.version }}-fpm'
     state: restarted

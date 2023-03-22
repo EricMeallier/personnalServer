@@ -12,7 +12,7 @@
       
 # finish installation with ssl termination
 - name: Copy full nginx ssl configuration file
-  copy:
+  template:
     src: nextcloudSSL.conf
     dest: /opt/nginx/conf/server/nextcloudSSL.conf
 

@@ -69,7 +69,7 @@
 
 - name: Mise à jour de l'environnement occ
   shell: 
-    cmd: 'sudo -u nobody php8.0 occ upgrade'
+    cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
     chdir: '/opt/nextcloud'
 
 - name: Restore files from pcloud Nextcloud
