@@ -40,5 +40,5 @@ resource "local_file" "ansible_inventory" {
      main_ip = vultr_instance.my_instance.main_ip
     }
   )
-  filename = "../inventory/inventoryTerraform"
+  filename = "../inventory/inventoryTerraform.yml"
 }

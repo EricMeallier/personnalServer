@@ -1,6 +1,6 @@
 ---
 
-nextcloud:
+package:
   version: 26.0.0
   appsToRestore:
   - 'bookmarks'

@@ -19,7 +19,7 @@
 
 - name: Is already downloaded ?
   stat:
-    path: "'/tmp/redmine-{{redmine.version}}.tar.gz'"
+    path: '/tmp/redmine-{{ package.version }}.{{package.type}}'
   register: already_zip
 
 - name: Create dedicated database
@@ -116,19 +116,19 @@
     path: '{{ item }}'
     state: absent
   loop:
-  - '/opt/redmine-{{redmine.version}}'
+  - '/opt/redmine-{{package.version}}'
   - '/opt/redmine'
 
 - name: Download redmine files
   get_url:
-    url: https://www.redmine.org/releases/redmine-{{redmine.version}}.tar.gz
-    dest: /tmp/redmine-{{redmine.version}}.tar.gz
-    checksum: sha256:{{redmine.checksum.sha256}}
+    url: https://www.redmine.org/releases/redmine-{{package.version}}.{{package.type}}
+    dest: /tmp/redmine-{{package.version}}.{{package.type}}
+    checksum: sha256:{{package.checksum.sha256}}
   when: not already_zip.stat.exists is defined or not already_zip.stat.exists
 
 - name: Extract redmine files into /opt
   unarchive:
-    src: /tmp/redmine-{{redmine.version}}.tar.gz
+    src: /tmp/redmine-{{package.version}}.{{package.type}}
     dest: /opt
     remote_src: 'yes'
     owner: 'root'
@@ -136,7 +136,7 @@
 
 - name: link to current version
   file:
-    src: /opt/redmine-{{redmine.version}}
+    src: /opt/redmine-{{package.version}}
     dest: /opt/redmine
     state: 'link'
     owner: 'root'
@@ -197,22 +197,25 @@
 
 - name: remove default files directory
   file:
-    path: /opt/redmine-{{redmine.version}}/files
+    path: /opt/redmine-{{package.version}}/files
     state: 'absent'
 
 - name: link to data directory
   file:
     src: /data/redmine-files
-    dest: /opt/redmine-{{redmine.version}}/files
+    dest: /opt/redmine-{{package.version}}/files
     state: 'link'
     owner: 'nobody'
     group: 'nogroup'
   
 - name: permission to tmp directory
   file:
-    path: /opt/redmine-{{redmine.version}}/tmp
+    path: /opt/redmine-{{package.version}}/tmp
     state: 'directory'
     mode: '777'
+    owner: 'nobody'
+    group: 'nogroup'
+    recurse: true
 
 - name: Install nginx service script
   copy:
@@ -243,13 +246,53 @@
     state: started
     enabled: true
 
-- name: 'Insecure configuration (for Vagrant)'
-  include: unsecure.yml
-  when: redmine_unsecured
-    
-- name: 'Secure configuration (for Internet)'
-  include: secure.yml
+# certbot installation
+- name: install certobot wth dependencies
+  apt: 
+    name:
+    - certbot
+    state: present
+
+- name: create acme challenge folder
+  file:
+    path: /opt/nginx/html/.well-known/acme-challenge
+    state: directory
+    recurse: yes
+    owner: redmine
+    group: redmine
+    mode: u+rxw,g+rw,o+rw
+
+- name: generate redmine certificate
+  shell: /usr/bin/certbot certonly -d redmine.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
+
+- name: check is DH already exists
+  stat:
+    path: /etc/redmine.dhparam.pem
+  register: DHExists
+  when: not redmine_unsecured
+
+- name: generate Secure Diffie-Hellman
+  shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
+  when: not redmine_unsecured and ( not DHExists.stat.exists is defined or not DHExists.stat.exists)
+
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: redmine.conf
+    dest: /opt/nginx/conf/server/redmine.conf
+
+- name: certbot deploy hook
+  copy:
+    src: restartNginx.sh
+    dest: /etc/letsencrypt/renewal-hooks/deploy/restartNginx.sh
+    mode: '0644'
+  when: not redmine_unsecured
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
 
 - name: logrotate configuration
   copy:
