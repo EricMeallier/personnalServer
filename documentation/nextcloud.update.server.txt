@@ -1,5 +1,5 @@
-export NEW_VERSION=25.0.4
-export OLD_VERSION=25.0.3
+export NEW_VERSION=26.0.0
+export OLD_VERSION=25.0.4
 
 cd /opt/nextcloud
 sudo -u nobody php8.0 occ maintenance:mode --on
@@ -23,7 +23,6 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/bookmarks nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/spreed nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/deck nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/mail nextcloud/apps
-sudo cp -a nextcloud-${OLD_VERSION}/apps/twofactor_totp nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/notes nextcloud/notes
 
 # restart services
