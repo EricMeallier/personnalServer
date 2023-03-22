@@ -34,13 +34,13 @@
 
 - name: Is already downloaded ?
   stat:
-    path: "'/tmp/nextcloud-{{nextcloud.version}}.zip'"
+    path: "'/tmp/nextcloud-{{package.version}}.zip'"
   register: nextcloud_zip
 
 - name: Download nextcloud files
   get_url:
-    url: https://download.nextcloud.com/server/releases/nextcloud-{{nextcloud.version}}.zip
-    dest: '/tmp/nextcloud-{{nextcloud.version}}.zip'
+    url: https://download.nextcloud.com/server/releases/nextcloud-{{package.version}}.zip
+    dest: '/tmp/nextcloud-{{package.version}}.zip'
   when: not nextcloud_zip.stat.exists is defined or not nextcloud_zip.stat.exists
 
 - name: Backup old installation (config), if needed
@@ -56,8 +56,10 @@
     remote_src: true
     src: '/opt/nextcloud/apps/{{ item }}'
     dest: '/opt/{{ item }}'
+    owner: 'nobody'
+    group: 'nogroup'
   ignore_errors: true
-  loop: "{{ nextcloud.appsToRestore }}"
+  loop: "{{ package.appsToRestore }}"
   when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Cleanup target folder
@@ -65,23 +67,23 @@
     path: '{{ item }}'
     state: absent
   loop:
-  - '/opt/nextcloud-{{nextcloud.version}}'
+  - '/opt/nextcloud-{{package.version}}'
   - '/opt/nextcloud'
 
 - name: Extract nextcloud files into /opt
   unarchive:
-    src: '/tmp/nextcloud-{{nextcloud.version}}.zip'
+    src: '/tmp/nextcloud-{{package.version}}.zip'
     dest: /opt
     remote_src: 'yes'
-    owner: nobody
-    group: nogroup
+    owner: 'nobody'
+    group: 'nogroup'
 
 - name: rename default folder name
-  command: 'mv /opt/nextcloud /opt/nextcloud-{{nextcloud.version}}'
+  command: 'mv /opt/nextcloud /opt/nextcloud-{{package.version}}'
 
 - name: link to current version
   file:
-    src: /opt/nextcloud-{{ nextcloud.version }}
+    src: /opt/nextcloud-{{ package.version }}
     dest: /opt/nextcloud
     state: 'link'
     owner: 'nobody'
@@ -113,7 +115,7 @@
 - name: Restore old apps, if needed
   command: mv /opt/{{ item }} /opt/nextcloud/apps/{{ item }}
   ignore_errors: true
-  loop: "{{ nextcloud.appsToRestore }}"
+  loop: "{{ package.appsToRestore }}"
   when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Create dedicated database
@@ -128,7 +130,7 @@
 - name: Configure database (config/config.php)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}" --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Force owner of config file
@@ -140,63 +142,77 @@
 - name: Add basics applications, if fresh install
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ app:install {{ item }}'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
-  loop: "{{ nextcloud.appsToRestore }}"
+    chdir: '/opt/nextcloud-{{package.version}}'
+  loop: "{{ package.appsToRestore }}"
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Mise à jour de l'environnement occ
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure database (Missing-indices)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-indices'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-primary keys)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-primary-keys'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (Missing-columns)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-columns'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (convert-filecache-bigint)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ db:convert-filecache-bigint'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure trusted domains (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure secure url overwrite (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: redmine_unsecured
 
 - name: Configure url overwrite (in config/config.php)
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
-    chdir: '/opt/nextcloud-{{nextcloud.version}}'
+    chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
-- name: 'Insecure configuration (for Vagrant)'
-  include: unsecure.yml
-  when: redmine_unsecured
-    
-- name: 'Secure configuration (for Internet)'
-  include: secure.yml
+- name: nextcloud service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: generate redmine certificate
+  shell: /usr/bin/certbot certonly -d nextcloud.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Template nginx configuration file
+  template:
+    src: nextcloud.conf
+    dest: /opt/nginx/conf/server/nextcloud.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
 
 - name: PHP-FPM service restart
   systemd:
@@ -234,8 +250,3 @@
   copy:
     src: logrotate
     dest: /etc/logrotate.d/nextcloud
-
-- name: PHP-FPM service restart
-  systemd:
-    name: 'php{{ php.version }}-fpm'
-    state: restarted

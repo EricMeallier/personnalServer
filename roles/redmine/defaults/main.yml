@@ -9,8 +9,8 @@ ruby:
     pg: 1.4.6
     strscan: 3.0.6
 
-redmine:
+package:
   version: 5.0.5
   checksum: 
     sha256: a89ad1c4bb9bf025e6527c77ab18c8faf7749c94a975caf2cfdbba00eb12a481
-  package: tar.gz
+  type: tar.gz

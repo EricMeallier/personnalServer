@@ -23,7 +23,7 @@
 
 - name: Is already downloaded ?
   stat:
-    path: "'/tmp/gogs-{{gogs.version}}.zip'"
+    path: "'/tmp/gogs-{{package.version}}.zip'"
   register: already_zip
 
 - name: Create dedicated database
@@ -37,8 +37,8 @@
 
 - name: Download gogs files
   get_url:
-    url: https://dl.gogs.io/{{ gogs.version }}/gogs_{{ gogs.version }}_linux_amd64.zip
-    dest: '/tmp/gogs-{{ gogs.version }}.zip'
+    url: https://dl.gogs.io/{{ package.version }}/gogs_{{ package.version }}_linux_amd64.zip
+    dest: '/tmp/gogs-{{ package.version }}.zip'
   when: not already_zip.stat.exists is defined or not already_zip.stat.exists
 
 - name: Backup old installation, if needed
@@ -53,6 +53,8 @@
     remote_src: true
     src: '/opt/gogs/data'
     dest: '/opt/data'
+    owner: gogs
+    group: gogs    
   when: already_installed.stat.exists is defined and already_installed.stat.exists
 
 - name: Cleanup target folder
@@ -60,23 +62,23 @@
     path: '{{ item }}'
     state: absent
   loop:
-  - '/opt/gogs-{{gogs.version}}'
+  - '/opt/gogs-{{package.version}}'
   - '/opt/gogs'
 
 - name: Extract gogs files into /opt
   unarchive:
-    src: '/tmp/gogs-{{ gogs.version }}.zip'
+    src: '/tmp/gogs-{{ package.version }}.zip'
     dest: /opt
     remote_src: 'yes'
     owner: gogs
     group: gogs
 
 - name: rename default folder name
-  command: 'mv /opt/gogs /opt/gogs-{{gogs.version}}'
+  command: 'mv /opt/gogs /opt/gogs-{{package.version}}'
 
 - name: link to current version
   file:
-    src: /opt/gogs-{{gogs.version}}
+    src: /opt/gogs-{{package.version}}
     dest: /opt/gogs
     state: 'link'
     owner: 'gogs'
@@ -138,13 +140,27 @@
   become_user: 'gogs'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
-- name: 'Insecure configuration (for Vagrant)'
-  include: unsecure.yml
-  when: redmine_unsecured
-    
-- name: 'Secure configuration (for Internet)'
-  include: secure.yml
+- name: nextcloud service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: generate gogs certificate
+  shell: /usr/bin/certbot certonly -d gogs.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: gogs.conf
+    dest: /opt/nginx/conf/server/gogs.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
 
 - name: logrotate configuration
   copy:

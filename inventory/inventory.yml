@@ -1,0 +1,6 @@
+remote:
+    hosts:
+        ovh:
+            ansible_port: 22022
+            ansible_host: redmine.meallier.fr
+            ansible_private_key_file: ~/.ssh/ovhuser
