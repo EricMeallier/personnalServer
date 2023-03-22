@@ -4,3 +4,6 @@
 
 # vars for environment
 redmine_unsecured: True
+
+php:
+  version: 8.2

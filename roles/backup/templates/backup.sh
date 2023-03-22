@@ -10,7 +10,7 @@ systemctl stop nginx
 #systemctl stop etherpad
 #systemctl stop ethercalc
 systemctl stop gogs
-systemctl stop php8.0-fpm.service
+systemctl stop php{{ php.version }}-fpm.service
 
 ## gogs
 tar zcvf ${targetDir}/gogs-${timestamp=}-data.tar.gz /data/gogs-repositories
@@ -64,5 +64,5 @@ systemctl restart postgresql
 #systemctl start etherpad
 #systemctl start ethercalc
 systemctl start gogs
-systemctl start php8.0-fpm.service
+systemctl start php{{ php.version }}-fpm.service
 systemctl start nginx
