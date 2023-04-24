@@ -1,12 +1,12 @@
-export NEW_VERSION=26.0.0
-export OLD_VERSION=25.0.4
+export NEW_VERSION=26.0.1
+export OLD_VERSION=26.0.0
 
-cd /opt/nextcloud
-sudo -u nobody php8.0 occ maintenance:mode --on
+cd /opt/nextcloud-${OLD_VERSION}
+sudo -u nobody php8.2 occ maintenance:mode --on
 
 cd /opt
 # remove current link version
-sudo rm nextcloud
+sudo rm -f nextcloud
 
 # unzip new verion
 sudo wget  https://download.nextcloud.com/server/releases/nextcloud-${NEW_VERSION}.zip
@@ -27,16 +27,17 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/notes nextcloud/notes
 
 # restart services
 sudo systemctl restart nginx
-sudo systemctl restart php8.0-fpm
+sudo systemctl restart php8.2-fpm
 
 # upgrade to version
 cd /opt/nextcloud
-sudo -u nobody php8.0 occ upgrade
+sudo -u nobody php8.2 occ upgrade
 
 # disable maintenance mode
-sudo -u nobody php8.0 occ maintenance:mode --off
+sudo -u nobody php8.2 occ maintenance:mode --off
 
 # sweep old versions
 cd /opt
+sudo mkdir -p toBeRemoved
 sudo mv nextcloud-${OLD_VERSION} toBeRemoved
 sudo rm nextcloud-${NEW_VERSION}.zip
