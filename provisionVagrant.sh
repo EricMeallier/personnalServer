@@ -14,6 +14,7 @@ fi
 
 
 cd ${dir}/vm
+vagrant plugin install vagrant-disksize
 vagrant up
 
 
