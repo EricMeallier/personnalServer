@@ -1,0 +1,82 @@
+---
+
+- name: install nodejs pre requisites
+  apt: 
+    name:
+    - dirmngr
+    - apt-transport-https
+    - lsb-release
+    - ca-certificates
+    - curl
+    state: present
+
+- name: install nodejs v16 dedicated repo
+  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -'
+
+- name: install pre requisites
+  apt: 
+    name:
+    - nodejs
+    - git
+    update_cache: yes
+    state: 'latest'
+
+- name: Ensure dedicated group exists
+  group:
+    name: '{{ uptimekuma.group }}'
+    state: present
+
+- name: Ensure dedicated user exists
+  user:
+    name: '{{ uptimekuma.user }}'
+    group: '{{ uptimekuma.group }}'
+
+- name: Checkout folder
+  file:
+    path: '/opt/uptime-kuma'
+    state: 'directory'
+    owner: '{{ uptimekuma.user }}'
+    group: '{{ uptimekuma.group }}'
+
+- name: Checkout the application 
+  git:
+    repo: 'https://github.com/louislam/uptime-kuma.git'
+    dest: /opt/uptime-kuma
+    version: '{{ package.version }}'
+  become_user: '{{ uptimekuma.user }}'
+
+- name: install uptime kuma
+  shell: /usr/bin/npm run setup
+  args:
+    chdir: '/opt/uptime-kuma'
+  become_user: '{{ uptimekuma.user }}'
+
+- name: Install service script
+  copy:
+    src: '{{ uptimekuma.service }}.service'
+    dest: /etc/systemd/system/{{ uptimekuma.service }}.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: service reload/start
+  systemd:
+    name: '{{ uptimekuma.service }}'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: generate certificate
+  shell: /usr/bin/certbot certonly -d kuma.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
+  when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Template nginx configuration file
+  template:
+    src: kuma.conf
+    dest: /opt/nginx/conf/server/kuma.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted

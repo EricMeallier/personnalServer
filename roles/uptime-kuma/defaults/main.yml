@@ -1,0 +1,10 @@
+---
+
+uptimekuma:
+  user: kuma
+  group: kuma
+  service: kuma
+
+package:
+  version: '1.21.2'
+  type: tar.gz
