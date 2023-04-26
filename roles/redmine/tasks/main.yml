@@ -131,7 +131,7 @@
     src: /tmp/redmine-{{package.version}}.{{package.type}}
     dest: /opt
     remote_src: 'yes'
-    owner: 'root'
+    owner: 'nobody'
     group: 'rvm'
 
 - name: link to current version
@@ -139,14 +139,14 @@
     src: /opt/redmine-{{package.version}}
     dest: /opt/redmine
     state: 'link'
-    owner: 'root'
+    owner: 'nobody'
     group: 'rvm'
 
 - name: Copy database configuration file
   template:
     src: database.yml
     dest: /opt/redmine/config/database.yml
-    owner: 'root'
+    owner: 'nobody'
     group: 'rvm'
     mode: '0644'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
@@ -229,8 +229,8 @@
   template:
     src: minimal.conf
     dest: /opt/nginx/conf/nginx.conf
-    owner: 'root'
-    group: 'rvm'
+    owner: 'nobody'
+    group: 'nogroup'
     mode: '0644'
 
 - name: Create external configuration for nginx
@@ -258,8 +258,8 @@
     path: /opt/nginx/html/.well-known/acme-challenge
     state: directory
     recurse: yes
-    owner: redmine
-    group: redmine
+    owner: nobody
+    group: nogroup
     mode: u+rxw,g+rw,o+rw
 
 - name: generate redmine certificate
