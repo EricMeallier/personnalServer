@@ -26,10 +26,18 @@
     name: 'monit'
     state: restarted
 
-- name: 'Insecure configuration (for Vagrant)'
-  include: unsecure.yml
-  when: redmine_unsecured
-    
-- name: 'Secure configuration (for Internet)'
-  include: secure.yml
+- name: generate redmine certificate
+  shell: /usr/bin/certbot certonly -d monit.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Template nginx configuration file
+  template:
+    src: monit.conf
+    dest: /opt/nginx/conf/server/monit.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
+
