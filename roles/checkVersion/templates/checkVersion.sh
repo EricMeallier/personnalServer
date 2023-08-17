@@ -39,7 +39,11 @@ check_delta "Nextcloud" $NEXTCLOUD_CURRENT_VERSION $NEXTCLOUD_VERSION
 #ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad-lite/releases/latest | grep "tag/" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
 #check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
 
-IS_APT_UP_TODATE=`apt update | grep "can be upgraded" | wc -l`
+IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then
+    echo "System updates available"
     envoi_mail "SYSTEM" "De nouvelles mises à jour sont disponibles pour apt"
+else
+    echo "System up to date"
 fi
+
