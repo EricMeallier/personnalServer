@@ -1,0 +1,13 @@
+- name: Configuration default
+  template:
+    src: default/sample
+    dest: /tmp/sampleTemplateAnsible
+  register: default_result
+  ignore_errors: true
+
+- name: Configuration specific
+  template:
+    src: sample
+    dest: /tmp/sampleTemplateAnsible
+  when: default_result.failed
+
