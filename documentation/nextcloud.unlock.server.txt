@@ -1,0 +1,9 @@
+
+cd /opt/nextcloud
+sudo -u nobody php8.2 occ maintenance:mode --on
+
+sudo -u postgres psql -d nextcloud -c "select 'Avant: ' || count(*) from oc_file_locks;"
+sudo -u postgres psql -d nextcloud -c "truncate oc_file_locks;"
+sudo -u postgres psql -d nextcloud -c "select 'Apres: ' || count(*) from oc_file_locks;"
+
+sudo -u nobody php8.2 occ maintenance:mode --off
