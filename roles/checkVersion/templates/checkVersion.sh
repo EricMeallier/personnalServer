@@ -42,7 +42,7 @@ check_delta "Nextcloud" $NEXTCLOUD_CURRENT_VERSION $NEXTCLOUD_VERSION
 IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then
     echo "System updates available"
-    envoi_mail "SYSTEM" "De nouvelles mises à jour sont disponibles pour apt"
+    envoi_mail "SYSTEM" "De nouvelles mises a jour sont disponibles pour apt"
 else
     echo "System up to date"
 fi
