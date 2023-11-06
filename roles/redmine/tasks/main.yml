@@ -133,6 +133,7 @@
     remote_src: 'yes'
     owner: 'nobody'
     group: 'rvm'
+    mode: '775'
 
 - name: link to current version
   file:
@@ -166,7 +167,7 @@
   become_user: redmine
 
 - name: retrieve dependencies for redmine
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install --path=.
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install
   args:
     chdir: '/opt/redmine/'
   become_user: redmine
