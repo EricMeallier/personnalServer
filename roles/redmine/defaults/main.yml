@@ -1,16 +1,16 @@
 ---
 
 ruby:
-  version: 3.1.4
-  reducedversion: 3.1.0
+  version: 3.2.2
+  reducedversion: 3.2.0
   gems:
     passenger: 6.0.18
-    rmagick: 4.2.6 #pas plus pour le moment !
-    pg: 1.4.6
-    strscan: 3.0.6
+    rmagick: 5.3.0
+    pg: 1.5.4
+    strscan: 3.0.7
 
 package:
-  version: 5.0.6
+  version: 5.1.0
   checksum: 
-    sha256: 488fe08f37a8eb1011415922a8ea743b7f38d8a7a5f8822950a34a375dcf08ee
+    sha256: a94d6ecde5a100a6271503fef154818212dac01cf5e45e37e2beb4059365ba93
   type: tar.gz
