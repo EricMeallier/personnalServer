@@ -1,4 +1,4 @@
-export NEW_VERSION=3.9.2
+export NEW_VERSION=3.10.1
 
 sudo rm -f /opt/Nextcloud-${NEW_VERSION}-x86_64.AppImage
 
