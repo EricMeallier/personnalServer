@@ -88,3 +88,8 @@
   systemd:
     name: 'nginx'
     state: restarted
+
+- name: Kuma service restart to clean http parameters
+  systemd:
+    name: 'kuma'
+    state: restarted
