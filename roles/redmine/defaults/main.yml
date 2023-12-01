@@ -4,7 +4,7 @@ ruby:
   version: 3.2.2
   reducedversion: 3.2.0
   gems:
-    passenger: 6.0.18
+    passenger: 6.0.19
     rmagick: 5.3.0
     pg: 1.5.4
     strscan: 3.0.7
