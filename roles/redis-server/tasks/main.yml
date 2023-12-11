@@ -1,0 +1,22 @@
+---
+
+- name: install redis pre requisites
+  apt: 
+    name:
+    - lsb-release
+    - curl
+    - gpg
+    state: present
+
+- name: install redis repo gpg key
+  shell: '/usr/bin/curl -fsSL https://packages.redis.io/gpg | gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg'
+
+- name: adding apt redis repo
+  shell: echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" > /etc/apt/sources.list.d/redis.list
+
+- name: install redis server
+  apt: 
+    name:
+    - redis-server
+    update_cache: yes
+    state: latest
