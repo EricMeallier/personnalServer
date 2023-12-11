@@ -1,5 +1,11 @@
 ---
 
+- name: install pcloud pre requisites
+  apt: 
+    name:
+    - jq
+    state: present
+
 - name: Getting auth token
   shell: curl -s "https://eapi.pcloud.com/userinfo?getauth=1&username={{ pcloud.username }}&password={{ pcloud.password }}" | jq -r '.auth'
   register: auth
