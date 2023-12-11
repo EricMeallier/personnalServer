@@ -1,15 +1,11 @@
 ---
 
-ruby:
-  version: 3.2.2
-  reducedversion: 3.2.0
+package:
   gems:
     passenger: 6.0.19
     rmagick: 5.3.0
     pg: 1.5.4
     strscan: 3.0.7
-
-package:
   version: 5.1.1
   checksum: 
     sha256: edf3095746effd04ad5140681d618f5fa8d06be09c47b6f8b615dcad0b753e6e

@@ -1,6 +1,6 @@
 ---
 
-- name: install redmine pre requisites
+- name: Install redmine pre requisites
   apt: 
     name:
     - curl
@@ -10,6 +10,7 @@
     - postgresql-client-13
     - postgresql-server-dev-13
     - imagemagick
+    - git
     state: present
 
 - name: Is already installed ?
@@ -64,17 +65,17 @@
   shell: /usr/local/rvm/bin/rvm --default use {{ruby.version}}
 
 - name: install pg client
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '{{ ruby.gems.pg }}'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '{{ package.gems.pg }}'
 
 - name: install rmagick
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '{{ ruby.gems.rmagick }}'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '{{ package.gems.rmagick }}'
 
 - name: install passenger
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '{{ ruby.gems.passenger }}'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '{{ package.gems.passenger }}'
   when: not nginx_exists.stat.exists
 
 - name: install strscan
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '{{ ruby.gems.strscan }}'
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '{{ package.gems.strscan }}'
 
 - name: install nginx with passenger
   shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
@@ -152,6 +153,15 @@
     mode: '0644'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
+- name: Copy mail configuration file
+  template:
+    src: configuration.yml
+    dest: /opt/redmine/config/configuration.yml
+    owner: 'nobody'
+    group: 'rvm'
+    mode: '0644'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
 - name: Restore old configuration, if needed
   command: mv /opt/{{ item }} /opt/redmine/config/{{ item }}
   loop:
@@ -165,6 +175,9 @@
   args:
     chdir: '/opt/redmine/'
   become_user: redmine
+
+- name: configure redmine user to retrieve gems
+  shell: chmod -R g+w /usr/local/rvm/rubies/ruby-{{ruby.version}}/lib/ruby/gems/{{ruby.reducedversion}}
 
 - name: retrieve dependencies for redmine
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install

@@ -1,0 +1,24 @@
+# = Redmine configuration file
+#
+# Each environment has its own configuration options.  If you are only
+# running in production, only the production block needs to be configured.
+# Environment specific configuration options override the default ones.
+#
+# Note that this file needs to be a valid YAML file.
+# DO NOT USE TABS! Use 2 spaces instead of tabs for indentation.
+
+# default configuration options for all environments
+default:
+  # Outgoing emails configuration
+  # See the examples below and the Rails guide for more configuration options:
+  # http://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
+  email_delivery:
+
+      delivery_method: :smtp
+      smtp_settings:
+        enable_starttls_auto: true
+        address: "{{ mail.smtp.address }}"
+        port: "{{ mail.smtp.port }}"
+        authentication: :plain
+        user_name: "{{ mail.smtp.username }}"
+        password: "{{ mail.smtp.password }}"
