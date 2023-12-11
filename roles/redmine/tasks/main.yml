@@ -183,6 +183,31 @@
     mode: '0644'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
+- name: sidekiq configuration
+  copy:
+    src: sidekiq.yml
+    dest: /opt/redmine/config
+
+- name: sidekiq/redmine configuration
+  copy:
+    src: additional_environment.rb
+    dest: /opt/redmine/config
+
+- name: Install sidekiq service script
+  template:
+    src: sidekiq.service
+    dest: /etc/systemd/system/sidekiq.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Sidekiq service reload/start
+  systemd:
+    name: 'sidekiq'
+    daemon_reload: true
+    state: started
+    enabled: true
+
 - name: Restore old configuration, if needed
   command: mv /opt/{{ item }} /opt/redmine/config/{{ item }}
   loop:
