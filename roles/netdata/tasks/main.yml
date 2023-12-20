@@ -1,0 +1,60 @@
+---
+
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{monitor.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
+
+- name: install netdata pre requisites
+  apt: 
+    name:
+    - lsb-release
+    - curl
+    - gpg
+    state: present
+
+- name: does the postgreql user exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='netdata'"
+  register: userExists
+  become_user: 'postgres'
+
+- name: create user netdata for postgresql
+  shell: psql -t -c "CREATE USER netdata"
+  become_user: 'postgres'
+  when: userExists.stdout.find('found') != 1
+
+- name: grant netdata on postgresql
+  shell: psql -t -c "GRANT pg_monitor TO netdata"
+  become_user: 'postgres'
+
+- name: Download netdata installation script
+  get_url:
+    url: https://get.netdata.cloud/kickstart.sh
+    dest: '/tmp/netdata-kickstart.sh'
+    mode: '0755'
+
+- name: Installation script launch
+  shell: '/tmp/netdata-kickstart.sh --stable-channel --non-interactive --native-only --dont-wait'
+
+- name: Cleanup installation script
+  file:
+    path: '/tmp/netdata-kickstart.sh'
+    state: 'absent'
+
+- name: generate monitor certificate
+  shell: /usr/bin/certbot certonly -d {{ monitor.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: monitor.conf
+    dest: /opt/nginx/conf/server/monitor.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
