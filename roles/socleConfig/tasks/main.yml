@@ -53,7 +53,7 @@
   - '80'
   - '443'
 
-- name: Ouverture firewall sortant (https, smtps, dns, ntp)
+- name: Ouverture firewall sortant (https, smtps, dns, ntp, http (pour APT))
   ufw:
     rule: 'allow'
     direction: 'out'
@@ -63,8 +63,13 @@
   - '465'
   - '53'
   - '123'
+  - '80'
 
 - name: Deny by default for outgoing
   ufw:
     default: 'deny'
     direction: 'outgoing'
+
+- name: UFW enabled
+  ufw:
+    state: 'enabled'
