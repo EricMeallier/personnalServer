@@ -121,7 +121,7 @@ EOF
 
 # run ansible playbook
 _info "Launch ansible playbook"
-if [ -z ${server_initial_key} ]; then
+if [ ! -z ${server_initial_address} ]; then
   ANSIBLE_FORCE_COLOR=true \
   ANSIBLE_HOST_KEY_CHECKING=false \
   ANSIBLE_SSH_ARGS="${_ssh_options_light}" \
@@ -134,12 +134,11 @@ else
   ANSIBLE_HOST_KEY_CHECKING=false \
   ANSIBLE_SSH_ARGS="${_ssh_options}" \
   ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
-  --private-key="${server_initial_key}" \
+  ansible-playbook -i "${temp_file_inventory}" -vvv -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
   --vault-id=user@~/.personnalVault \
   "${dir}/bootstrapPlaybook.yml"
 fi
-rm -f /tmp/inventory
+
 checkForError "Setup failed"
 
 

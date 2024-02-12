@@ -14,11 +14,11 @@ fi
 
 
 cd ${dir}/vm
-vagrant plugin install vagrant-disksize
 vagrant up
 
 
 cd ${dir}
+chmod 600 "${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
 ./bootstrapVMAuthent.sh -t vagrant -u 'vagrant' -k "${dir}/vm/.vagrant/machines/default/virtualbox/private_key"
 
 displayDuration

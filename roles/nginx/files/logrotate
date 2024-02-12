@@ -1,0 +1,8 @@
+/var/log/nginx/*.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}

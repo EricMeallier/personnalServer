@@ -1,0 +1,86 @@
+---
+
+- name: Install nginx pre requisites
+  apt: 
+    name:
+    - curl
+    - gnupg2
+    - libcurl4-openssl-dev
+    - gcc
+    - libssl-dev
+    - make
+    - libpcre3-dev
+    - zlib1g-dev
+    - libxml2-dev
+    - libxslt-dev
+    - libgd-dev
+    - libgeoip-dev
+    update_cache: yes
+    state: present
+
+
+- name: Download nginx sources
+  get_url:
+    url: https://github.com/nginx/nginx/archive/release-{{package.version}}.tar.gz
+    dest: /tmp/nginx-{{package.version}}.tar.gz
+
+- name: Extract nginx sources
+  unarchive:
+    src: /tmp/nginx-{{package.version}}.tar.gz
+    dest: /tmp
+    remote_src: 'yes'
+
+- name: nginx auto configure
+  shell: auto/configure --with-pcre --prefix=/opt/nginx --user=www-data --group=www-data --with-threads --with-file-aio --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_addition_module --with-http_xslt_module=dynamic --with-http_image_filter_module --with-http_geoip_module=dynamic --with-http_sub_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_auth_request_module --with-http_random_index_module --with-http_secure_link_module --with-http_degradation_module --with-http_slice_module --with-http_stub_status_module --without-http_charset_module --with-mail=dynamic --with-mail_ssl_module --with-stream=dynamic --with-stream_ssl_module --with-stream_realip_module --with-stream_geoip_module=dynamic --with-stream_ssl_preread_module
+  args:
+    chdir: '/tmp/nginx-release-{{package.version}}'
+
+- name: nginx make
+  shell: make
+  args:
+    chdir: '/tmp/nginx-release-{{package.version}}'
+
+- name: nginx make
+  shell: make install
+  args:
+    chdir: '/tmp/nginx-release-{{package.version}}'
+
+- name: Install nginx service script
+  copy:
+    src: nginx.service
+    dest: /etc/systemd/system/nginx.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy minimal nginx configuration file
+  template:
+    src: minimal.conf
+    dest: /opt/nginx/conf/nginx.conf
+    owner: 'nobody'
+    group: 'nogroup'
+    mode: '0644'
+
+- name: Create external configuration for nginx
+  file:
+    path: /opt/nginx/conf/server
+    state: 'directory'
+    mode: '0755'
+  
+- name: Create log folder for nginx
+  file:
+    path: /var/log/nginx
+    state: 'directory'
+    mode: '0755'
+
+- name: Nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: logrotate configuration
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/nginx
