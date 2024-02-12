@@ -29,3 +29,16 @@ Usage: ./launchPlaybook.sh [-s <target server>]
 `bootstrapVMAuthent.sh` is used to configure basic authentication for future deploiement. It launchs `bootstrapPlaybook.yml` playbook.
 
 Usage: ./bootstrapVMAuthent.sh [-a <initial_address>] [-p <initial_port>] [-u <initial_user, root ?>] [-k <initial_ssh_key_path>]
+
+
+
+# Special Windows 10
+
+Pre requisites:
+- WSL2 + linux box, like ubuntu
+- in windows: dism.exe /online /Enable-Feature /FeatureName:VirtualMachinePlatform /all /NoRestart
+- restart windows
+- install vagrant and virtual box on Windows host
+- install vagrant and ansible in ubuntu box
+- before all vagrant scripts  export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
+- https://thedatabaseme.de/2022/02/20/vagrant-up-running-vagrant-under-wsl2/
