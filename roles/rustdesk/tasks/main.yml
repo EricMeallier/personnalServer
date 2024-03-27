@@ -1,0 +1,61 @@
+---
+
+- name: Install rustdesk relay
+  apt:
+    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbr_1.1.10-3_amd64.deb
+
+- name: Install rustdesk Rendezvous
+  apt:
+    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbs_1.1.10-3_amd64.deb
+
+- name: Accept only encrypted connections (hbbr)
+  lineinfile:
+    dest: /lib/systemd/system/rustdesk-hbbr.service
+    regexp: "ExecStart=.*"
+    line: "ExecStart=/usr/bin/hbbr -k _"
+
+- name: Accept only encrypted connections (hbbs)
+  lineinfile:
+    dest: /lib/systemd/system/rustdesk-hbbs.service
+    regexp: "ExecStart=.*"
+    line: "ExecStart=/usr/bin/hbbs -r rustdesk.meallier.fr:21116 -k _"
+
+- name: hbbr service reload/start
+  systemd:
+    name: 'rustdesk-hbbr'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: hbbs service reload/start
+  systemd:
+    name: 'rustdesk-hbbs'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: Ouverture firewall entrant (tcp)
+  ufw:
+    rule: 'allow'
+    proto: 'tcp'
+    port: '{{ item }}'
+  loop:
+  - '21115'
+  - '21116'
+  - '21117'
+  - '21118'
+  - '21119'
+  - '8000'
+
+- name: Ouverture firewall entrant (udp)
+  ufw:
+    rule: 'allow'
+    proto: 'udp'
+    port: '21116'
+
+- name: Slurp hosts key
+  slurp:
+    src: /var/lib/rustdesk-server/id_ed25519.pub
+  register: slurpfile
+
+- debug: msg="{{ slurpfile['content'] | b64decode }}"
