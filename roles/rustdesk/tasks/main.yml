@@ -59,3 +59,9 @@
   register: slurpfile
 
 - debug: msg="{{ slurpfile['content'] | b64decode }}"
+
+- name: Publish the key
+  file:
+    src: /var/lib/rustdesk-server/id_ed25519.pub
+    dest: /data/static-files/rustdesk.txt
+    state: 'link'
