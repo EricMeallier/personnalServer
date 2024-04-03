@@ -192,6 +192,57 @@
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
+
+- name: Configure Mail (in config/config.php) - mail_smtpmode
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpmode --value=smtp'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtpsecure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpsecure --value=ssl'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_from_address
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_from_address --value={{ mail.smtp.user_from }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_sendmailmode
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_sendmailmode --value=smtp'
+    chdir: '/opt/nextcloud-{{package.version}}'
+    
+- name: Configure Mail (in config/config.php) - mail_domain
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_domain --value={{ mail.smtp.user_domain }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtphost
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtphost --value={{ mail.smtp.address }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtpauth
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpauth --value=1'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtpname
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpname --value={{ mail.smtp.username }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtppassword
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtppassword --value={{ mail.smtp.password }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Mail (in config/config.php) - mail_smtpport
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpport --value={{ mail.smtp.port }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
 - name: nextcloud service reload/start
   systemd:
     name: 'nginx'
