@@ -100,6 +100,13 @@
     regexp: '^memory_limit = .*$'
     replace: 'memory_limit = 512M'
 
+- name: Configure php FPM to set the interned_strings_buffer
+  lineinfile:
+    dest: '/etc/php/{{ php.version }}/fpm/php.ini'
+    insertafter: '[opcache]'
+    regexp: '^opcache.interned_strings_buffer=.*$'
+    line: 'opcache.interned_strings_buffer=16'
+
 - name: create data directory
   file:
     path: /data/nextcloud
@@ -151,7 +158,7 @@
     cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
     chdir: '/opt/nextcloud-{{package.version}}'
 
-- name: Configure database (Missing-indices)
+- name: Configure database (Missing-indices)db:add-missing-primary-keys
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-indices'
     chdir: '/opt/nextcloud-{{package.version}}'
@@ -241,6 +248,11 @@
 - name: Configure Mail (in config/config.php) - mail_smtpport
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpport --value={{ mail.smtp.port }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure Maintenance frame (in config/config.php) - maintenance_window_start
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4'
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: nextcloud service reload/start
