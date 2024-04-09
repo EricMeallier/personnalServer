@@ -20,6 +20,20 @@
     regexp: "ExecStart=.*"
     line: "ExecStart=/usr/bin/hbbs -r rustdesk.meallier.fr:21116 -k _"
 
+- name: Delayed rustdesk startup (hbbr)
+  lineinfile:
+    dest: /lib/systemd/system/rustdesk-hbbr.service
+    insertafter: '[Service]'
+    regexp: 'ExecStartPre=.*'
+    line: 'ExecStartPre=/bin/sleep 15'
+
+- name: Delayed rustdesk startup (hbbs)
+  lineinfile:
+    dest: /lib/systemd/system/rustdesk-hbbs.service
+    insertafter: '[Service]'
+    regexp: 'ExecStartPre=.*'
+    line: 'ExecStartPre=/bin/sleep 15'
+
 - name: hbbr service reload/start
   systemd:
     name: 'rustdesk-hbbr'
