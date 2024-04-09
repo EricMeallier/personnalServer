@@ -85,6 +85,14 @@
     PATH: '/usr/local/rvm/gems/ruby-{{ruby.version}}/bin:/usr/local/rvm/gems/ruby-{{ruby.version}}@global/bin:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
   when: not nginx_exists.stat.exists
 
+- name: add mjs extension to javascript files
+  lineinfile:
+    dest: /opt/nginx/conf/mime.types
+    insertafter: '[Service]'
+    regexp: '    application/javascript.*'
+    line: '    application/javascript                           js mjs;'
+  when: not nginx_exists.stat.exists
+
 - name: Ensure group "redmine" exists
   group:
     name: redmine
