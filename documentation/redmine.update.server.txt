@@ -23,11 +23,10 @@ bundle install
 rake generate_secret_token
 RAILS_ENV=production rake db:migrate
 
-cd /opt
-sudo chown -R root:rvm redmine
-sudo chown -R root:rvm redmine-${NEW}
+sudo chown -R root:rvm /opt/redmine
+sudo chown -R root:rvm /opt/redmine-${NEW}
 sudo chown -R nobody:nogroup /data/redmine-files
-sudo chmod 777 redmine/tmp
+sudo chmod -R 777 /opt/redmine/tmp
 
 rm -rf /opt/redmine/files
 ln -s /data/redmine-files /opt/redmine/files
