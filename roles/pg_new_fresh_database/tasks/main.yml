@@ -26,6 +26,6 @@
 
 - name: Allow of access for user
   lineinfile:
-    dest: /etc/postgresql/13/main/pg_hba.conf
+    dest: /etc/postgresql/15/main/pg_hba.conf
     regexp: "{{ pg_username }}"
     line: "local {{pg_database}} {{ pg_username }} md5"
