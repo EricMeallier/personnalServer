@@ -3,5 +3,5 @@
 - name: install postgresql server
   apt: 
     name:
-    - postgresql-15
+    - postgresql-{{ postgresql.version }}
     state: present
