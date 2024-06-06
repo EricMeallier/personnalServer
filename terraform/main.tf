@@ -16,7 +16,7 @@ provider "vultr" {
 
 resource "vultr_ssh_key" "my_user" {
   name = "Root SSH key"
-  ssh_key = "${file("~/.ssh/ovhuser.pub")}"
+  ssh_key = file("~/.ssh/ovhuser.pub")
 }
 
 resource "vultr_instance" "my_instance" {
