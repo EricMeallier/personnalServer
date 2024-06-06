@@ -20,9 +20,9 @@ resource "vultr_ssh_key" "my_user" {
 }
 
 resource "vultr_instance" "my_instance" {
-    plan = "vc2-1c-2gb"
+    plan = "vc2-2c-4gb"
     region = "cdg"
-    os_id = 477
+    os_id = 2136
     enable_ipv6 = false
     ssh_key_ids = ["${vultr_ssh_key.my_user.id}"]
     script_id = vultr_startup_script.bootinit.id
