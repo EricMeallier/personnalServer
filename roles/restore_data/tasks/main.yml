@@ -74,7 +74,7 @@
 
 - name: Disable TOTP for users
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ twofactorauth:disable {{ item }}'
+    cmd: 'sudo -u nobody php{{ php.version }} occ twofactorauth:disable {{ item }} totp'
     chdir: '/opt/nextcloud'
   loop:
   - 'administrator'
