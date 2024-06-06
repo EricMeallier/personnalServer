@@ -27,9 +27,9 @@
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ postgresql.redmine.username }}'
-  - pg_password: '{{ postgresql.redmine.password }}'
-  - pg_database: '{{ postgresql.redmine.database }}'
+  - pg_username: '{{ dbschema.redmine.username }}'
+  - pg_password: '{{ dbschema.redmine.password }}'
+  - pg_database: '{{ dbschema.redmine.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: adding gpg key for rvm mpapis
@@ -44,7 +44,7 @@
   register: rvmExists
   
 - name: install rvm
-  shell: \curl -sSL https://get.rvm.io | bash -s stable
+  shell: curl -sSL https://get.rvm.io | bash -s stable
   when: not rvmExists.stat.isdir is defined or not rvmExists.stat.isdir
 
 - name: Adding user root to rvm users

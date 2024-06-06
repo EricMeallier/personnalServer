@@ -5,8 +5,8 @@
     name : pg_restore_database
   vars:
   - pg_filename: 'redmine-last.dmp'
-  - pg_username: '{{ postgresql.redmine.username }}'
-  - pg_database: '{{ postgresql.redmine.database }}'
+  - pg_username: '{{ dbschema.redmine.username }}'
+  - pg_database: '{{ dbschema.redmine.database }}'
 
 - name: Restore files from pcloud Redmine
   include_role:
