@@ -2,11 +2,11 @@
 
 - name: Install rustdesk relay
   apt:
-    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbr_1.1.10-3_amd64.deb
+    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbr_{{package.version}}_amd64.deb
 
 - name: Install rustdesk Rendezvous
   apt:
-    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbs_1.1.10-3_amd64.deb
+    deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbs_{{package.version}}_amd64.deb
 
 - name: Accept only encrypted connections (hbbr)
   lineinfile:
