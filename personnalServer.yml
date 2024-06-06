@@ -14,5 +14,6 @@
   - monit
   - checkVersion
   - logo
-  - uptime-kuma
+#  - uptime-kuma
 #  - restore_data
+  - rustdesk
