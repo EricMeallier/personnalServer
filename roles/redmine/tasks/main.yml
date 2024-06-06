@@ -7,8 +7,8 @@
     - gnupg2
     - libcurl4-openssl-dev
     - libmagickwand-dev
-    - postgresql-client-15
-    - postgresql-server-dev-15
+    - postgresql-client-{{ postgresql.version }}
+    - postgresql-server-dev-{{ postgresql.version }}
     - imagemagick
     - git
     state: present

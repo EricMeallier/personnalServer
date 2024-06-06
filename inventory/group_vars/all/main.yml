@@ -8,6 +8,9 @@ redmine_unsecured: True
 php:
   version: 8.3
 
+postgresql:
+  version: 15
+
 ruby:
   version: 3.2.4
   reducedversion: 3.2.0
