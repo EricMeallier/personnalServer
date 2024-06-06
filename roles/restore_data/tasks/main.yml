@@ -72,6 +72,14 @@
     cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
     chdir: '/opt/nextcloud'
 
+- name: Disable TOTP for users
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ twofactorauth:disable {{ item }}'
+    chdir: '/opt/nextcloud'
+  loop:
+  - 'administrator'
+  - 'rickou_412'
+    
 - name: Restore files from pcloud Nextcloud
   include_role:
     name : pcloud_restore_file
