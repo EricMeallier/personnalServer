@@ -134,14 +134,14 @@
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ postgresql.nextcloud.username }}'
-  - pg_password: '{{ postgresql.nextcloud.password }}'
-  - pg_database: '{{ postgresql.nextcloud.database }}'
+  - pg_username: '{{ dbschema.nextcloud.username }}'
+  - pg_password: '{{ dbschema.nextcloud.password }}'
+  - pg_database: '{{ dbschema.nextcloud.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ maintenance:install --database "pgsql" --database-name "{{postgresql.nextcloud.database}}" --database-user "{{postgresql.nextcloud.username}}" --database-pass "{{postgresql.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
+    cmd: 'sudo -u nobody php{{ php.version }} occ maintenance:install --database "pgsql" --database-name "{{dbschema.nextcloud.database}}" --database-user "{{dbschema.nextcloud.username}}" --database-pass "{{dbschema.nextcloud.password}}" --admin-user "{{nextcloud.admin.username}}" --admin-pass "{{nextcloud.admin.password}}" --data-dir "/data/nextcloud"'
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 

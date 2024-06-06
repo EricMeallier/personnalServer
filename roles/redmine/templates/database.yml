@@ -1,8 +1,8 @@
 # PostgreSQL configuration example
 production:
   adapter: postgresql
-  database: {{ postgresql.redmine.database }}
+  database: {{ dbschema.redmine.database }}
   host: localhost
-  username: {{ postgresql.redmine.username }}
-  password: {{ postgresql.redmine.password }}
+  username: {{ dbschema.redmine.username }}
+  password: {{ dbschema.redmine.password }}
   

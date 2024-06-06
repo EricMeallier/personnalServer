@@ -171,10 +171,10 @@
   
     "dbType": "postgres",
     "dbSettings": {
-        "user"    : "{{ postgresql.etherpad.username }}",
+        "user"    : "{{ dbschema.etherpad.username }}",
         "host"    : "localhost",
-        "password": "{{ postgresql.etherpad.password }}",
-        "database": "{{ postgresql.etherpad.database }}",
+        "password": "{{ dbschema.etherpad.password }}",
+        "database": "{{ dbschema.etherpad.database }}",
         "charset" : "utf8mb4"
     },  
   

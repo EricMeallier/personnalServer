@@ -30,9 +30,9 @@
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ postgresql.gogs.username }}'
-  - pg_password: '{{ postgresql.gogs.password }}'
-  - pg_database: '{{ postgresql.gogs.database }}'
+  - pg_username: '{{ dbschema.gogs.username }}'
+  - pg_password: '{{ dbschema.gogs.password }}'
+  - pg_database: '{{ dbschema.gogs.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Download gogs files

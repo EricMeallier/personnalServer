@@ -5,8 +5,8 @@
     name : pg_restore_database
   vars:
   - pg_filename: 'redmine-last.dmp'
-  - pg_username: '{{ postgresql.redmine.username }}'
-  - pg_database: '{{ postgresql.redmine.database }}'
+  - pg_username: '{{ dbschema.redmine.username }}'
+  - pg_database: '{{ dbschema.redmine.database }}'
 
 - name: Restore files from pcloud Redmine
   include_role:
@@ -34,8 +34,8 @@
     name : pg_restore_database
   vars:
   - pg_filename: 'gogs-last.dmp'
-  - pg_username: '{{ postgresql.gogs.username }}'
-  - pg_database: '{{ postgresql.gogs.database }}'
+  - pg_username: '{{ dbschema.gogs.username }}'
+  - pg_database: '{{ dbschema.gogs.database }}'
 
 - name: Restore files from pcloud Gogs
   include_role:
@@ -64,8 +64,8 @@
     name : pg_restore_database
   vars:
   - pg_filename: 'nextcloud-last.dmp'
-  - pg_username: '{{ postgresql.nextcloud.username }}'
-  - pg_database: '{{ postgresql.nextcloud.database }}'
+  - pg_username: '{{ dbschema.nextcloud.username }}'
+  - pg_database: '{{ dbschema.nextcloud.database }}'
 
 - name: Mise à jour de l'environnement occ
   shell: 
