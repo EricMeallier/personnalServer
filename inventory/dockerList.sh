@@ -6,7 +6,7 @@ if [ -x "/etc/profile.d/dockerEnv.sh" ] ; then
 fi
 
 # Name container pattern
-PATTERN='test_app_*'
+PATTERN='test-app-*'
 
 # container list following the pattern
 containers_id=$(docker ps  -f "name=${PATTERN}" -f "status=running" --format '{{.ID}}')
