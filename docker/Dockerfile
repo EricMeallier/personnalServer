@@ -9,13 +9,12 @@ RUN sed -i 's/#TCPKeepAlive yes/TCPKeepAlive yes/g' /etc/ssh/sshd_config
 RUN sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 99999/g' /etc/ssh/sshd_config
 RUN mkdir /run/sshd
 
-# config user admin
-RUN adduser --system admin
-RUN usermod --password '$1$MlR6rrbh$DmU5UoTVCMyon/jtMBRdF.' admin
-RUN usermod --shell /bin/bash admin
-RUN echo "admin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
 RUN apt install -y python3 python3-pip python3-setuptools
+
+# config user admin
+RUN adduser --system --shell /bin/bash --home /home/admin admin
+RUN echo 'Password\nPassword' | passwd admin
+RUN echo "admin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 EXPOSE 22
 
