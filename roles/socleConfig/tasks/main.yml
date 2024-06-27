@@ -28,6 +28,10 @@
     - ntp
     state: absent
 
+- name: Configuration timezone for the server
+  shell: 
+    cmd: 'timedatectl set-timezone {{ server.timezone}}'
+
 - name: Configure systemd timesync for Europe pool
   copy:
     src: 'timesyncd.conf'
