@@ -255,6 +255,11 @@
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpport --value={{ mail.smtp.port }}'
     chdir: '/opt/nextcloud-{{package.version}}'
 
+- name: Configure country code (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set default_phone_region --value={{ server.countrycode }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
 - name: Configure Maintenance frame (in config/config.php) - maintenance_window_start
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4'
