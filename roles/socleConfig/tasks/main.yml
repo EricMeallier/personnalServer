@@ -20,7 +20,7 @@
 - name: Disable Root Login and Password
   copy:
     src: disable_root_login.conf
-    dest: /etc/ssh/ssh_config.d/disable_root_login.conf
+    dest: /etc/ssh/sshd_config.d/disable_root_login.conf
 
 - name: Remove ntp daemon if present
   apt:
@@ -36,6 +36,11 @@
   copy:
     src: 'timesyncd.conf'
     dest: '/etc/systemd/timesyncd.conf'
+
+- name: Customize message of the day motd
+  copy:
+    src: 'motd'
+    dest: '/etc/motd'
 
 - name: Enable Time synchronization
   command: '/usr/bin/timedatectl set-ntp true'
