@@ -47,33 +47,41 @@
     state: 'restarted'
     enabled: true
 
-- name: Ouverture firewall entrant (ssh, http, https)
-  ufw:
-    rule: 'allow'
-    proto: 'tcp'
-    port: '{{ item }}'
-  loop:
-  - '22'
-  - '80'
-  - '443'
+- name: Configuration firewall
+  block:
+  - name: Reset firewall
+    ufw: 
+      state: reset
+  - name: Ouverture firewall entrant (ssh, http, https)
+    ufw:
+      rule: 'allow'
+      proto: 'tcp'
+      port: '{{ item }}'
+    loop:
+    - '22'
+    - '80'
+    - '443'
 
-- name: Ouverture firewall sortant (https, smtps, dns, ntp, http (pour APT))
-  ufw:
-    rule: 'allow'
-    direction: 'out'
-    port: '{{ item }}'
-  loop:
-  - '443'
-  - '587'
-  - '53'
-  - '123'
-  - '80'
+  - name: Ouverture firewall sortant (https, smtps, dns, ntp, http (pour APT), imap(s) + smtp(s) pour portail mail dans nextcloud)
+    ufw:
+      rule: 'allow'
+      direction: 'out'
+      port: '{{ item }}'
+    loop:
+    - '443'
+    - '587'
+    - '53'
+    - '123'
+    - '80'
+    - '993'
+    - '465'
 
-- name: Deny by default for outgoing
-  ufw:
-    default: 'deny'
-    direction: 'outgoing'
+  - name: Deny by default for outgoing
+    ufw:
+      default: 'deny'
+      direction: 'outgoing'
 
-- name: UFW enabled
-  ufw:
-    state: 'enabled'
+  always:
+    - name: UFW enabled
+      ufw:
+        state: 'enabled'
