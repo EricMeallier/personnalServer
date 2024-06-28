@@ -57,7 +57,7 @@
   - name: Reset firewall
     ufw: 
       state: reset
-  - name: Ouverture firewall entrant (ssh, http, https)
+  - name: Ouverture firewall entrant (ssh, http, https, ssh for gogs)
     ufw:
       rule: 'allow'
       proto: 'tcp'
@@ -66,6 +66,7 @@
     - '22'
     - '80'
     - '443'
+    - '3022'
 
   - name: Ouverture firewall sortant (https, smtps, dns, ntp, http (pour APT), imap(s) + smtp(s) pour portail mail dans nextcloud)
     ufw:
