@@ -66,7 +66,6 @@
     - '22'
     - '80'
     - '443'
-    - '3022'
 
   - name: Ouverture firewall sortant (https, smtps, dns, ntp, http (pour APT), imap(s) + smtp(s) pour portail mail dans nextcloud)
     ufw:
@@ -80,7 +79,6 @@
     - '123'
     - '80'
     - '993'
-    - '465'
 
   - name: Deny by default for outgoing
     ufw:
