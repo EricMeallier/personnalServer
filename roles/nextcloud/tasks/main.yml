@@ -210,11 +210,6 @@
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpmode --value=smtp'
     chdir: '/opt/nextcloud-{{package.version}}'
 
-- name: Configure Mail (in config/config.php) - mail_smtpsecure
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_smtpsecure --value=ssl'
-    chdir: '/opt/nextcloud-{{package.version}}'
-
 - name: Configure Mail (in config/config.php) - mail_from_address
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set mail_from_address --value={{ mail.smtp.user_from }}'
