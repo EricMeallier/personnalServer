@@ -80,6 +80,14 @@
     - '80'
     - '993'
 
+  - name: Ouverture firewall sortant (UDP DHCP)
+    ufw:
+      rule: 'allow'
+      direction: 'out'
+      port: '{{ item }}'
+    loop:
+    - '67'
+    
   - name: Deny by default for outgoing
     ufw:
       default: 'deny'
