@@ -15,7 +15,7 @@
     dest: /data/static-files/logo.svg
 
 - name: generate static certificate
-  shell: /usr/bin/certbot certonly -d static.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  shell: /usr/bin/certbot certonly -d {{ static.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
 
 # finish installation with ssl termination

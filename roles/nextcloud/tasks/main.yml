@@ -189,18 +189,18 @@
 
 - name: Configure trusted domains (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value=nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value={{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure secure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://{{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
     chdir: '/opt/nextcloud-{{package.version}}'
   when: redmine_unsecured
 
 - name: Configure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://nextcloud.meallier.fr'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://{{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
@@ -268,7 +268,7 @@
     enabled: true
 
 - name: generate redmine certificate
-  shell: /usr/bin/certbot certonly -d nextcloud.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
+  shell: /usr/bin/certbot certonly -d {{ nextcloud.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
       
 # finish installation with ssl termination

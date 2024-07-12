@@ -1,0 +1,11 @@
+---
+
+# vars for environment
+redmine_unsecured: False
+
+server:
+  domain:
+    dns: test.meallier.fr
+    contact: eric@meallier.fr
+  timezone: Europe/Paris
+  countrycode: FR    

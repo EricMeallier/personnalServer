@@ -26,8 +26,8 @@
     name: 'monit'
     state: restarted
 
-- name: generate redmine certificate
-  shell: /usr/bin/certbot certonly -d monit.meallier.fr -m eric@meallier.fr --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
+- name: generate monit certificate
+  shell: /usr/bin/certbot certonly -d {{ monit.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
       
 # finish installation with ssl termination
