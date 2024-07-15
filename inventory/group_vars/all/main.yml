@@ -16,5 +16,8 @@ ruby:
   reducedversion: 3.2.0
 
 server:
+  domain:
+    dns: meallier.fr
+    contact: eric@meallier.fr
   timezone: Europe/Paris
   countrycode: FR

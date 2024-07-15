@@ -1,6 +1,6 @@
 #### CONFIGURATION MUTT
 # Adresse électronique de l'expéditeur
-set from="service@meallier.fr"
+set from="{{ mail.smtp.from }}"
 
 # Nom complet de l'expéditeur
 set realname = "Service"
