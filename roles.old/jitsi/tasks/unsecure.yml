@@ -1,0 +1,13 @@
+---
+
+- name: Copy unsecured nginx configuration file
+  copy:
+    src: jitsiUnsecured.conf
+    dest: /opt/nginx/conf/server/jitsiUnsecured.conf
+
+- name: Nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true

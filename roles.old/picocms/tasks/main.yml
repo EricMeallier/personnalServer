@@ -1,0 +1,98 @@
+---
+
+- name: install pre requisites
+  apt: 
+    name:
+    - php7.3-fpm
+    - php7.3-common
+    - php7.3-dom
+    - php7.3-mbstring
+    state: present
+
+- name: Download files
+  get_url:
+    url: https://github.com/picocms/Pico/releases/download/v{{pico.version}}/pico-release-v{{pico.version}}.tar.gz
+    dest: '/tmp/pico-{{pico.version}}.tar.gz'
+
+- name: Configuration folder creation
+  file:
+    path: '/opt/pico-{{pico.version}}'
+    state: 'directory'
+    owner: nobody
+    group: nogroup
+
+- name: Extract pico files into /opt
+  unarchive:
+    src: '/tmp/pico-{{pico.version}}.tar.gz'
+    dest: /opt/pico-{{pico.version}}
+    remote_src: 'yes'
+    owner: nobody
+    group: nogroup
+
+- name: link to current version
+  file:
+    src: /opt/pico-{{pico.version}}
+    dest: /opt/pico
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: directory content for files under /data
+  file:
+    path: /data/picocms/content
+    state: 'directory'
+    recurse: yes
+    owner: nobody
+    group: nogroup
+
+- name: directory assets for files under /data
+  file:
+    path: /data/picocms/assets
+    state: 'directory'
+    recurse: yes
+    owner: nobody
+    group: nogroup
+
+- name: remove old directory content
+  file:
+    path: /opt/pico/content
+    state: 'absent'
+
+- name: remove old directory assets
+  file:
+    path: /opt/pico/assets
+    state: 'absent'
+
+- name: link to data directory content
+  file:
+    src: /data/picocms/content
+    dest: /opt/pico/content
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: link to data directory assets
+  file:
+    src: /data/picocms/assets
+    dest: /opt/pico/assets
+    state: 'link'
+    owner: nobody
+    group: nogroup
+
+- name: Copy php FPM configuration file
+  copy:
+    src: pico.conf
+    dest: /etc/php/7.3/fpm/pool.d/pico.conf
+
+- name: 'Insecure configuration (for Vagrant)'
+  include: unsecure.yml
+  when: redmine_unsecured
+    
+- name: 'Secure configuration (for Internet)'
+  include: secure.yml
+  when: not redmine_unsecured
+
+- name: PHP-FPM service restart
+  systemd:
+    name: 'php7.3-fpm'
+    state: restarted
