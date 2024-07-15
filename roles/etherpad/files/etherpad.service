@@ -9,7 +9,7 @@ Type=simple
 User=etherpad
 Group=etherpad
 WorkingDirectory=/opt/etherpad-lite
-ExecStart=/opt/etherpad-lite/bin/fastRun.sh
+ExecStart=/opt/etherpad-lite/bin/run.sh
 Restart=always
 Environment=NODE_ENV=production
 
