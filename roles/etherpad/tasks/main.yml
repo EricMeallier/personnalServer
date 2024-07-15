@@ -18,7 +18,10 @@
   - pg_database: '{{ dbschema.etherpad.database }}'
 
 - name: install nodejs v16 dedicated repo
-  shell: '/usr/bin/curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -'
+  shell: 'curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh'
+
+- name: retrieve dependencies
+  shell: bash /tmp/nodesource_setup.sh
 
 - name: install nodejs
   apt: 
@@ -38,13 +41,13 @@
 
 - name: Download etherpad files
   get_url:
-    url: https://github.com/ether/etherpad-lite/archive/{{ etherpad.version }}.zip
-    dest: '/tmp/etherpad-{{ etherpad.version }}.zip'
+    url: https://github.com/ether/etherpad-lite/archive/{{ package.version }}.zip
+    dest: '/tmp/etherpad-{{ package.version }}.zip'
     timeout: 30
 
 - name: Extract etherpad files into /opt
   unarchive:
-    src: '/tmp/etherpad-{{ etherpad.version }}.zip'
+    src: '/tmp/etherpad-{{ package.version }}.zip'
     dest: /opt
     remote_src: 'yes'
     owner: etherpad
@@ -52,7 +55,7 @@
 
 - name: link to current version
   file:
-    src: /opt/etherpad-lite-{{ etherpad.version }}
+    src: /opt/etherpad-lite-{{ package.version }}
     dest: /opt/etherpad-lite
     state: 'link'
     owner: 'etherpad'
@@ -67,7 +70,9 @@
     mode: '0644'
 
 - name: retrieve dependencies
-  shell: /opt/etherpad-lite/bin/installDeps.sh
+  shell: 
+    cmd: bash /opt/etherpad-lite/bin/installDeps.sh
+    chdir: '/opt/etherpad-lite'
   become_user: 'etherpad'
 
 - name: Install etherpad service script
@@ -85,10 +90,17 @@
     state: restarted
     enabled: true
   
-- name: 'Insecure configuration (for Vagrant)'
-  include: unsecure.yml
-  when: redmine_unsecured
-    
-- name: 'Secure configuration (for Internet)'
-  include: secure.yml
+- name: generate etherpad certificate
+  shell: /usr/bin/certbot certonly -d {{ etherpad.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: etherpad.conf
+    dest: /opt/nginx/conf/server/etherpad.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted

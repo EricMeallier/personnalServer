@@ -9,6 +9,7 @@
   - redmine
   - gogs
   - nextcloud
+  - etherpad
   - fail2ban
   - backup
   - monit
