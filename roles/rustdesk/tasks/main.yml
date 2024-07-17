@@ -1,5 +1,12 @@
 ---
 
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{rustdesk.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
+
 - name: Install rustdesk relay
   apt:
     deb: https://github.com/rustdesk/rustdesk-server/releases/download/{{package.version}}/rustdesk-server-hbbr_{{package.version}}_amd64.deb

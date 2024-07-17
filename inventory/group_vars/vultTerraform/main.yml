@@ -5,7 +5,8 @@ redmine_unsecured: False
 
 server:
   domain:
-    dns: test.meallier.fr
+    main: meallier.fr
+    sub: test.
     contact: eric@meallier.fr
   timezone: Europe/Paris
   countrycode: FR    

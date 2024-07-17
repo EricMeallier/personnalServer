@@ -1,5 +1,12 @@
 ---
 
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{nextcloud.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
+
 - name: install php installation pre requisites
   apt: 
     name:
@@ -189,18 +196,18 @@
 
 - name: Configure trusted domains (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value={{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set trusted_domains 0 --value={{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}'
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure secure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://{{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=http://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}'
     chdir: '/opt/nextcloud-{{package.version}}'
   when: redmine_unsecured
 
 - name: Configure url overwrite (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://{{ nextcloud.domain.suffix }}.{{ server.domain.dns }}'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set overwrite.cli.url --value=https://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}'
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
@@ -268,7 +275,7 @@
     enabled: true
 
 - name: generate redmine certificate
-  shell: /usr/bin/certbot certonly -d {{ nextcloud.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
+  shell: /usr/bin/certbot certonly -d {{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
       
 # finish installation with ssl termination

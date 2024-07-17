@@ -2,7 +2,7 @@
 
 
 envoi_mail () {
-    mutt -s "[{{ server.domain.dns }}] Alerte Version $1: $2"  {{ mail.smtp.alertingTo }} < /dev/null
+    mutt -s "[{{ server.domain.sub}}{{server.domain.main }}] Alerte Version $1: $2"  {{ mail.smtp.alertingTo }} < /dev/null
 }
 
 check_delta () {
