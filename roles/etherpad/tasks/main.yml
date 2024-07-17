@@ -1,4 +1,10 @@
 ---
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{etherpad.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
 
 - name: install nodejs pre requisites
   apt: 
@@ -17,10 +23,10 @@
   - pg_password: '{{ dbschema.etherpad.password }}'
   - pg_database: '{{ dbschema.etherpad.database }}'
 
-- name: install nodejs v16 dedicated repo
+- name: install nodejs v22 dedicated repo
   shell: 'curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh'
 
-- name: retrieve dependencies
+- name: Node installation script execution
   shell: bash /tmp/nodesource_setup.sh
 
 - name: install nodejs
@@ -73,7 +79,6 @@
   shell: 
     cmd: bash /opt/etherpad-lite/bin/installDeps.sh
     chdir: '/opt/etherpad-lite'
-  become_user: 'etherpad'
 
 - name: Install etherpad service script
   copy:
@@ -89,9 +94,9 @@
     daemon_reload: true
     state: restarted
     enabled: true
-  
+
 - name: generate etherpad certificate
-  shell: /usr/bin/certbot certonly -d {{ etherpad.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  shell: /usr/bin/certbot certonly -d {{ etherpad.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
       
 # finish installation with ssl termination

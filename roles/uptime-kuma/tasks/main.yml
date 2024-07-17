@@ -1,5 +1,12 @@
 ---
 
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{kuma.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
+
 - name: install nodejs pre requisites
   apt: 
     name:
@@ -75,7 +82,7 @@
     enabled: true
 
 - name: generate certificate
-  shell: /usr/bin/certbot certonly -d {{ kuma.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
+  shell: /usr/bin/certbot certonly -d {{ kuma.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
       
 # finish installation with ssl termination

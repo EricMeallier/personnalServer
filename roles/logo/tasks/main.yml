@@ -1,6 +1,13 @@
 ---
-
 # put a logo in public access to enable BIMI when sending mails with the domain
+
+
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+  - targetExtension : '{{static.domain.suffix}}'
+  - targetIP: '{{ansible_default_ipv4.address}}'
 
 - name: directory for files under /data
   file:
@@ -15,7 +22,7 @@
     dest: /data/static-files/logo.svg
 
 - name: generate static certificate
-  shell: /usr/bin/certbot certonly -d {{ static.domain.suffix }}.{{ server.domain.dns }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  shell: /usr/bin/certbot certonly -d {{ static.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
 
 # finish installation with ssl termination

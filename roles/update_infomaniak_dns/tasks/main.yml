@@ -1,0 +1,21 @@
+---
+
+- name: install API calls pre requisites
+  apt: 
+    name:
+    - jq
+    - curl
+    state: present
+
+- name: Get account ID
+  shell: "curl -s \"{{infomaniak.api_url}}1/product?service_name=domain&customer_name={{server.domain.main}}\" --header 'Authorization: Bearer {{infomaniak.token}}' | jq -r '.data[].id'"
+  register: accountID
+
+- name: Get record ID
+  shell: "curl -s {{infomaniak.api_url}}1/domain/{{accountID.stdout}}/dns/record --header 'Authorization: Bearer {{infomaniak.token}}' | jq -r --arg fqdn {{targetExtension}}.{{server.domain.sub}}{{server.domain.main}} '.data | map(select(.source_idn == $fqdn)) | .[0].id'"
+  register: recordID
+  when: accountID.stderr | length == 0
+
+- name: Update record
+  shell: "curl -s -X PUT -d target={{targetIP}} -d ttl={{extension.ttl}} '{{infomaniak.api_url}}1/domain/{{accountID.stdout}}/dns/record/{{recordID.stdout}}' --header 'Authorization: Bearer {{infomaniak.token}}'"
+  when: accountID.stderr | length == 0 and recordID.stderr | length == 0
