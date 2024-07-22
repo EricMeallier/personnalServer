@@ -275,36 +275,9 @@
     state: started
     enabled: true
 
-# certbot installation
-- name: install certobot wth dependencies
-  apt: 
-    name:
-    - certbot
-    state: present
-
-- name: create acme challenge folder
-  file:
-    path: /opt/nginx/html/.well-known/acme-challenge
-    state: directory
-    recurse: yes
-    owner: nobody
-    group: nogroup
-    mode: u+rxw,g+rw,o+rw
-
 - name: generate redmine certificate
   shell: /usr/bin/certbot certonly -d {{ redmine.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
   when: not redmine_unsecured
-
-- name: check is DH already exists
-  stat:
-    path: /etc/redmine.dhparam.pem
-  register: DHExists
-  when: not redmine_unsecured
-
-# could take long - around 10 minutes on a vultr VPS
-- name: generate Secure Diffie-Hellman
-  shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
-  when: not redmine_unsecured and ( not DHExists.stat.exists is defined or not DHExists.stat.exists)
 
 # finish installation with ssl termination
 - name: Copy full nginx ssl configuration file

@@ -11,10 +11,18 @@ RUN mkdir /run/sshd
 
 RUN apt install -y python3 python3-pip python3-setuptools
 
-# config user admin
-RUN adduser --system --shell /bin/bash --home /home/admin admin
-RUN echo 'Password\nPassword' | passwd admin
-RUN echo "admin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# config user ovhuser
+RUN adduser --system --shell /bin/bash --home /home/ovhuser ovhuser
+# Authorize SSH Host
+RUN mkdir -p /home/ovhuser/.ssh && \
+    chmod 0700 /home/ovhuser/.ssh && \
+    chown ovhuser:nogroup /home/ovhuser/.ssh
+COPY ovhuser.pub /home/ovhuser/.ssh/authorized_keys
+RUN chmod 600 /home/ovhuser/.ssh/authorized_keys && \
+    chown ovhuser:nogroup /home/ovhuser/.ssh/authorized_keys
+
+RUN echo 'Password\nPassword' | passwd ovhuser
+RUN echo "ovhuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 EXPOSE 22
 
