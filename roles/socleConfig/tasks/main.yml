@@ -52,14 +52,6 @@
     state: 'restarted'
     enabled: true
 
-- name: Configure the kernel to keep connections alive when enabling the firewall
-  sysctl:
-    name: net.netfilter.nf_conntrack_tcp_be_liberal
-    value: 1
-    state: present
-    sysctl_set: yes
-    reload: yes
-
 - name: Configuration firewall
   block:
   - name: Reset firewall
@@ -105,3 +97,30 @@
     - name: UFW enabled
       ufw:
         state: 'enabled'
+
+# certbot installation
+- name: install certobot wth dependencies
+  apt: 
+    name:
+    - certbot
+    state: present
+
+- name: create acme challenge folder
+  file:
+    path: /opt/nginx/html/.well-known/acme-challenge
+    state: directory
+    recurse: yes
+    owner: nobody
+    group: nogroup
+    mode: u+rxw,g+rw,o+rw
+
+- name: check is DH already exists
+  stat:
+    path: /etc/redmine.dhparam.pem
+  register: DHExists
+  when: not redmine_unsecured
+
+# could take long - around 10 minutes on a vultr VPS
+- name: generate Secure Diffie-Hellman
+  shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
+  when: not redmine_unsecured and ( not DHExists.stat.exists is defined or not DHExists.stat.exists)

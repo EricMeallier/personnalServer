@@ -5,6 +5,10 @@ if [ -x "/etc/profile.d/dockerEnv.sh" ] ; then
   . "/etc/profile.d/dockerEnv.sh"
 fi
 
+# User for ssh connection
+dockerUser=ovhuser
+dockerIdentity=~/.ssh/ovhuser
+
 # Name container pattern
 PATTERN='test-app-*'
 
@@ -41,6 +45,8 @@ do
   printf "\"docker${i}\":"
   printf "{\"ansible_ssh_host\":\"${address[i]}\","
   #printf "\"ansible_port\":\"${ports[i]}\"}"
+  printf "\"ansible_user\":\"${dockerUser}\","
+  printf "\"ansible_ssh_private_key_file\":\"${dockerIdentity}\","
   printf "\"ansible_port\":\"22\"}"
 done
 printf "}}"

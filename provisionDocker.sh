@@ -14,9 +14,11 @@ fi
 
 
 cd ${dir}/docker
+cp ~/.ssh/ovhuser.pub .
 docker compose -f docker-compose.yml -p test up --scale "app=3" --build -d
+rm ovhuser.pub
 
 cd ${dir}
-./bootstrapVMAuthent.sh -t dockerHosts -u admin
+./bootstrapVMAuthent.sh -t dockerHosts
 
 displayDuration
