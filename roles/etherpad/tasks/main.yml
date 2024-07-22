@@ -6,15 +6,6 @@
   - targetExtension : '{{etherpad.domain.suffix}}'
   - targetIP: '{{ansible_default_ipv4.address}}'
 
-- name: install nodejs pre requisites
-  apt: 
-    name:
-    - dirmngr
-    - apt-transport-https
-    - lsb-release
-    - ca-certificates
-    state: present
-
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
@@ -22,18 +13,6 @@
   - pg_username: '{{ dbschema.etherpad.username }}'
   - pg_password: '{{ dbschema.etherpad.password }}'
   - pg_database: '{{ dbschema.etherpad.database }}'
-
-- name: install nodejs v22 dedicated repo
-  shell: 'curl -fsSL https://deb.nodesource.com/setup_22.x -o /tmp/nodesource_setup.sh'
-
-- name: Node installation script execution
-  shell: bash /tmp/nodesource_setup.sh
-
-- name: install nodejs
-  apt: 
-    name:
-    - nodejs
-    state: present
 
 - name: Ensure group "etherpad" exists
   group:

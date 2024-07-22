@@ -1,7 +1,5 @@
 ---
 
-NODE_MAJOR: 20
-
 uptimekuma:
   user: kuma
   group: kuma

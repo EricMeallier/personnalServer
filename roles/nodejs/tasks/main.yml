@@ -1,0 +1,23 @@
+---
+
+
+
+
+- name: install nodejs pre requisites
+  apt: 
+    name:
+    - dirmngr
+    - apt-transport-https
+    - lsb-release
+    - ca-certificates
+    - curl
+    state: present
+
+- name: install nodejs v{{package.version}} dedicated repo
+  shell: 'curl -fsSL https://deb.nodesource.com/setup_20.x | bash -'
+
+- name: install nodejs
+  apt: 
+    name:
+    - nodejs
+    state: latest
