@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clientConfig version="1.1">
+    <emailProvider id="{{ server.domain.sub}}{{server.domain.main }}">
+        <domain>{{ server.domain.sub}}{{server.domain.main }}</domain>
+        <displayName>Service {{ server.domain.sub}}{{server.domain.main }}</displayName>
+        <displayShortName>{{ server.domain.sub}}{{server.domain.main }}</displayShortName>
+        <incomingServer type="imap">
+            <hostname>mail.infomaniak.com</hostname>
+            <port>993</port>
+            <socketType>SSL</socketType>
+            <username>%EMAILADDRESS%</username>
+            <authentication>password-encrypted</authentication>
+        </incomingServer>
+        <incomingServer type="pop3">
+            <hostname>mail.infomaniak.com</hostname>
+            <port>995</port>
+            <socketType>SSL</socketType>
+            <username>%EMAILADDRESS%</username>
+            <authentication>password-encrypted</authentication>
+        </incomingServer>
+        <outgoingServer type="smtp">
+            <hostname>mail.infomaniak.com</hostname>
+            <port>465</port>
+            <socketType>SSL</socketType>
+            <username>%EMAILADDRESS%</username>
+            <authentication>password-encrypted</authentication>
+        </outgoingServer>
+    </emailProvider>
+</clientConfig>
