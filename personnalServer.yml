@@ -5,18 +5,3 @@
 
   roles:
   - socleConfig
-  - postgresql
-  - nginx
-#  - redmine
-  - gogs
-  - nextcloud
-  - etherpad
-  - fail2ban
-  - backup
-  - monit
-  - checkVersion
-  - logo
-  - autoconfigMail
-#  - uptime-kuma
-#  - restore_data
-  - rustdesk

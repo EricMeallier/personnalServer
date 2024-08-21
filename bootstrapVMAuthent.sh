@@ -134,7 +134,7 @@ else
   ANSIBLE_HOST_KEY_CHECKING=false \
   ANSIBLE_SSH_ARGS="${_ssh_options}" \
   ANSIBLE_CONFIG="${dir}/ansible.cfg" \
-  ansible-playbook -i "${temp_file_inventory}" -vvv -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
+  ansible-playbook -i "${temp_file_inventory}" -i "${dir}/inventory" -l "${server_target}" --user "${server_initial_root}" \
   --vault-id=user@~/.personnalVault \
   "${dir}/bootstrapPlaybook.yml"
 fi
