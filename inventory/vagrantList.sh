@@ -2,10 +2,10 @@
 
 dir=$(cd -P -- "$(dirname -- "$BASH_SOURCE[0]")" && pwd -P)
 
-vagrantIP=`cd ${dir}/../vm;vagrant ssh-config | grep HostName |awk  '{print $2}'`
-vagrantPort=`cd ${dir}/../vm;vagrant ssh-config | grep Port |awk  '{print $2}'`
-vagrantUser=`cd ${dir}/../vm;vagrant ssh-config | grep 'User ' |awk  '{print $2}'`
-vagrantIdentity=`cd ${dir}/../vm;vagrant ssh-config | grep IdentityFile |awk  '{print $2}'`
+vagrantIP=`cd ${dir}/../provision/vm;vagrant ssh-config | grep HostName |awk  '{print $2}'`
+vagrantPort=`cd ${dir}/../provision/vm;vagrant ssh-config | grep Port |awk  '{print $2}'`
+vagrantUser=`cd ${dir}/../provision/vm;vagrant ssh-config | grep 'User ' |awk  '{print $2}'`
+vagrantIdentity=`cd ${dir}/../provision/vm;vagrant ssh-config | grep IdentityFile |awk  '{print $2}'`
 
 
 # inventory building

@@ -99,7 +99,7 @@
         state: 'enabled'
 
 # certbot installation
-- name: install certobot wth dependencies
+- name: install certobot with dependencies
   apt: 
     name:
     - certbot
