@@ -16,6 +16,7 @@
   - monit
   - checkVersion
   - logo
+  - autoconfigMail
 #  - uptime-kuma
 #  - restore_data
   - rustdesk
