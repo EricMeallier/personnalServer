@@ -6,6 +6,7 @@
     - unzip
     - systemd-timesyncd
     - ufw
+    - acl
     state: present
     update_cache: yes
 
