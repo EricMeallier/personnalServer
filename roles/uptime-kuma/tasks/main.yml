@@ -6,6 +6,7 @@
   vars:
   - targetExtension : '{{kuma.domain.suffix}}'
   - targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
 
 - name: install pre requisites
   apt: 
