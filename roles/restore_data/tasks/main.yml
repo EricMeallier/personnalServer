@@ -1,5 +1,15 @@
 ---
 
+- name: Stop applications
+  systemd:
+    name: '{{ item }}'
+    state: stopped
+  loop:
+  - 'nginx.service'
+  - 'etherpad'
+  - 'gogs'
+  - 'php{{ php.version }}-fpm'
+
 - name: Restore database Redmine
   include_role:
     name : pg_restore_database
@@ -99,3 +109,14 @@
   file:
     path: '/data/nextcloud/nextcloud-last-data.tar'
     state: 'absent'
+
+- name: Restart applications
+  systemd:
+    name: '{{ item }}'
+    state: started
+  loop:
+  - 'nginx.service'
+  - 'etherpad'
+  - 'gogs'
+  - 'php{{ php.version }}-fpm'
+
