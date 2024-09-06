@@ -5,6 +5,7 @@
     name: '{{ item }}'
     state: stopped
   loop:
+  - 'monit'
   - 'nginx.service'
   - 'etherpad'
   - 'gogs'
@@ -119,4 +120,5 @@
   - 'etherpad'
   - 'gogs'
   - 'php{{ php.version }}-fpm'
+  - 'monit'
 
