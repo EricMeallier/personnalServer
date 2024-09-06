@@ -302,3 +302,8 @@
   copy:
     src: logrotate
     dest: /etc/logrotate.d/redmine
+
+- name: Cleanup installation
+  file:
+    path: '/tmp/redmine-{{package.version}}.{{package.type}}'
+    state: 'absent'

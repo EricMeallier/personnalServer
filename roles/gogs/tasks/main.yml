@@ -179,4 +179,9 @@
 - name: logrotate configuration
   copy:
     src: logrotate
-    dest: /etc/logrotate.d/gogs  
+    dest: /etc/logrotate.d/gogs
+
+- name: Cleanup installation
+  file:
+    path: '/tmp/gogs-{{ package.version }}.zip'
+    state: 'absent'
