@@ -10,7 +10,13 @@
   copy:
     src: customNginx.conf
     dest: /etc/fail2ban/jail.d/customNginx.conf
-    mode: '0640'
+    mode: '0644'
+
+- name: Default backend set to systemd
+  lineinfile:
+    dest: /etc/fail2ban/jail.conf
+    regexp: "^backend = auto"
+    line: "backend = systemd"
 
 - name: Service restart
   systemd:
