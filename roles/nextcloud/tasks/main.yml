@@ -326,3 +326,8 @@
   copy:
     src: logrotate
     dest: /etc/logrotate.d/nextcloud
+
+- name: Cleanup installation
+  file:
+    path: '/tmp/nextcloud-{{package.version}}.zip'
+    state: 'absent'

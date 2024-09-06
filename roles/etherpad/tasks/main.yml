@@ -89,3 +89,8 @@
   systemd:
     name: 'nginx'
     state: restarted
+
+- name: Cleanup installation
+  file:
+    path: '/tmp/etherpad-{{ package.version }}.zip'
+    state: 'absent'
