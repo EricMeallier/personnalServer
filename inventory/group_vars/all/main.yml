@@ -3,7 +3,7 @@
 
 
 # vars for environment
-redmine_unsecured: True
+redmine_unsecured: true
 
 php:
   version: 8.3
