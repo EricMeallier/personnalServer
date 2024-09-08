@@ -1,0 +1,43 @@
+---
+
+# Supervision of postgresql engine
+- name: does the postgreql user exists ?
+  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='netdata'"
+  register: userExists
+  become_user: 'postgres'
+
+- name: create user netdata for postgresql
+  shell: psql -t -c "CREATE USER netdata"
+  become_user: 'postgres'
+  when: userExists.stdout.find('found') != 1
+
+- name: grant netdata on postgresql
+  shell: psql -t -c "GRANT pg_monitor TO netdata"
+  become_user: 'postgres'
+
+# Supervision of PHP FPM engine
+- name: Active status page
+  lineinfile:
+    dest: /etc/php/{{ php.version }}/fpm/pool.d/www.conf
+    regexp: ";pm.status_path = /status"
+    line: "pm.status_path = /status"
+
+- name: active php-fpm monitoring
+  template:
+    src: phpfpm.conf
+    dest: /etc/netdata/go.d/phpfpm.conf
+
+- name: add netdata to nogroup to use fpm local socket
+  user:
+    name: 'netdata'
+    groups: 'nogroup'
+    append: yes
+
+# Restart nginx
+- name: Nginx service restart with full configuration
+  systemd:
+    name: '{{ item }}'
+    state: restarted
+  loop:
+    - 'nginx'
+    - 'php{{ php.version }}-fpm'

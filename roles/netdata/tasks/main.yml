@@ -16,20 +16,6 @@
     - gpg
     state: present
 
-- name: does the postgreql user exists ?
-  shell: psql -t -c "SELECT 'found' FROM pg_roles WHERE rolname='netdata'"
-  register: userExists
-  become_user: 'postgres'
-
-- name: create user netdata for postgresql
-  shell: psql -t -c "CREATE USER netdata"
-  become_user: 'postgres'
-  when: userExists.stdout.find('found') != 1
-
-- name: grant netdata on postgresql
-  shell: psql -t -c "GRANT pg_monitor TO netdata"
-  become_user: 'postgres'
-
 - name: Download netdata installation script
   get_url:
     url: https://get.netdata.cloud/kickstart.sh
