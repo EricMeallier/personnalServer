@@ -4,6 +4,8 @@
 redmine_unsecured: False
 
 server:
+  disk:
+    mainDevice: '/dev/vda2'
   domain:
     main: meallier.fr
     sub: test.

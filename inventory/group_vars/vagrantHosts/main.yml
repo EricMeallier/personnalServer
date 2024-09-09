@@ -4,6 +4,8 @@
 redmine_unsecured: True
 
 server:
+  disk:
+    mainDevice: '/dev/sda1'
   domain:
     main: meallier.fr
     sub: test.
