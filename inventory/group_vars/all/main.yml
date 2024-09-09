@@ -16,6 +16,8 @@ ruby:
   reducedversion: 3.2.0
 
 server:
+  disk:
+    mainDevice: '/dev/sda1'
   domain:
     main: meallier.fr
     sub:
