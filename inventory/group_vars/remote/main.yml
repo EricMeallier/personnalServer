@@ -2,7 +2,3 @@
 
 # vars for environment
 redmine_unsecured: False
-
-server:
-  disk:
-    mainDevice: '/dev/sda1'
