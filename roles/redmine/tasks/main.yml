@@ -58,7 +58,8 @@
 - name: Adding user root to rvm users
   user:
     name: 'root'
-    group: 'rvm'
+    groups: 
+      - 'rvm'
     append: yes
 
 - name: check if nginx already exists

@@ -17,7 +17,8 @@
   - checkVersion
   - logo
   - autoconfigMail
-#  - uptime-kuma
-#  - restore_data
-#  - rustdesk
-#  - netdata
+  - uptime-kuma
+  - restore_data
+  - rustdesk
+  - netdata
+  - netdataConf
