@@ -4,8 +4,8 @@
   include_role:
     name : pcloud_restore_file
   vars:
-  - foldername: '/tmp'
-  - filename: '{{ pg_filename }}'
+    foldername: '/tmp'
+    filename: '{{ pg_filename }}'
 
 - name: delete existing database
   shell: psql -c "DROP DATABASE {{ pg_database }}"

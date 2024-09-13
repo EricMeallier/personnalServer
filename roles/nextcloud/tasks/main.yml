@@ -4,8 +4,8 @@
   include_role:
     name : update_infomaniak_dns
   vars:
-  - targetExtension : '{{nextcloud.domain.suffix}}'
-  - targetIP: '{{ansible_default_ipv4.address}}'
+    targetExtension : '{{nextcloud.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
 - name: install php installation pre requisites
@@ -142,9 +142,9 @@
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ dbschema.nextcloud.username }}'
-  - pg_password: '{{ dbschema.nextcloud.password }}'
-  - pg_database: '{{ dbschema.nextcloud.database }}'
+    pg_username: '{{ dbschema.nextcloud.username }}'
+    pg_password: '{{ dbschema.nextcloud.password }}'
+    pg_database: '{{ dbschema.nextcloud.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure database (config/config.php)

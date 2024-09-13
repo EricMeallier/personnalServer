@@ -6,8 +6,8 @@
   include_role:
     name : update_infomaniak_dns
   vars:
-  - targetExtension : '{{autoconfig.domain.suffix}}'
-  - targetIP: '{{ansible_default_ipv4.address}}'
+    targetExtension : '{{autoconfig.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
 - name: directory for files under /data

@@ -3,17 +3,17 @@
   include_role:
     name : update_infomaniak_dns
   vars:
-  - targetExtension : '{{etherpad.domain.suffix}}'
-  - targetIP: '{{ansible_default_ipv4.address}}'
+    targetExtension : '{{etherpad.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ dbschema.etherpad.username }}'
-  - pg_password: '{{ dbschema.etherpad.password }}'
-  - pg_database: '{{ dbschema.etherpad.database }}'
+    pg_username: '{{ dbschema.etherpad.username }}'
+    pg_password: '{{ dbschema.etherpad.password }}'
+    pg_database: '{{ dbschema.etherpad.database }}'
 
 - name: Ensure group "etherpad" exists
   group:

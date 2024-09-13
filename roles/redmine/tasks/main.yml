@@ -4,8 +4,8 @@
   include_role:
     name : update_infomaniak_dns
   vars:
-  - targetExtension : '{{redmine.domain.suffix}}'
-  - targetIP: '{{ansible_default_ipv4.address}}'
+    targetExtension : '{{redmine.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
 - name: Install redmine pre requisites
@@ -35,9 +35,9 @@
   include_role:
     name : pg_new_fresh_database
   vars:
-  - pg_username: '{{ dbschema.redmine.username }}'
-  - pg_password: '{{ dbschema.redmine.password }}'
-  - pg_database: '{{ dbschema.redmine.database }}'
+    pg_username: '{{ dbschema.redmine.username }}'
+    pg_password: '{{ dbschema.redmine.password }}'
+    pg_database: '{{ dbschema.redmine.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: adding gpg key for rvm mpapis
