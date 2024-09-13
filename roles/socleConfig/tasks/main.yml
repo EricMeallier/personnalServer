@@ -125,3 +125,10 @@
 - name: generate Secure Diffie-Hellman
   shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
   when: not redmine_unsecured and ( not DHExists.stat.exists is defined or not DHExists.stat.exists)
+
+- name: certbot deploy hook
+  copy:
+    src: restartNginx.sh
+    dest: /etc/letsencrypt/renewal-hooks/deploy/restartNginx.sh
+    mode: '0644'
+  when: not redmine_unsecured

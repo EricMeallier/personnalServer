@@ -94,6 +94,9 @@
     PATH: '/usr/local/rvm/gems/ruby-{{ruby.version}}/bin:/usr/local/rvm/gems/ruby-{{ruby.version}}@global/bin:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
   when: not nginx_exists.stat.exists
 
+- name: rvm group for rubies folders
+  shell: chown -R root:rvm /usr/local/rvm/rubies
+
 - name: add mjs extension to javascript files
   lineinfile:
     dest: /opt/nginx/conf/mime.types
@@ -115,9 +118,10 @@
 - name: Adding user redmine to rvm users
   user:
     name: 'redmine'
-    group: 'rvm'
+    groups:
+    - 'rvm'
     append: yes
-
+  
 - name: Backup old installation, if needed
   copy:
     remote_src: true
@@ -286,13 +290,6 @@
   template:
     src: redmine.conf
     dest: /opt/nginx/conf/server/redmine.conf
-
-- name: certbot deploy hook
-  copy:
-    src: restartNginx.sh
-    dest: /etc/letsencrypt/renewal-hooks/deploy/restartNginx.sh
-    mode: '0644'
-  when: not redmine_unsecured
 
 - name: Nginx service restart with full configuration
   systemd:
