@@ -18,6 +18,9 @@
     regexp: "^backend = auto"
     line: "backend = systemd"
 
+- name: Modify rights access to allow netdata supervision
+  shell: chmod o+r /var/run/fail2ban/fail2ban.sock
+
 - name: Service restart
   systemd:
     name: 'fail2ban'
