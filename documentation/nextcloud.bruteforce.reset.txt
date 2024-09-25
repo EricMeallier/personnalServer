@@ -1,9 +1,9 @@
 
 cd /opt/nextcloud
-sudo -u nobody php8.2 occ maintenance:mode --on
+sudo -u nobody php8.3 occ maintenance:mode --on
 
 sudo -u postgres psql -d nextcloud -c "select 'Avant: ' || count(*) from oc_bruteforce_attempts;"
 sudo -u postgres psql -d nextcloud -c "truncate oc_bruteforce_attempts;"
 sudo -u postgres psql -d nextcloud -c "select 'Apres: ' || count(*) from oc_bruteforce_attempts;"
 
-sudo -u nobody php8.2 occ maintenance:mode --off
+sudo -u nobody php8.3 occ maintenance:mode --off

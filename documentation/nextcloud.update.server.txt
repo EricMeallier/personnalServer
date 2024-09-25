@@ -2,7 +2,7 @@ export NEW_VERSION=29.0.7
 export OLD_VERSION=29.0.6
 
 cd /opt/nextcloud-${OLD_VERSION}
-sudo -u nobody php8.2 occ maintenance:mode --on
+sudo -u nobody php8.3 occ maintenance:mode --on
 
 cd /opt
 # remove current link version
@@ -29,14 +29,14 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/tasks nextcloud/apps
 
 # restart services
 sudo systemctl restart nginx
-sudo systemctl restart php8.2-fpm
+sudo systemctl restart php8.3-fpm
 
 # upgrade to version
 cd /opt/nextcloud
-sudo -u nobody php8.2 occ upgrade
+sudo -u nobody php8.3 occ upgrade
 
 # disable maintenance mode
-sudo -u nobody php8.2 occ maintenance:mode --off
+sudo -u nobody php8.3 occ maintenance:mode --off
 
 # sweep old versions
 cd /opt
