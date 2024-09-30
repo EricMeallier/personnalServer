@@ -1,5 +1,5 @@
-export NEW_VERSION=29.0.7
-export OLD_VERSION=29.0.6
+export NEW_VERSION=30.0.0
+export OLD_VERSION=29.0.7
 
 cd /opt/nextcloud-${OLD_VERSION}
 sudo -u nobody php8.3 occ maintenance:mode --on
@@ -34,6 +34,11 @@ sudo systemctl restart php8.3-fpm
 # upgrade to version
 cd /opt/nextcloud
 sudo -u nobody php8.3 occ upgrade
+
+# check missing indexes in db
+sudo -u nobody php8.3 occ db:add-missing-indices
+sudo -u nobody php8.3 occ db:add-missing-primary-keys
+sudo -u nobody php8.3 occ db:add-missing-columns
 
 # disable maintenance mode
 sudo -u nobody php8.3 occ maintenance:mode --off
