@@ -1,5 +1,11 @@
 ---
 
+- name: Upgrade packages to the latest version
+  apt: 
+    name: "*"
+    state: latest
+    update_cache: yes
+
 - name: install socle packages
   apt: 
     name:
@@ -8,7 +14,6 @@
     - ufw
     - acl
     state: present
-    update_cache: yes
 
 - name: Data folder creation
   file:
