@@ -20,6 +20,9 @@
     path: '/home/ovhuser/.ssh/authorized_keys'
     manage_dir: 'yes'
 
+- name: user with no password (must be set to unlock account for sshd)
+  shell: '/usr/sbin/usermod -p "*" ovhuser'
+
 - name: user ovhuser sudoer
   lineinfile: dest=/etc/sudoers.d/ovhuser regexp="{{ item.regexp }}" line="{{ item.line }}"
               create=true state=present owner=root group=root mode=440

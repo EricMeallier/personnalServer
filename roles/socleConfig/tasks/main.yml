@@ -25,8 +25,13 @@
 
 - name: Disable Root Login and Password
   copy:
-    src: disable_root_login.conf
-    dest: /etc/ssh/sshd_config.d/disable_root_login.conf
+    src: 40-disable-root-login.conf
+    dest: /etc/ssh/sshd_config.d/40-disable-root-login.conf
+
+- name: Sshd service restart with full configuration
+  systemd:
+    name: 'sshd'
+    state: restarted
 
 - name: Remove ntp daemon if present
   apt:
@@ -57,6 +62,20 @@
     daemon_reload: true
     state: 'restarted'
     enabled: true
+
+- name: Defines available locales
+  copy:
+    src: 'locale.gen'
+    dest: '/etc/locale.gen'
+
+- name: Locale generation
+  shell: '/usr/sbin/locale-gen'
+
+- name: Set LANG
+  shell: '/usr/sbin/locale-gen set-locale LANG=en_US.UTF-8'
+
+- name: Set LC_ALL
+  shell: '/usr/sbin/locale-gen set-locale LC_ALL=fr_FR.UTF-8'
 
 - name: Configuration firewall
   block:

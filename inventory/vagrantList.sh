@@ -18,7 +18,7 @@ then
     vagrantIP=`cat ${vagrantSshConfig} | grep HostName |awk  '{print $2}'`
     vagrantPort=`cat ${vagrantSshConfig} | grep Port |awk  '{print $2}'`
 
-    ps -f | grep bootstrapVMAuthent >/dev/null 2>&1
+    ps -f | grep bootstrapVMAuthent | grep -v grep  >/dev/null 2>&1
     if [ $? -eq 0 ]
     then
         vagrantUser=`cat ${vagrantSshConfig} | grep 'User ' |awk  '{print $2}'`
