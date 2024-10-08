@@ -5,7 +5,6 @@ set -o pipefail   # honor exit codes when piping
 set -o nounset  # fail on unset variables
 
 dir=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
-playbook="personnalServer.yml"
 
 #
 # load utilities
