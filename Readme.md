@@ -1,5 +1,19 @@
 # Personnel Server
 
+## Pre requisites
+
+* Pour KVM/Libvirt
+```
+sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libvirt-dev
+sudo apt-get install virt-manager
+
+sudo apt-get install nfs-common nfs-kernel-server # ?
+
+sudo usermod -a -G libvirt $(whoami)
+
+newgrp libvirt # pas serein sur cette commande :)
+```
+
 ## Utilisation
 
 * Bootstrap: la connexion au server cible afin d'uniformiser le user, blocage du root + key ssh obligatoire
