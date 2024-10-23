@@ -1,5 +1,5 @@
-export NEW_VERSION=30.0.0
-export OLD_VERSION=29.0.7
+export NEW_VERSION=30.0.1
+export OLD_VERSION=30.0.0
 
 cd /opt/nextcloud-${OLD_VERSION}
 sudo -u nobody php8.3 occ maintenance:mode --on
@@ -26,6 +26,8 @@ sudo cp -a nextcloud-${OLD_VERSION}/apps/mail nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/notes nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/contacts nextcloud/apps
 sudo cp -a nextcloud-${OLD_VERSION}/apps/tasks nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/drawio nextcloud/apps
+sudo cp -a nextcloud-${OLD_VERSION}/apps/whiteboard nextcloud/apps
 
 # restart services
 sudo systemctl restart nginx
@@ -35,13 +37,13 @@ sudo systemctl restart php8.3-fpm
 cd /opt/nextcloud
 sudo -u nobody php8.3 occ upgrade
 
-# check missing indexes in db
+# disable maintenance mode
+sudo -u nobody php8.3 occ maintenance:mode --off
+
+# check missing indexes in db (without maintenance mode to include apps)
 sudo -u nobody php8.3 occ db:add-missing-indices
 sudo -u nobody php8.3 occ db:add-missing-primary-keys
 sudo -u nobody php8.3 occ db:add-missing-columns
-
-# disable maintenance mode
-sudo -u nobody php8.3 occ maintenance:mode --off
 
 # sweep old versions
 cd /opt
