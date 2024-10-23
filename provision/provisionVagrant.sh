@@ -12,10 +12,19 @@ if [ ! -r "${_utilities}" ]; then
 fi
 . "${_utilities}"
 
+set +o pipefail # to ignore grep error when nothing is found
 
 cd ${dir}/vm
-vagrant up
+# Choose provider: if libvirt plugin present => libvirt
+libvirt=$(vagrant plugin list | grep libvirt | wc -l)
+if [ ${libvirt} -eq 1 ]
+then
+  PROVIDER=libvirt
+else
+  PROVIDER=virtualbox
+fi
 
+vagrant up --provider=${PROVIDER}
 
 cd ${dir}
 ../bootstrapVMAuthent.sh -t vagrantHosts

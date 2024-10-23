@@ -30,11 +30,11 @@ sudo apt install virtualbox-7.0
 sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libvirt-dev
 sudo apt-get install virt-manager
 
-sudo apt-get install nfs-common nfs-kernel-server # ?
+sudo apt-get install nfs-common nfs-kernel-server # to enable sharing between host and VM - not mandatory
 
 sudo usermod -a -G libvirt $(whoami)
 
-newgrp libvirt # pas serein sur cette commande :)
+newgrp libvirt # to get into libvirt group immediately, not persistent
 
 vagrant plugin install vagrant-libvirt
 ```
