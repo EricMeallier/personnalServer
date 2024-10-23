@@ -2,7 +2,30 @@
 
 ## Pre requisites
 
-* Pour KVM/Libvirt
+* Vagrant
+```
+sudo echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com noble main" > /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt install vagrant
+
+vagrant plugin install vagrant-disksize
+```
+
+
+* VirtualBox 7.0 (on Mint 22)
+```
+sudo echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] http://download.virtualbox.org/virtualbox/debian jammy contrib" > /etc/apt/sources.list.d/virtualbox.list
+
+wget http://ftp.de.debian.org/debian/pool/main/libv/libvpx/libvpx7_1.12.0-1+deb12u3_amd64.deb
+sudo dpkg --install libvpx7_1.12.0-1+deb12u3_amd64.deb
+
+sudo apt install virtualbox-7.0
+
+# + install manually virtualbox Extension Pack
+```
+
+
+* Pour KVM/Libvirt (on Mint 22)
 ```
 sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libvirt-dev
 sudo apt-get install virt-manager
@@ -12,6 +35,16 @@ sudo apt-get install nfs-common nfs-kernel-server # ?
 sudo usermod -a -G libvirt $(whoami)
 
 newgrp libvirt # pas serein sur cette commande :)
+
+vagrant plugin install vagrant-libvirt
+```
+
+* Revert libvirt installation
+
+```
+vagrant plugin uninstall vagrant-libvirt
+
+sudo apt-get remove qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libvirt-dev virt-manager nfs-common nfs-kernel-server 
 ```
 
 ## Utilisation
