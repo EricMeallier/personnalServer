@@ -2,6 +2,8 @@
 
 package:
   version: 30.0.1
+  whiteboard:
+    version: 1.0.4
   appsToRestore:
   - 'bookmarks'
   - 'spreed'

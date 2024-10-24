@@ -1,0 +1,23 @@
+[Unit]
+Description=Etherpad
+After=syslog.target
+After=network.target
+After=postgresql.service
+
+[Service]
+Type=simple
+User=nobody
+Group=nogroup
+WorkingDirectory=/opt/whiteboard
+ExecStart=/usr/bin/npm run server:start
+Restart=always
+Environment=JWT_SECRET_KEY={{whiteboard_secret}}
+{% if redmine_unsecured %}
+Environment=NEXTCLOUD_URL=http://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}
+{% endif %}
+{% if not redmine_unsecured %}
+Environment=NEXTCLOUD_URL=https://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

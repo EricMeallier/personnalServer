@@ -285,6 +285,77 @@
     src: nextcloud.conf
     dest: /opt/nginx/conf/server/nextcloud.conf
 
+# Whiteboard standalone server
+
+- name: Whiteboard config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set whiteboard collabBackendUrl --value="https://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}/whiteboard/"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not redmine_unsecured
+
+- name: Whiteboard config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set whiteboard collabBackendUrl --value="http://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}/whiteboard/"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: redmine_unsecured
+
+- name: Whiteboard config Secret
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set whiteboard jwt_secret_key --value="{{whiteboard_secret}}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  
+- name: install pre requisites
+  apt: 
+    name:
+    - unzip
+    state: 'latest'
+
+- name: Download whiteboard files
+  get_url:
+    url: https://github.com/nextcloud/whiteboard/archive/refs/tags/v{{package.whiteboard.version}}.zip
+    dest: '/tmp/whiteboard-{{package.whiteboard.version}}.zip'
+ 
+- name: Extract whiteboard files into /opt
+  unarchive:
+    src: '/tmp/whiteboard-{{package.whiteboard.version}}.zip'
+    dest: /opt
+    remote_src: 'yes'
+    owner: 'nobody'
+    group: 'nogroup'
+
+- name: link whiteboard to current version
+  file:
+    src: /opt/whiteboard-{{package.whiteboard.version}}
+    dest: /opt/whiteboard
+    state: 'link'
+    owner: 'nobody'
+    group: 'nogroup'
+
+- name: build Whiteboard from sources
+  shell:
+    cmd: '/usr/bin/npm ci'
+    chdir: '/opt/whiteboard'
+
+- name: Whiteboard service script
+  template:
+    src: whiteboard.service
+    dest: /etc/systemd/system/whiteboard.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Whiteboard service enable
+  systemd:
+    name: 'whiteboard.service'
+    enabled: yes
+
+- name: Whiteboard service start
+  systemd:
+    name: 'whiteboard'
+    state: restarted
+
+# Restart services
+
 - name: Nginx service restart with full configuration
   systemd:
     name: 'nginx'

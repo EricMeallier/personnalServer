@@ -45,6 +45,13 @@
   args:
     chdir: '/tmp/nginx-release-{{package.version}}'
 
+- name: add mjs extension to javascript files
+  lineinfile:
+    dest: /opt/nginx/conf/mime.types
+    insertafter: '[Service]'
+    regexp: '    application/javascript.*'
+    line: '    application/javascript                           js mjs;'
+  
 - name: Install nginx service script
   copy:
     src: nginx.service
