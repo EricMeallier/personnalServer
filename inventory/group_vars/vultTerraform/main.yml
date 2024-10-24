@@ -3,6 +3,8 @@
 # vars for environment
 redmine_unsecured: False
 
+firewall_enabled: enabled
+
 server:
   disk:
     mainDevice: '/dev/vda2'

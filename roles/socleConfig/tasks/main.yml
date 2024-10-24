@@ -127,9 +127,9 @@
         state: present
         sysctl_set: yes
         reload: yes
-    - name: UFW enabled
+    - name: UFW enabled/disabled - {{ firewall_enabled }}
       ufw:
-        state: 'enabled'
+        state: '{{ firewall_enabled }}'
 
 # certbot installation
 - name: install certobot with dependencies

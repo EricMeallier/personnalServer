@@ -5,6 +5,8 @@
 # vars for environment
 redmine_unsecured: true
 
+firewall_enabled: enabled
+
 php:
   version: 8.3
 
