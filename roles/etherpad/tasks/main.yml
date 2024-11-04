@@ -7,6 +7,11 @@
     targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
+- name: Is already installed ?
+  stat:
+    path: "/opt/etherpad-lite/settings.json"
+  register: already_installed
+
 - name: Create dedicated database
   include_role:
     name : pg_new_fresh_database
@@ -14,6 +19,7 @@
     pg_username: '{{ dbschema.etherpad.username }}'
     pg_password: '{{ dbschema.etherpad.password }}'
     pg_database: '{{ dbschema.etherpad.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Ensure group "etherpad" exists
   group:
@@ -75,9 +81,14 @@
     state: restarted
     enabled: true
 
+- name: Is certificate already installed ?
+  stat:
+    path: "/etc/letsencrypt/live/{{ etherpad.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}/fullchain.pem"
+  register: cert_already_installed
+
 - name: generate etherpad certificate
   shell: /usr/bin/certbot certonly -d {{ etherpad.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
-  when: not redmine_unsecured
+  when: not redmine_unsecured and not cert_already_installed.stat.exists is defined and not cert_already_installed.stat.exists
       
 # finish installation with ssl termination
 - name: Copy full nginx ssl configuration file
