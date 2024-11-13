@@ -88,7 +88,7 @@
 
 - name: generate etherpad certificate
   shell: /usr/bin/certbot certonly -d {{ etherpad.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
-  when: not redmine_unsecured and not cert_already_installed.stat.exists is defined and not cert_already_installed.stat.exists
+  when: not redmine_unsecured and not cert_already_installed.stat.exists
       
 # finish installation with ssl termination
 - name: Copy full nginx ssl configuration file
