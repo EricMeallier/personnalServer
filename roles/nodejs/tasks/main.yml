@@ -14,7 +14,7 @@
     state: present
 
 - name: install nodejs v{{package.version}} dedicated repo
-  shell: 'curl -fsSL https://deb.nodesource.com/setup_20.x | bash -'
+  shell: 'curl -fsSL https://deb.nodesource.com/setup_{{package.version}}.x | bash -'
 
 - name: install nodejs
   apt: 

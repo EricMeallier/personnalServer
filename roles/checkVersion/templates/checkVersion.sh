@@ -63,9 +63,24 @@ STRSCAN_CURRENT_VERSION='3.1.0'
 STRSCAN_VERSION=`curl -sL https://rubygems.org/gems/strscan/versions | grep 'strscan\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*strscan\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
 check_delta "STRSCAN" $STRSCAN_CURRENT_VERSION $STRSCAN_VERSION
 
+NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
+NODEJS_VERSION=`curl -sL https://nodejs.org/en/about/previous-releases | grep 'data-label="Version"' | sed -e 's/.*\(22\.[0-9]*\.[0-9]*\).*/\1/'`
+check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
+
+NPM_CURRENT_VERSION=`/usr/bin/npm -v`
+NPM_VERSION=`curl -sL https://nodejs.org/en/about/previous-releases | grep 'data-label="npm"' | sed -e 's/.*\(10\.9\.[0-9]*\).*/\1/'`
+check_delta "NPM (apt)" $NPM_CURRENT_VERSION $NPM_VERSION
+
+RUBY_CURRENT_VERSION=`ls -l /usr/local/rvm/gems| grep 'ruby-[0-9]*\.[0-9]*\.[0-9]*$' | sed -e 's/.*ruby-\(.*\)/\1/' | sort --version-sort | tail -1`
+RUBY_VERSION=`curl -sL https://www.ruby-lang.org/en/downloads/releases/ | grep 'Ruby 3\.2\.[0-9]*<' | sed -e 's/.*Ruby \([0-9]*\.[0-9]*\.[0-9]*\)<.*/\1/' | sort --version-sort | tail -1`
+check_delta "RUBY" $RUBY_CURRENT_VERSION $RUBY_VERSION
+
 NGINX_CURRENT_VERSION=`/opt/nginx/sbin/nginx -v 2>&1 | sed -e 's/nginx version: nginx\/\([0-9]\.[0-9]*\.[0-9]*\)$/\1/'`
 NGINX_VERSION=`curl -sL https://github.com/nginx/nginx/tags | grep "tag\/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
-check_delta "NGINX" $NGINX_CURRENT_VERSION $NGINX_VERSION
+check_delta "NGINX" $NPM_CURRENT_VERSION $NGINX_VERSION
+
+check_delta "Postgresql (apt)" 15 15
+check_delta "PHP (apt)" 8.3 8.3
 
 IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then
