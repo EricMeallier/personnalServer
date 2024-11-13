@@ -1,5 +1,5 @@
-export NEW_VERSION=30.0.1
-export OLD_VERSION=30.0.0
+export NEW_VERSION=30.0.2
+export OLD_VERSION=30.0.1
 
 cd /opt/nextcloud-${OLD_VERSION}
 sudo -u nobody php8.3 occ maintenance:mode --on
