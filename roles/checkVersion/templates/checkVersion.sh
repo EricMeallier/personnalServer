@@ -77,10 +77,14 @@ check_delta "RUBY" $RUBY_CURRENT_VERSION $RUBY_VERSION
 
 NGINX_CURRENT_VERSION=`/opt/nginx/sbin/nginx -v 2>&1 | sed -e 's/nginx version: nginx\/\([0-9]\.[0-9]*\.[0-9]*\)$/\1/'`
 NGINX_VERSION=`curl -sL https://github.com/nginx/nginx/tags | grep "tag\/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
-check_delta "NGINX" $NPM_CURRENT_VERSION $NGINX_VERSION
+check_delta "NGINX" $NGINX_CURRENT_VERSION $NGINX_VERSION
 
 check_delta "Postgresql (apt)" 15 15
 check_delta "PHP (apt)" 8.3 8.3
+
+UPTIMEKUMA_CURRENT_VERSION='1.23.15'
+UPTIMEKUMA_VERSION=`curl -sL https://github.com/louislam/uptime-kuma/tags | grep "tags/[0-9]*\.[0-9]*\.[0-9]*\." | sed -e "s/.*tags\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
+check_delta "Passenger" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
 
 IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then

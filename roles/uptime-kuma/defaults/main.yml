@@ -6,5 +6,5 @@ uptimekuma:
   service: kuma
 
 package:
-  version: '1.23.13'
+  version: '1.23.15'
   type: tar.gz
