@@ -2,11 +2,9 @@
 
 package:
   gems:
-    passenger: 6.0.23
-    rmagick: 6.0.1
+    passenger: 6.0.27
     pg: 1.5.9
-    strscan: 3.1.0
-  version: 5.1.8
+  version: 6.0.4
   checksum: 
-    sha256: 50a30cd16c43d0ae64f256866c8cef4b0e9dd818d6feef489fa24507fbde3a7b
+    sha256: bebf8acb4fd1843f88e5f4285ff0b497fab43320c33e780a5c34e1124c5e177a
   type: tar.gz
