@@ -1,0 +1,53 @@
+---
+
+- name: Stop applications
+  systemd:
+    name: '{{ service_name }}'
+    state: stopped
+  loop:
+  - 'monit'
+  - 'nginx.service'
+  - 'gogs'
+  loop_control:
+    loop_var: service_name
+  ignore_errors: True
+
+- name: Restore database Gogs
+  include_role:
+    name : pg_restore_database
+  vars:
+    pg_filename: 'gogs-last.dmp'
+    pg_username: '{{ dbschema.gogs.username }}'
+    pg_database: '{{ dbschema.gogs.database }}'
+
+- name: Restore files from pcloud Gogs
+  include_role:
+    name : pcloud_restore_file
+  vars:
+    foldername: '/data/gogs-repositories'
+    filename: 'gogs-last-data.tar'
+
+- name: Uncompress data Gogs
+  unarchive:
+    src: '/data/gogs-repositories/gogs-last-data.tar'
+    dest: '/'
+    remote_src: 'yes'
+    owner: gogs
+    group: gogs
+
+- name: Remove old archive Gogs
+  file:
+    path: '/data/gogs-repositories/gogs-last-data.tar'
+    state: 'absent'
+
+- name: Restart applications
+  systemd:
+    name: '{{ service_name }}'
+    state: started
+  loop:
+  - 'gogs'
+  - 'nginx.service'
+  - 'monit'
+  loop_control:
+    loop_var: service_name
+

@@ -1,0 +1,57 @@
+---
+
+- name: Stop applications
+  systemd:
+    name: '{{ service_name }}'
+    state: stopped
+  loop:
+  - 'monit'
+  - 'nginx.service'
+  loop_control:
+    loop_var: service_name
+  ignore_errors: True
+  
+- name: Restore database Redmine
+  include_role:
+    name : pg_restore_database
+  vars:
+    pg_filename: 'redmine-last.dmp'
+    pg_username: '{{ dbschema.redmine.username }}'
+    pg_database: '{{ dbschema.redmine.database }}'
+
+- name: migrate redmine database
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; RAILS_ENV=production bin/rake db:migrate
+  args:
+    chdir: '/opt/redmine/'
+  become_user: redmine
+
+- name: Restore files from pcloud Redmine
+  include_role:
+    name : pcloud_restore_file
+  vars:
+    foldername: '/data/redmine-files'
+    filename: 'redmine-last-files.tar'
+
+- name: Uncompress data Redmine
+  unarchive:
+    src: '/data/redmine-files/redmine-last-files.tar'
+    dest: '/'
+    remote_src: 'yes'
+    owner: nobody
+    group: nogroup
+
+- name: Remove old archive Redmine Redmine
+  file:
+    path: '/data/redmine-files/redmine-last-files.tar'
+    state: 'absent'
+
+- name: Restart applications
+  systemd:
+    name: '{{ service_name }}'
+    state: started
+  loop:
+  - 'nginx.service'
+  - 'monit'
+  loop_control:
+    loop_var: service_name
+
