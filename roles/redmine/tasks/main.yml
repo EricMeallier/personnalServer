@@ -76,15 +76,9 @@
 - name: install pg client
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '{{ package.gems.pg }}'
 
-- name: install rmagick
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install rmagick -v '{{ package.gems.rmagick }}'
-
 - name: install passenger
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install passenger -v '{{ package.gems.passenger }}'
   when: not nginx_exists.stat.exists
-
-- name: install strscan
-  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install strscan -v '{{ package.gems.strscan }}'
 
 - name: install nginx with passenger
   shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
