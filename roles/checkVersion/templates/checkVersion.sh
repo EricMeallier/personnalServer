@@ -20,7 +20,7 @@ check_delta () {
 }
 
 REDMINE_CURRENT_VERSION=`ls -l /opt/redmine | sed -e 's/.*redmine-\(.*\)/\1/'`
-REDMINE_VERSION=`curl -s https://www.redmine.org/ | grep "wiki-page" | grep "Download\"" | sed -e "s/.*Download\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*wiki-page.*/\1/"`
+REDMINE_VERSION=`curl -s https://www.redmine.org/ | grep "wiki-page" | grep "Download\"" | sed -e "s/.*Download\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*/\1/"`
 check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
 
 GOGS_CURRENT_VERSION=`ls -l /opt/gogs | sed -e 's/.*gogs-\(.*\)/\1/'`
@@ -47,7 +47,7 @@ RUSTDESK_CURRENT_VERSION=`apt show rustdesk-server-hbbr 2> /dev/null | grep Vers
 RUSTDESK_VERSION=`curl -sL https://github.com/rustdesk/rustdesk-server/releases | grep "tag/[0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\"" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Rustdesk" $RUSTDESK_CURRENT_VERSION $RUSTDESK_VERSION
 
-PASSENGER_CURRENT_VERSION='6.0.23'
+PASSENGER_CURRENT_VERSION='6.0.27'
 PASSENGER_VERSION=`curl -sL https://github.com/phusion/passenger/releases | grep "tag/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Passenger" $PASSENGER_CURRENT_VERSION $PASSENGER_VERSION
 
@@ -55,20 +55,12 @@ PG_CURRENT_VERSION='1.5.9'
 PG_VERSION=`curl -sL https://rubygems.org/gems/pg/versions | grep 'pg\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*pg\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
 check_delta "PG" $PG_CURRENT_VERSION $PG_VERSION
 
-RMAGICK_CURRENT_VERSION='6.0.1'
-RMAGICK_VERSION=`curl -sL https://rubygems.org/gems/rmagick/versions | grep 'rmagick\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*rmagick\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
-check_delta "RMAGICK" $RMAGICK_CURRENT_VERSION $RMAGICK_VERSION
-
-STRSCAN_CURRENT_VERSION='3.1.0'
-STRSCAN_VERSION=`curl -sL https://rubygems.org/gems/strscan/versions | grep 'strscan\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*strscan\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
-check_delta "STRSCAN" $STRSCAN_CURRENT_VERSION $STRSCAN_VERSION
-
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
 NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v22\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(22.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
 
 RUBY_CURRENT_VERSION=`ls -l /usr/local/rvm/gems| grep 'ruby-[0-9]*\.[0-9]*\.[0-9]*$' | sed -e 's/.*ruby-\(.*\)/\1/' | sort --version-sort | tail -1`
-RUBY_VERSION=`curl -sL https://www.ruby-lang.org/en/downloads/releases/ | grep 'Ruby 3\.2\.[0-9]*<' | sed -e 's/.*Ruby \([0-9]*\.[0-9]*\.[0-9]*\)<.*/\1/' | sort --version-sort | tail -1`
+RUBY_VERSION=`curl -sL https://www.ruby-lang.org/en/downloads/releases/ | grep 'Ruby 3\.3\.[0-9]*<' | sed -e 's/.*Ruby \([0-9]*\.[0-9]*\.[0-9]*\)<.*/\1/' | sort --version-sort | tail -1`
 check_delta "RUBY" $RUBY_CURRENT_VERSION $RUBY_VERSION
 
 NGINX_CURRENT_VERSION=`/opt/nginx/sbin/nginx -v 2>&1 | sed -e 's/nginx version: nginx\/\([0-9]\.[0-9]*\.[0-9]*\)$/\1/'`
@@ -80,7 +72,7 @@ check_delta "PHP (apt)" 8.3 8.3
 
 UPTIMEKUMA_CURRENT_VERSION='1.23.16'
 UPTIMEKUMA_VERSION=`curl -sL https://github.com/louislam/uptime-kuma/tags | grep "tags/[0-9]*\.[0-9]*\.[0-9]*\." | sed -e "s/.*tags\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
-check_delta "Passenger" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
+check_delta "UptimeKuma" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
 
 IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
 if [ "${IS_APT_UP_TODATE}" != "0" ]; then
