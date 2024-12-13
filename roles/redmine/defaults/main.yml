@@ -2,11 +2,18 @@
 
 package:
   gems:
-    passenger: 6.0.23
+    passenger: 6.0.24
     rmagick: 6.0.1
     pg: 1.5.9
+<<<<<<< HEAD
     strscan: 3.1.0
   version: 5.1.5
   checksum: 
     sha256: 2c9739511712fc1381d9584fa005f911a3022e8366d1d6a53fec0f014dac0168
+=======
+    strscan: 3.1.1
+  version: 6.0.2
+  checksum: 
+    sha256: d06e8b1b0c0c9210d2ed6207d2a3f729c26a996255e47c3b0bd4782550150e45
+>>>>>>> c802951 (Update Ruby/Redmine/etc redmine 6.x)
   type: tar.gz
