@@ -1,0 +1,16 @@
+/opt/gitea/log/hooks/*.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}
+/opt/gitea/log/*.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    missingok
+    notifempty
+}

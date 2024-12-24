@@ -1,0 +1,156 @@
+---
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+    targetExtension : '{{gitea.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
+
+- name: install gitea pre requisites
+  apt: 
+    name:
+    - git
+    state: present
+
+- name: Ensure group "gitea" exists
+  group:
+    name: gitea
+    state: present
+
+- name: Add the user 'gitea'
+  user:
+    name: gitea
+    group: gitea
+
+- name: Creating working folders
+  file:
+    path: '{{ item }}'
+    state: directory
+    recurse: yes
+    owner: gitea
+    group: gitea
+  loop:
+  - '/opt/gitea'
+  - '/data/gitea'  
+
+
+- name: Is already installed ?
+  stat:
+    path: "/opt/gitea/gitea.ini"
+  register: already_installed
+
+- name: Is already downloaded ?
+  stat:
+    path: "'/opt/gitea/gitea-{{ package.version }}-linux-amd64'"
+  register: already_zip
+
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+    pg_username: '{{ dbschema.gitea.username }}'
+    pg_password: '{{ dbschema.gitea.password }}'
+    pg_database: '{{ dbschema.gitea.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Download gitea files
+  get_url:
+    url: https://github.com/go-gitea/gitea/releases/download/v{{ package.version }}/gitea-{{ package.version }}-linux-amd64
+    dest: '/opt/gitea/gitea-{{ package.version }}-linux-amd64'
+  when: not already_zip.stat.exists is defined or not already_zip.stat.exists
+
+- name: Backup old installation, if needed
+  copy:
+    remote_src: true
+    src: '/opt/gitea/gitea.ini'
+    dest: '/opt/gitea.ini'
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Make it executable
+  file:
+    path: '/opt/gitea/gitea-{{ package.version }}-linux-amd64'
+    mode: '755'
+    owner: gitea
+    group: gitea
+
+- name: link to current version
+  file:
+    src: /opt/gitea/gitea-{{ package.version }}-linux-amd64
+    dest: /opt/gitea/gitea
+    state: 'link'
+    owner: 'gitea'
+    group: 'gitea'
+
+- name: Data folder creation
+  file:
+    path: '/data/gitea'
+    state: 'directory'
+    owner: gitea
+    group: gitea
+
+- name: Restore old configuration, if needed
+  command: mv /opt/gitea.ini /opt/gitea/gitea.ini
+  when: already_installed.stat.exists is defined and already_installed.stat.exists
+
+- name: Copy database configuration file
+  template:
+    src: gitea.ini
+    dest: /opt/gitea/gitea.ini
+    owner: gitea
+    group: gitea
+    mode: '0644'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+  
+- name: Install gitea service script
+  copy:
+    src: gitea.service
+    dest: /etc/systemd/system/gitea.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: gitea service reload/start
+  systemd:
+    name: 'gitea'
+    daemon_reload: true
+    state: restarted
+    enabled: true
+
+- name: Create admin user
+  command: '/opt/gitea/gitea --config /opt/gitea/gitea.ini admin user create --username {{ gitea.admin.username }} --password {{ gitea.admin.password }} --email {{ gitea.admin.email }} --admin'
+  become_user: 'gitea'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: generate gitea certificate
+  shell: /usr/bin/certbot certonly -d {{ gitea.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: gitea.conf
+    dest: /opt/nginx/conf/server/gitea.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
+
+- name: Ouverture firewall entrant (tcp)
+  ufw:
+    rule: 'allow'
+    proto: 'tcp'
+    port: '{{ gitea.ssh.port }}'
+
+- name: logrotate configuration
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/gitea

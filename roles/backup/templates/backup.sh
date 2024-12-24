@@ -19,6 +19,11 @@ gzip -f ${targetDir}/gogs-${timestamp=}.dmp
 curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gogs-${timestamp=}.dmp.gz
 rm -f ${targetDir}/gogs-${timestamp=}.dmp.gz
 
+sudo su - postgres -c "pg_dump gitea > ${targetDir}/gitea-${timestamp=}.dmp"
+gzip -f ${targetDir}/gitea-${timestamp=}.dmp
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gitea-${timestamp=}.dmp.gz
+rm -f ${targetDir}/gitea-${timestamp=}.dmp.gz
+
 sudo su - postgres -c "pg_dump redmine > ${targetDir}/redmine-${timestamp=}.dmp"
 gzip -f ${targetDir}/redmine-${timestamp=}.dmp
 curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/redmine-${timestamp=}.dmp.gz
@@ -50,6 +55,12 @@ tar zcvf ${targetDir}/gogs-${timestamp=}-data.tar.gz /data/gogs-repositories
 curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gogs-${timestamp=}-data.tar.gz
 rm -f ${targetDir}/gogs-${timestamp=}-data.tar.gz
 systemctl start gogs
+
+## gitea
+tar zcvf ${targetDir}/gitea-${timestamp=}-data.tar.gz /data/gitea
+curl -X POST "https://eapi.pcloud.com/uploadfile?auth=${auth}&folderid={{ pcloud.folder.id }}" -F update=@${targetDir}/gitea-${timestamp=}-data.tar.gz
+rm -f ${targetDir}/gitea-${timestamp=}-data.tar.gz
+systemctl start gitea
 
 # nextcloud
 GZIP=-9; tar zcvf ${targetDir}/nextcloud-${timestamp=}-data.tar.gz --exclude={"nextcloud.log*"} /data/nextcloud

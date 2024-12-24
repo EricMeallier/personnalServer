@@ -9,6 +9,7 @@
   - redmine
 #  - nginx
   - gogs
+  - gitea
   - nextcloud
   - etherpad
   - fail2ban
