@@ -1,0 +1,51 @@
+---
+
+
+
+- name: gitea service reload/start
+  systemd:
+    name: 'gitea'
+    daemon_reload: true
+    state: restarted
+    enabled: true
+
+- name: gitea initial configuration
+  shell: 'curl -H "Content-type: application/x-www-form-urlencoded" -d "db_type=postgres" -d "db_host={{ dbschema.gitea.database }}" -d "db_user={{ dbschema.gitea.username }}" -d "db_passwd={{ dbschema.gitea.password }}" -d "db_name={{ dbschema.gitea.database }}" -d "ssl_mode=disable" -d "db_schema=" -d "charset=utf8" -d "db_path=fake.db" -d "app_name=Gitea: Initial" -d "repo_root_path=%2Fdata%2Fgitea%2Frepositories" -d "lfs_root_path=%2Fdata%2Fgitea%2Flfs" -d "run_user=gitea" -d "domain={{ gitea.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}" -d "ssh_port={{ gitea.ssh.port }}" -d "http_port=3000" -d "app_url=http:%2F%2F{{ gitea.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}%2F" -d "log_root_path=%2Fdata%2Fgitea%2Flog" -d "smtp_addr={{ mail.smtp.address }}" -d "smtp_port={{ mail.smtp.port }}" -d "smtp_from={{ mail.smtp.from }}" -d "smtp_user={{ mail.smtp.username }}" -d "smtp_passwd={{ mail.smtp.password }}" -d "enable_federated_avatar=off" -d "enable_open_id_sign_in=off" -d "enable_open_id_sign_up=off" -d "enable_captcha=off" -d "require_sign_in_view=off" -d "default_allow_create_organization=off" -d "default_enable_timetracking=on" -d "no_reply_address=noreply.localhost" -d "password_algorithm=pbkdf2" -d "admin_name={{ gitea.admin.username }}" -d "admin_passwd={{ gitea.admin.password }}" -d "admin_confirm_passwd={{ gitea.admin.password }}" -d "admin_email={{ gitea.admin.email }}" -X POST  http://localhost:3000/'
+
+#- name: Create admin user
+#  command: '/opt/gitea/gitea admin user create --username {{ gitea.admin.username }} --password {{ gitea.admin.password }} --email {{ gitea.admin.email }} --admin'
+#  become_user: 'gitea'
+#  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: nginx service reload/start
+  systemd:
+    name: 'nginx'
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: generate gitea certificate
+  shell: /usr/bin/certbot certonly -d {{ gitea.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: gitea.conf
+    dest: /opt/nginx/conf/server/gitea.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
+
+- name: Ouverture firewall entrant (tcp)
+  ufw:
+    rule: 'allow'
+    proto: 'tcp'
+    port: '{{ gitea.ssh.port }}'
+
+- name: logrotate configuration
+  copy:
+    src: logrotate
+    dest: /etc/logrotate.d/gitea

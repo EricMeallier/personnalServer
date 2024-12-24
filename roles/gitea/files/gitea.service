@@ -1,0 +1,17 @@
+[Unit]
+Description=Gitea
+After=syslog.target
+After=network.target
+After=postgresql.service
+
+[Service]
+Type=simple
+User=gitea
+Group=gitea
+WorkingDirectory=/opt/gitea
+ExecStart=/opt/gitea/gitea web --config /opt/gitea/gitea.ini
+Environment=USER=gitea HOME=/opt/gitea GITEA_WORK_DIR=/opt/gitea
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
