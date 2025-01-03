@@ -1,0 +1,16 @@
+---
+ 
+- name: generate couinche certificate
+  shell: /usr/bin/certbot certonly -d {{ couinche.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: couinche.conf
+    dest: /opt/nginx/conf/server/couinche.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
