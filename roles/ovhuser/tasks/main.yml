@@ -31,3 +31,17 @@
 
 - name: user ovhuser sudo witout tty
   replace: dest=/etc/sudoers regexp='^#?Defaults(\s+)requiretty$' replace='Defaults !requiretty'
+
+- name: push default vi configuration
+  copy:
+    src:  vimrc
+    dest: /home/ovhuser/.vimrc
+    owner: ovhuser
+    mode: '0755'
+
+- name: push default vi configuration for root user
+  copy:
+    src:  vimrc
+    dest: /root/.vimrc
+    owner: ovhuser
+    mode: '0755'
