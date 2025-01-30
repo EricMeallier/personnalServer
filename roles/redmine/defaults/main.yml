@@ -6,7 +6,7 @@ package:
     rmagick: 6.0.1
     pg: 1.5.9
     strscan: 3.1.0
-  version: 5.1.5
+  version: 5.1.6
   checksum: 
-    sha256: 2c9739511712fc1381d9584fa005f911a3022e8366d1d6a53fec0f014dac0168
+    sha256: d73584e74d692aa94644799d986df4e846fb59a43205c16bd857ed56cf0abed9
   type: tar.gz
