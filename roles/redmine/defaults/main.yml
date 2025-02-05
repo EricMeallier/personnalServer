@@ -3,9 +3,7 @@
 package:
   gems:
     passenger: 6.0.24
-    rmagick: 6.1.0
     pg: 1.5.9
-    strscan: 3.1.2
   version: 6.0.3
   checksum: 
     sha256: 48a139e9416f97922ab48231912fed8aa4c48d4a96b8f507124b11e4335218d6

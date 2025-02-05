@@ -55,14 +55,6 @@ PG_CURRENT_VERSION='1.5.9'
 PG_VERSION=`curl -sL https://rubygems.org/gems/pg/versions | grep 'pg\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*pg\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
 check_delta "PG" $PG_CURRENT_VERSION $PG_VERSION
 
-RMAGICK_CURRENT_VERSION='6.0.1'
-RMAGICK_VERSION=`curl -sL https://rubygems.org/gems/rmagick/versions | grep 'rmagick\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*rmagick\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
-check_delta "RMAGICK" $RMAGICK_CURRENT_VERSION $RMAGICK_VERSION
-
-STRSCAN_CURRENT_VERSION='3.1.2'
-STRSCAN_VERSION=`curl -sL https://rubygems.org/gems/strscan/versions | grep 'strscan\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*strscan\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
-check_delta "STRSCAN" $STRSCAN_CURRENT_VERSION $STRSCAN_VERSION
-
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
 NODEJS_VERSION=`curl -sL https://nodejs.org/en/about/previous-releases | grep 'data-label="Version"' | sed -e 's/.*\(22\.[0-9]*\.[0-9]*\).*/\1/'`
 check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
