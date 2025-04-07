@@ -2,7 +2,7 @@
 
 package:
   gems:
-    passenger: 6.0.26
+    passenger: 6.0.27
     pg: 1.5.9
   version: 6.0.4
   checksum: 
