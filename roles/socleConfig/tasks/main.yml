@@ -23,10 +23,16 @@
     owner: root
     group: root
 
-- name: Disable Root Login and Password
+- name: Disable Root Login and Password (+ security bonus)
   copy:
-    src: 40-disable-root-login.conf
-    dest: /etc/ssh/sshd_config.d/40-disable-root-login.conf
+    src: '40-disable-root-login.conf'
+    dest: '/etc/ssh/sshd_config.d/40-disable-root-login.conf'
+
+- name: Disable SFTP
+  lineinfile:
+    dest: '/etc/ssh/sshd_config'
+    regexp: '^Subsystem.*sftp'
+    line: '# Subsystem       sftp    /usr/lib/openssh/sftp-server'
 
 - name: Sshd service restart with full configuration
   systemd:
