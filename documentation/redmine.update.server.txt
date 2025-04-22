@@ -1,7 +1,7 @@
 sudo su -
 
-export OLD=5.1.6
-export NEW=5.1.7
+export OLD=5.1.7
+export NEW=5.1.8
 
 cd /opt
 rm redmine
