@@ -42,6 +42,7 @@ vagrant plugin install vagrant-libvirt
 * Revert libvirt installation
 
 ```
+ # Somtimes, workaround needed: export VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1
 vagrant plugin uninstall vagrant-libvirt
 
 sudo apt-get remove qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libvirt-dev virt-manager nfs-common nfs-kernel-server 
