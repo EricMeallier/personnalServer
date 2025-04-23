@@ -25,8 +25,11 @@ else
 fi
 
 vagrant up --provider=${PROVIDER}
+address_ip=$(vagrant ssh-config 2> /dev/null | grep HostName | tr -d ' HostName')
 
 cd ${dir}
 ../bootstrapVMAuthent.sh -t vagrantHosts
+
+echo "Address IP: ${address_ip}"
 
 displayDuration

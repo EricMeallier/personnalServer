@@ -19,4 +19,5 @@ initial_address=$(cat terraform.tfstate | jq -r '.resources[]|select( .type == "
 cd ${dir}
 ../bootstrapVMAuthent.sh -t vultTerraform
 
+echo "Address IP: ${initial_address}"
 displayDuration
