@@ -194,6 +194,12 @@
 - name: configure redmine user to retrieve gems
   shell: chmod -R g+w /usr/local/rvm/rubies/ruby-{{ruby.version}}/lib/ruby/gems/{{ruby.reducedversion}}
 
+- name: tweak before redmine 6.0.6
+  lineinfile:
+    dest: /opt/redmine/Gemfile
+    regexp: "^gem 'rbpdf.*"
+    line: "gem 'rbpdf', '~> 1.21.4'"
+
 - name: retrieve dependencies for redmine
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; bundle install
   args:
