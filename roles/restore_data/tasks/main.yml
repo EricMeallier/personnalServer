@@ -19,6 +19,12 @@
     pg_username: '{{ dbschema.redmine.username }}'
     pg_database: '{{ dbschema.redmine.database }}'
 
+- name: migrate redmine database
+  shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; RAILS_ENV=production bin/rake db:migrate
+  args:
+    chdir: '/opt/redmine/'
+  become_user: redmine
+
 - name: Restore files from pcloud Redmine
   include_role:
     name : pcloud_restore_file
