@@ -64,12 +64,8 @@ STRSCAN_VERSION=`curl -sL https://rubygems.org/gems/strscan/versions | grep 'str
 check_delta "STRSCAN" $STRSCAN_CURRENT_VERSION $STRSCAN_VERSION
 
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
-NODEJS_VERSION=`curl -sL https://nodejs.org/en/about/previous-releases | grep 'data-label="Version"' | sed -e 's/.*\(22\.[0-9]*\.[0-9]*\).*/\1/'`
+NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v22\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(22.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
-
-NPM_CURRENT_VERSION=`/usr/bin/npm -v`
-NPM_VERSION=`curl -sL https://nodejs.org/en/about/previous-releases | grep 'data-label="npm"' | sed -e 's/.*\(10\.9\.[0-9]*\).*/\1/'`
-check_delta "NPM (apt)" $NPM_CURRENT_VERSION $NPM_VERSION
 
 RUBY_CURRENT_VERSION=`ls -l /usr/local/rvm/gems| grep 'ruby-[0-9]*\.[0-9]*\.[0-9]*$' | sed -e 's/.*ruby-\(.*\)/\1/' | sort --version-sort | tail -1`
 RUBY_VERSION=`curl -sL https://www.ruby-lang.org/en/downloads/releases/ | grep 'Ruby 3\.2\.[0-9]*<' | sed -e 's/.*Ruby \([0-9]*\.[0-9]*\.[0-9]*\)<.*/\1/' | sort --version-sort | tail -1`
