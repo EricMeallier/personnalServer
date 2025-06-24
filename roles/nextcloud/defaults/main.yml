@@ -3,7 +3,7 @@
 package:
   version: 31.0.6
   whiteboard:
-    version: 1.0.5
+    version: 1.1.1
   appsToRestore:
   - 'bookmarks'
   - 'spreed'
