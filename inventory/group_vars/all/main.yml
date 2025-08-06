@@ -14,7 +14,7 @@ postgresql:
   version: 15
 
 ruby:
-  version: 3.3.8
+  version: 3.3.9
   reducedversion: 3.3.0
 
 server:

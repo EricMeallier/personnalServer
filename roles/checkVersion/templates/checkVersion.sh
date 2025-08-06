@@ -51,10 +51,6 @@ PASSENGER_CURRENT_VERSION='6.0.27'
 PASSENGER_VERSION=`curl -sL https://github.com/phusion/passenger/releases | grep "tag/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Passenger" $PASSENGER_CURRENT_VERSION $PASSENGER_VERSION
 
-PG_CURRENT_VERSION='1.5.9'
-PG_VERSION=`curl -sL https://rubygems.org/gems/pg/versions | grep 'pg\/versions\/[0-9]*\.[0-9]*\.[0-9]*\">' | sed -e 's/.*pg\/versions\/\([0-9]\.[0-9]*\.[0-9]*\)">.*/\1/' | sort --version-sort | tail -1`
-check_delta "PG" $PG_CURRENT_VERSION $PG_VERSION
-
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
 NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v22\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(22.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
