@@ -1,5 +1,5 @@
 [Unit]
-Description=Etherpad
+Description=Whiteboard
 After=syslog.target
 After=network.target
 After=postgresql.service
