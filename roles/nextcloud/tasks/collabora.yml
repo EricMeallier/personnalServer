@@ -1,0 +1,84 @@
+---
+
+# Collabora standalone server
+
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+    targetExtension : '{{office.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
+
+- name: Wopi public config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not redmine_unsecured
+
+- name: Wopi config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not redmine_unsecured
+
+- name: Wopi public config URL unsecure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: redmine_unsecured
+
+- name: Wopi config URL unsecure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: redmine_unsecured
+
+- name: Download repo certificate
+  get_url:
+    url: https://collaboraoffice.com/downloads/gpg/collaboraonline-release-keyring.gpg
+    dest: '/etc/apt/keyrings/collaboraonline-release-keyring.gpg'
+
+- name: Add repo source
+  copy:
+    src: collaboraonline.sources
+    dest: /etc/apt/sources.list.d/collaboraonline.sources
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install Collabora package
+  apt: 
+    name:
+    - coolwsd
+    - code-brand
+    state: 'latest'
+    update_cache: yes
+
+- name: Configure Collabora Server
+  template:
+    src: coolwsd.xml
+    dest: /etc/coolwsd/coolwsd.xml
+    owner: cool
+    group: cool
+    mode: '0640'
+
+- name: Collabora service start
+  systemd:
+    name: 'coolwsd'
+    state: restarted
+
+- name: generate office certificate
+  shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: office.conf
+    dest: /opt/nginx/conf/server/office.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted

@@ -3,7 +3,7 @@
 package:
   version: 31.0.9
   whiteboard:
-    version: 1.2.0
+    version: 1.2.1
   appsToRestore:
   - 'bookmarks'
   - 'spreed'
@@ -14,3 +14,4 @@ package:
   - 'tasks'
   - 'drawio'
   - 'whiteboard'
+  - 'richdocuments'

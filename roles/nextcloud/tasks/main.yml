@@ -289,6 +289,10 @@
 - name: Whiteboard installation
   include_tasks: whiteboard.yml
 
+# Collabora standalone server
+- name: Collabora installation
+  include_tasks: collabora.yml
+
 # Restart services
 
 - name: Nginx service restart with full configuration
