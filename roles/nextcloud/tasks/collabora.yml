@@ -49,11 +49,11 @@
 
 - name: Collabora config - admin username
   shell: 
-    cmd: 'coolconfig set admin.username {{ office.admin.username }}'
+    cmd: 'coolconfig set admin_console.username {{ office.admin.username }}'
 
 - name: Collabora config - admin password
   shell: 
-    cmd: 'coolconfig set admin.password admin {{ office.admin.password }}'
+    cmd: 'coolconfig set admin_console.password {{ office.admin.password }}'
 
 - name: Collabora config - Post Allow host
   shell: 

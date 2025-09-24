@@ -1,0 +1,1 @@
+URL de la console d'administration de collabora: https://office.meallier.fr/browser/dist/admin/admin.html
