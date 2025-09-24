@@ -10,30 +10,6 @@
     targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
-- name: Wopi public config URL secure
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not redmine_unsecured
-
-- name: Wopi config URL secure
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not redmine_unsecured
-
-- name: Wopi public config URL unsecure
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: redmine_unsecured
-
-- name: Wopi config URL unsecure
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: redmine_unsecured
-
 - name: Download repo certificate
   get_url:
     url: https://collaboraoffice.com/downloads/gpg/collaboraonline-release-keyring.gpg
@@ -63,10 +39,65 @@
     group: cool
     mode: '0640'
 
+- name: Collabora config - termination SSL
+  shell: 
+    cmd: 'coolconfig set ssl.termination true'
+
+- name: Collabora config - enable SSL
+  shell: 
+    cmd: 'coolconfig set ssl.enable true'
+
+- name: Collabora config - admin username
+  shell: 
+    cmd: 'coolconfig set admin.username {{ office.admin.username }}'
+
+- name: Collabora config - admin password
+  shell: 
+    cmd: 'coolconfig set admin.password admin {{ office.admin.password }}'
+
+- name: Collabora config - Post Allow host
+  shell: 
+    cmd: 'coolconfig set net.post_allow.host 127.0.0.1/32'
+
 - name: Collabora service start
   systemd:
     name: 'coolwsd'
     state: restarted
+
+- name: Wopi public config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not redmine_unsecured
+
+- name: Wopi config URL secure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not redmine_unsecured
+
+- name: Wopi public config URL unsecure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: redmine_unsecured
+
+- name: Wopi config URL unsecure
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_url --value="http://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: redmine_unsecured
+
+- name: Restrict WOPI host list => not working / disabled
+  shell: 
+    cmd: "sudo -u nobody php{{ php.version }} occ richdocuments wopi_allowlist --value='127.0.0.1\/32'"
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: 0 > 1
+
+- name: App RichDocuments activating
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ richdocuments:activate-config'
+    chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: generate office certificate
   shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
@@ -77,8 +108,3 @@
   template:
     src: office.conf
     dest: /opt/nginx/conf/server/office.conf
-
-- name: Nginx service restart with full configuration
-  systemd:
-    name: 'nginx'
-    state: restarted

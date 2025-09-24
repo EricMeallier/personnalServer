@@ -8,7 +8,7 @@
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
-- name: Whiteboard config URL secure
+- name: Whiteboard config URL unsecure
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set whiteboard collabBackendUrl --value="http://{{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}/whiteboard/"'
     chdir: '/opt/nextcloud-{{package.version}}'
