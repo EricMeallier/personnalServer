@@ -1,0 +1,23 @@
+# Purge Olds Kernels
+
+
+## list of installed kernels
+
+dpkg --list | egrep -i --color 'linux-image|linux-headers' | grep -v 'image-generic' | grep -v 'headers-generic' | grep '^ii'
+
+```
+ii  linux-headers-6.11.0-29-generic                6.11.0-29.29~24.04.1                         amd64        Linux kernel headers for version 6.11.0 on 64 bit x86 SMP
+ii  linux-headers-6.14.0-33-generic                6.14.0-33.33~24.04.1                         amd64        Linux kernel headers for version 6.14.0
+ii  linux-headers-6.8.0-85                         6.8.0-85.85                                  all          Header files related to Linux kernel version 6.8.0
+ii  linux-headers-6.8.0-85-generic                 6.8.0-85.85                                  amd64        Linux kernel headers for version 6.8.0 on 64 bit x86 SMP
+ii  linux-image-6.14.0-33-generic                  6.14.0-33.33~24.04.1                         amd64        Signed kernel image generic
+ii  linux-image-6.8.0-85-generic                   6.8.0-85.85                                  amd64        Signed kernel image generic
+```
+
+## remove selected kernels
+
+sudo apt-get --purge remove linux-image-XXX-generic linux-headers-XXX-generic
+
+## autoremove linked packages
+
+sudo apt-get --purge  autoremove
