@@ -1,0 +1,44 @@
+
+
+# Generate the certificate
+
+```
+export EMAIL=eric@meallier.fr
+
+git clone https://github.com/polhenarejos/acme_email.git
+cd acme_email
+
+# Prepare environment
+python3 -m venv venv
+source venv/bin/activate
+pip3 install .
+
+# Excute challenge (with interaction to avoid password leaks)
+python cli.py cert -e $EMAIL --config-dir . --work-dir . --logs-dir . --usage digitalSignature --usage keyEncipherment --agree-tos --contact eric@meallier.fr 
+```
+
+# In thunderbird, Account Settings/End to End encryption/Manage S/MIME Certificates
+## Your certificate => pfx file
+## Authorities => ca.pem
+
+
+# In DNS server
+
+## Prepare certificate format
+
+```
+cd live
+# Convert the certificate to der format
+openssl x509 -outform der -in cert.pem -out CERTIFICATE.der
+# Ouput der certificate in hexa
+xxd -p -c 1000000 CERTIFICATE.der
+```
+
+## Add en SMIMEA record with 3 0 0 options and the hexa certificate as value
+
+
+# References:
+
+- Explanations: https://incenp.org/notes/2015/keys-in-dns.html
+- Generation: https://www.co.tt/smimea.cgi
+- Because of the signing chain, you have to add the CA certificate manually in thunderbird: https://github.com/polhenarejos/acme_email/issues/10
