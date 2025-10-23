@@ -70,7 +70,7 @@ check_delta "RUBY" $RUBY_CURRENT_VERSION $RUBY_VERSION
 # check_delta "Postgresql (apt)" 15 15
 # check_delta "PHP (apt)" 8.3 8.3
 
-UPTIMEKUMA_CURRENT_VERSION='1.23.16'
+UPTIMEKUMA_CURRENT_VERSION='2.0.2'
 UPTIMEKUMA_VERSION=`curl -sL https://github.com/louislam/uptime-kuma/tags | grep "tags/[0-9]*\.[0-9]*\.[0-9]*\." | sed -e "s/.*tags\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "UptimeKuma" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
 
