@@ -71,7 +71,7 @@
   shell: /usr/local/rvm/bin/rvm install {{ruby.version}}
 
 - name: use {{ruby.version}} ruby version
-  shell: /usr/local/rvm/bin/rvm --default use {{ruby.version}}
+  shell: /usr/local/rvm/bin/rvm alias create default ruby-{{ruby.version}}
 
 - name: install pg client
   shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ruby.version}}/bin; gem install pg -v '{{ package.gems.pg }}'
