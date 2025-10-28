@@ -83,6 +83,11 @@
 - name: Set LC_ALL
   shell: '/usr/sbin/locale-gen set-locale LC_ALL=fr_FR.UTF-8'
 
+- name: Defines default locales
+  copy:
+    src: 'locale.sh'
+    dest: '/etc/profile.d/locale.sh'
+
 - name: Configuration firewall
   block:
   - name: Reset firewall
