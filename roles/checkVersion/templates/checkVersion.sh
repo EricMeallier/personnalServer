@@ -24,7 +24,7 @@ REDMINE_VERSION=`curl -s https://www.redmine.org/ | grep "wiki-page" | grep "Dow
 check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
 
 GOGS_CURRENT_VERSION=`ls -l /opt/gogs | sed -e 's/.*gogs-\(.*\)/\1/'`
-GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href=\"[0-9]?*'| sed -e 's/.*\([0-9]\.[0-9]*\.[0-9]*\).*/\1/' | sort --version-sort | tail -1`
+GOGS_VERSION=`curl -s https://dl.gogs.io/ | grep '\<a href=\"./[0-9]?*'| sed -e 's/.*\([0-9]\.[0-9]*\.[0-9]*\).*/\1/' | sort --version-sort | tail -1`
 check_delta "Gogs" $GOGS_CURRENT_VERSION $GOGS_VERSION
 
 GITEA_CURRENT_VERSION=`ls -l /opt/gitea | grep 'gitea-' | sed -e 's/.*gitea-\(.*\)-linux.*/\1/' | sort --version-sort | tail -1`
@@ -74,10 +74,11 @@ UPTIMEKUMA_CURRENT_VERSION='2.0.2'
 UPTIMEKUMA_VERSION=`curl -sL https://github.com/louislam/uptime-kuma/tags | grep "tags/[0-9]*\.[0-9]*\.[0-9]*\." | sed -e "s/.*tags\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "UptimeKuma" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
 
-IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "can be upgraded" | wc -l`
-if [ "${IS_APT_UP_TODATE}" != "0" ]; then
-    echo "System updates available"
-    envoi_mail "SYSTEM" "De nouvelles mises a jour sont disponibles pour apt"
+IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "upgradable"`
+
+if [ `echo -n ${IS_APT_UP_TODATE} | wc -l` != "0" ]; then
+    echo "`echo -n ${IS_APT_UP_TODATE} |sed -e "s/^\([0-9]*\).*/\1/"` system updates available"
+    envoi_mail echo "SYSTEM: `echo ${IS_APT_UP_TODATE} |sed -e "s/^\([0-9]*\).*/\1/"` nouvelles mises a jour sont disponibles pour apt"
 else
     echo "System up to date"
 fi
