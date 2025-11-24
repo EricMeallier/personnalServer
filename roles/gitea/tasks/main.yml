@@ -34,7 +34,6 @@
   - '/opt/gitea'
   - '/data/gitea'  
 
-
 - name: Is already installed ?
   stat:
     path: "/opt/gitea/gitea.ini"
@@ -44,6 +43,16 @@
   stat:
     path: "'/opt/gitea/gitea-{{ package.version }}-linux-amd64'"
   register: already_zip
+
+- find:
+    paths: /opt/gitea/
+    patterns: "gitea-*-linux-amd64"
+  register: find_results
+
+- file:
+    path: "{{ item['path'] }}"
+    state: absent
+  with_items: "{{ find_results['files'] }}"
 
 - name: Create dedicated database
   include_role:
