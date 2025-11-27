@@ -2,7 +2,7 @@
 Description=Run backup.service every month
 
 [Timer]
-OnCalendar=*-*-01 02:00:00
+OnCalendar=Mon *-*-* 02:00:00
 
 [Install]
 WantedBy=timers.target

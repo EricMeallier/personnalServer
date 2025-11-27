@@ -2,7 +2,7 @@
 Description=Run checkVersion.service every day
 
 [Timer]
-OnCalendar=Mon *-*-* 05:00:00
+OnCalendar=*-*-* 06:00:00
 
 [Install]
 WantedBy=timers.target
