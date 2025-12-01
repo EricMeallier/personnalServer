@@ -76,9 +76,9 @@ check_delta "UptimeKuma" $UPTIMEKUMA_CURRENT_VERSION $UPTIMEKUMA_VERSION
 
 IS_APT_UP_TODATE=`apt update 2> /dev/null | grep "upgradable"`
 
-if [ `echo -n ${IS_APT_UP_TODATE} | wc -l` != "0" ]; then
+if [ `echo -n ${IS_APT_UP_TODATE} | wc -w` != "0" ]; then
     echo "`echo -n ${IS_APT_UP_TODATE} |sed -e "s/^\([0-9]*\).*/\1/"` system updates available"
-    envoi_mail echo "SYSTEM: `echo ${IS_APT_UP_TODATE} |sed -e "s/^\([0-9]*\).*/\1/"` nouvelles mises a jour sont disponibles pour apt"
+    envoi_mail echo "SYSTEM: `echo -n ${IS_APT_UP_TODATE} |sed -e "s/^\([0-9]*\).*/\1/"` nouvelles mises a jour sont disponibles pour apt"
 else
     echo "System up to date"
 fi
