@@ -1,0 +1,115 @@
+---
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+    targetExtension : '{{spliit.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
+
+- name: Is already installed ?
+  stat:
+    path: "/opt/spliit/.env"
+  register: already_installed
+
+- name: Create dedicated database
+  include_role:
+    name : pg_new_fresh_database
+  vars:
+    pg_username: '{{ dbschema.spliit.username }}'
+    pg_password: '{{ dbschema.spliit.password }}'
+    pg_database: '{{ dbschema.spliit.database }}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Ensure group "spliit" exists
+  group:
+    name: spliit
+    state: present
+
+- name: Add the user 'spliit'
+  user:
+    name: spliit
+    group: spliit
+
+- name: Download spliit files
+  get_url:
+    url: https://github.com/spliit-app/spliit/archive/refs/tags/{{ package.version }}.tar.gz
+    dest: '/tmp/spliit-{{ package.version }}.tar.gz'
+    timeout: 30
+
+- name: Extract spliit files into /opt
+  unarchive:
+    src: '/tmp/spliit-{{ package.version }}.tar.gz'
+    dest: /opt
+    remote_src: 'yes'
+    owner: spliit
+    group: spliit
+
+- name: link to current version
+  file:
+    src: /opt/spliit-{{ package.version }}
+    dest: /opt/spliit
+    state: 'link'
+    owner: 'spliit'
+    group: 'spliit'
+
+- name: Copy database configuration file
+  template:
+    src: env
+    dest: /opt/spliit/.env
+    owner: spliit
+    group: spliit
+    mode: '0644'
+
+- name: retrieve dependencies
+  shell:
+    cmd: '/usr/bin/npm install'
+    chdir: '/opt/spliit'
+
+- name: build application
+  shell:
+    cmd: '/usr/bin/npm run build'
+    chdir: '/opt/spliit'
+
+- name: open acces to .next folder
+  shell: chmod -R 777 /opt/spliit/.next
+
+- name: Install spliit service script
+  copy:
+    src: spliit.service
+    dest: /etc/systemd/system/spliit.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: spliit service reload/start
+  systemd:
+    name: 'spliit'
+    daemon_reload: true
+    state: restarted
+    enabled: true
+
+- name: Is certificate already installed ?
+  stat:
+    path: "/etc/letsencrypt/live/{{ spliit.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}/fullchain.pem"
+  register: cert_already_installed
+
+- name: generate spliit certificate
+  shell: /usr/bin/certbot certonly -d {{ spliit.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured and not cert_already_installed.stat.exists
+      
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: spliit.conf
+    dest: /opt/nginx/conf/server/spliit.conf
+
+- name: Nginx service restart with full configuration
+  systemd:
+    name: 'nginx'
+    state: restarted
+
+- name: Cleanup installation
+  file:
+    path: '/tmp/spliit-{{ package.version }}.tar.gz'
+    state: 'absent'

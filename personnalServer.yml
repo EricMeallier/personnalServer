@@ -12,6 +12,7 @@
   - gitea
   - nextcloud
   - etherpad
+  - spliit  
   - fail2ban
   - backup
   - monit

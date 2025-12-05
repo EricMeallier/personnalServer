@@ -1,0 +1,17 @@
+[Unit]
+Description=Spliit
+After=syslog.target
+After=network.target
+After=postgresql.service
+
+[Service]
+Type=simple
+User=spliit
+Group=spliit
+WorkingDirectory=/opt/spliit
+ExecStart=/usr/bin/npm run start
+Environment=PORT=3007
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
