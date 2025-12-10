@@ -353,11 +353,6 @@
     name: 'nextcloudCron.timer'
     enabled: yes
 
-- name: Configure maintenance_window_start (in config/config.php)
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=3
-    chdir: '/opt/nextcloud-{{package.version}}'
-
 - name: logrotate configuration
   copy:
     src: logrotate
