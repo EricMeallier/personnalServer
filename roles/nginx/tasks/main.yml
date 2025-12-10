@@ -9,7 +9,7 @@
     - gcc
     - libssl-dev
     - make
-    - libpcre3-dev
+    - libpcre2-dev
     - zlib1g-dev
     - libxml2-dev
     - libxslt-dev

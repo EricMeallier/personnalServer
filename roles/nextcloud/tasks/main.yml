@@ -11,37 +11,8 @@
 - name: install nextcloud installation pre requisites
   apt: 
     name:
-    - apt-transport-https
     - redis
     state: present
-
-- name: adding php repository
-  shell: 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-
-- name: adding php repository gpg key
-  get_url:
-    url: https://packages.sury.org/php/apt.gpg
-    dest: /usr/share/keyrings/deb.sury.org-php.gpg
-
-- name: install nextcloud pre requisites
-  apt: 
-    name:
-    - php{{ php.version }}-fpm
-    - php{{ php.version }}-common
-    - php{{ php.version }}-gd
-    - php{{ php.version }}-pgsql
-    - php{{ php.version }}-curl
-    - php{{ php.version }}-mbstring
-    - php{{ php.version }}-xml
-    - php{{ php.version }}-intl
-    - php{{ php.version }}-zip
-    - php{{ php.version }}-gmp
-    - php{{ php.version }}-redis
-    - php{{ php.version }}-bcmath
-    - php{{ php.version }}-imagick
-    - php{{ php.version }}-apcu
-    state: present
-    update_cache: yes
 
 - name: Is already installed ?
   stat:
@@ -123,6 +94,13 @@
     regexp: '^opcache.interned_strings_buffer=.*$'
     line: 'opcache.interned_strings_buffer=16'
 
+- name: Configure acces to php-fpm.sock
+  file:
+    path: /run/php/php{{ php.version }}-fpm.sock
+    state: file
+    owner: 'nobody'
+    group: 'nogroup'
+
 - name: create data directory
   file:
     path: /data/nextcloud
@@ -162,41 +140,10 @@
     owner: 'nobody'
     group: 'nogroup'
 
-- name: Add basics applications, if fresh install
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ app:install {{ item }}'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  loop: "{{ package.appsToRestore }}"
-  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
-
 - name: Mise à jour de l'environnement occ
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ upgrade'
     chdir: '/opt/nextcloud-{{package.version}}'
-
-- name: Configure database (Missing-indices)db:add-missing-primary-keys
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-indices'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
-
-- name: Configure database (Missing-primary keys)
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-primary-keys'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
-
-- name: Configure database (Missing-columns)
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-columns'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
-
-- name: Configure database (convert-filecache-bigint)
-  shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ db:convert-filecache-bigint'
-    chdir: '/opt/nextcloud-{{package.version}}'
-  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
 - name: Configure trusted domains (in config/config.php)
   shell: 
@@ -222,12 +169,12 @@
 
 - name: Configure memcache distributed (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.distributed --value=\OC\Memcache\Redis'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.distributed --value=\\OC\\Memcache\\Redis'
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure memcache locking (in config/config.php)
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.locking --value=\OC\Memcache\Redis'
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.locking --value=\\OC\\Memcache\\Redis'
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure memcache redis host (in config/config.php)
@@ -292,7 +239,7 @@
 
 - name: Configure Maintenance frame (in config/config.php) - maintenance_window_start
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4'
+    cmd: "sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4"
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: nextcloud service reload/start
@@ -302,7 +249,51 @@
     state: started
     enabled: true
 
-- name: generate redmine certificate
+- name: Add basics applications, if fresh install
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:install {{ item }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  loop: "{{ package.appsToInstall }}"
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Enable basics applications, if fresh install (drawio not activated by default, for example)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:enable {{ item }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  loop: "{{ package.appsToInstall }}"
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Configure database (Missing-indices)db:add-missing-primary-keys
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-indices'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Configure database (Missing-primary keys)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-primary-keys'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Configure database (Missing-columns)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:add-missing-columns'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Configure database (convert-filecache-bigint)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ db:convert-filecache-bigint'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: Configure repair include expensive
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ maintenance:repair --include-expensive'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
+- name: generate nextcloud certificate
   shell: /usr/bin/certbot certonly -d {{ nextcloud.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive  
   when: not redmine_unsecured
       
@@ -312,16 +303,7 @@
     src: nextcloud.conf
     dest: /opt/nginx/conf/server/nextcloud.conf
 
-# Whiteboard standalone server
-- name: Whiteboard installation
-  include_tasks: whiteboard.yml
-
-# Collabora standalone server
-- name: Collabora installation
-  include_tasks: collabora.yml
-
 # Restart services
-
 - name: Nginx service restart with full configuration
   systemd:
     name: 'nginx'
@@ -331,6 +313,16 @@
   systemd:
     name: 'php{{ php.version }}-fpm'
     state: restarted
+
+# Whiteboard standalone server
+- name: Whiteboard installation
+  include_tasks: whiteboard.yml
+
+# Collabora standalone server
+- name: Collabora installation
+  include_tasks: collabora.yml
+
+# Scripts and timers
 
 - name: Copy emptyTrash script
   template:

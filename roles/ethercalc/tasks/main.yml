@@ -1,5 +1,13 @@
 ---
 
+- name: Update DNS
+  include_role:
+    name : update_infomaniak_dns
+  vars:
+    targetExtension : '{{ethercalc.domain.suffix}}'
+    targetIP: '{{ansible_default_ipv4.address}}'
+  when: not redmine_unsecured
+
 - name: install ethercalc pre requisites
   apt: 
     name:

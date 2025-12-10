@@ -15,3 +15,12 @@ package:
   - 'drawio'
   - 'whiteboard'
   - 'richdocuments'
+  appsToInstall:
+  - 'bookmarks'
+  - 'spreed'
+  - 'deck'
+  - 'mail'
+  - 'notes'
+  - 'contacts'
+  - 'tasks'
+  - 'drawio'

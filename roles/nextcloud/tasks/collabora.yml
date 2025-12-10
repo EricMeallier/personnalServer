@@ -31,21 +31,13 @@
     state: 'latest'
     update_cache: yes
 
-- name: Configure Collabora Server
-  template:
-    src: coolwsd.xml
-    dest: /etc/coolwsd/coolwsd.xml
-    owner: cool
-    group: cool
-    mode: '0640'
-
 - name: Collabora config - termination SSL
   shell: 
     cmd: 'coolconfig set ssl.termination true'
 
 - name: Collabora config - enable SSL
   shell: 
-    cmd: 'coolconfig set ssl.enable true'
+    cmd: 'coolconfig set ssl.enable false'
 
 - name: Collabora config - admin username
   shell: 
@@ -59,9 +51,28 @@
   shell: 
     cmd: 'coolconfig set net.post_allow.host 127.0.0.1/32'
 
+- name: Collabora config - Max coucurrency
+  shell: 
+    cmd: 'coolconfig set  per_document.max_concurrency 1'
+
 - name: Collabora service start
   systemd:
     name: 'coolwsd'
+    state: restarted
+
+- name: generate office certificate
+  shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: office.conf
+    dest: /opt/nginx/conf/server/office.conf
+
+- name: nextcloud service reload/start
+  systemd:
+    name: 'nginx'
     state: restarted
 
 - name: Wopi public config URL secure
@@ -88,23 +99,23 @@
     chdir: '/opt/nextcloud-{{package.version}}'
   when: redmine_unsecured
 
-- name: Restrict WOPI host list => not working / disabled
+- name: Restrict WOPI host list => not working as wish
   shell: 
-    cmd: "sudo -u nobody php{{ php.version }} occ richdocuments wopi_allowlist --value='127.0.0.1\/32'"
+    cmd: "sudo -u nobody php{{ php.version }} occ config:app:set richdocuments wopi_allowlist --value='95.179.212.183,fe80::af95:a8b:2dc3:f8e6'"
     chdir: '/opt/nextcloud-{{package.version}}'
-  when: 0 > 1
+
+- name: Add richdocuments nextcloud application
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:install richdocuments'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Enable richdocuments nextcloud application
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:enable richdocuments'
+    chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: App RichDocuments activating
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ richdocuments:activate-config'
     chdir: '/opt/nextcloud-{{package.version}}'
-
-- name: generate office certificate
-  shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
-  when: not redmine_unsecured
-
-# finish installation with ssl termination
-- name: Copy full nginx ssl configuration file
-  template:
-    src: office.conf
-    dest: /opt/nginx/conf/server/office.conf
+  

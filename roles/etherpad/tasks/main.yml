@@ -66,6 +66,9 @@
     cmd: bash /opt/etherpad-lite/bin/installDeps.sh
     chdir: '/opt/etherpad-lite'
 
+- name: etherpad owner for node_modules
+  shell: chown -R etherpad:etherpad /opt/etherpad-lite-{{ package.version }}
+
 - name: Install etherpad service script
   copy:
     src: etherpad.service

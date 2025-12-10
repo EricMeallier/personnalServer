@@ -12,6 +12,8 @@ WorkingDirectory=/opt/etherpad-lite
 ExecStart=/opt/etherpad-lite/bin/run.sh
 Restart=always
 Environment=NODE_ENV=production
+Environment=ETHERPAD_PRODUCTION=1
+Environment=CI=1
 
 [Install]
 WantedBy=multi-user.target

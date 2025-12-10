@@ -8,10 +8,11 @@
   - postgresql
   - redmine
 #  - nginx
+  - nextcloud
   - gogs
   - gitea
-  - nextcloud
   - etherpad
+  - ethercalc
   - spliit  
   - fail2ban
   - backup
@@ -20,7 +21,7 @@
   - logo
   - autoconfigMail
   - uptime-kuma
-  - restore_data
+#  - restore_data
   - rustdesk
   - netdata
   - netdataConf

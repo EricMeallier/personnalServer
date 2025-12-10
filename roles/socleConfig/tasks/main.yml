@@ -69,24 +69,14 @@
     state: 'restarted'
     enabled: true
 
-- name: Defines available locales
-  copy:
-    src: 'locale.gen'
-    dest: '/etc/locale.gen'
+- name: Install locales
+  apt:
+    name:
+    - locales-all
+    state: present
 
-- name: Locale generation
-  shell: '/usr/sbin/locale-gen'
-
-- name: Set LANG
-  shell: '/usr/sbin/locale-gen set-locale LANG=en_US.UTF-8'
-
-- name: Set LC_ALL
-  shell: '/usr/sbin/locale-gen set-locale LC_ALL=fr_FR.UTF-8'
-
-- name: Defines default locales
-  copy:
-    src: 'locale.sh'
-    dest: '/etc/profile.d/locale.sh'
+- name: Update locales
+  shell: '/usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=fr_FR.UTF-8'
 
 - name: Configuration firewall
   block:
@@ -148,6 +138,7 @@
     name:
     - certbot
     state: present
+  when: not redmine_unsecured
 
 - name: create acme challenge folder
   file:
@@ -157,6 +148,7 @@
     owner: nobody
     group: nogroup
     mode: u+rxw,g+rw,o+rw
+  when: not redmine_unsecured
 
 - name: check is DH already exists
   stat:
@@ -168,6 +160,13 @@
 - name: generate Secure Diffie-Hellman
   shell: /usr/bin/openssl dhparam -out /etc/redmine.dhparam.pem 4096
   when: not redmine_unsecured and ( not DHExists.stat.exists is defined or not DHExists.stat.exists)
+
+- name: create letsencrypt hook scripts folder
+  file:
+    path: /etc/letsencrypt/renewal-hooks/deploy
+    state: directory
+    recurse: yes
+  when: not redmine_unsecured
 
 - name: certbot deploy hook
   copy:

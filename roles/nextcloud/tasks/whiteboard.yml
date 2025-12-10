@@ -51,6 +51,23 @@
     cmd: '/usr/bin/npm ci'
     chdir: '/opt/whiteboard'
 
+- name: Add whiteboard nextcloud application
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:install whiteboard'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Enable whiteboard nextcloud application
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:enable whiteboard'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Enable basics applications, if fresh install (drawio not activated bby default, for example)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ app:enable {{ item }}'
+    chdir: '/opt/nextcloud-{{package.version}}'
+  loop: "{{ package.appsToInstall }}"
+  when: not already_installed.stat.exists is defined or not already_installed.stat.exists
+
 - name: Whiteboard service script
   template:
     src: whiteboard.service
