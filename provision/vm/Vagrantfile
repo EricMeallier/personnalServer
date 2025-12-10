@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
   
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "debian/bookworm64"
+  config.vm.box = "cloud-image/debian-13"
 
   # Disable temporarily because of the new version of vagrant; libvirt does not work anymore
   # config.disksize.size = '50GB'

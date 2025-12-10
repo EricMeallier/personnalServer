@@ -1,7 +1,29 @@
 ---
 
+- name: install postgresql installation pre requisites
+  apt: 
+    name:
+    - apt-transport-https
+    - curl
+    - ca-certificates
+
+- name: Create nested directory structure for daily logs
+  file:
+    path: /usr/share/postgresql-common/pgdg
+    state: directory
+    mode: '0755'
+
+- name: adding postgres repository
+  shell: 'echo "deb [signed-by=/usr/share/keyrings/deb.postgres.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/postgres.list'
+
+- name: adding postgres repository asc key
+  get_url:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    dest: /usr/share/keyrings/deb.postgres.asc
+
 - name: install postgresql server
   apt: 
     name:
     - postgresql-{{ postgresql.version }}
     state: present
+    update_cache: yes

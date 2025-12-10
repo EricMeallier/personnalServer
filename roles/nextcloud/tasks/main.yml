@@ -8,38 +8,6 @@
     targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
-- name: install php installation pre requisites
-  apt: 
-    name:
-    - apt-transport-https
-
-- name: adding php repository
-  shell: 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-
-- name: adding php repository gpg key
-  get_url:
-    url: https://packages.sury.org/php/apt.gpg
-    dest: /usr/share/keyrings/deb.sury.org-php.gpg
-
-- name: install nextcloud pre requisites
-  apt: 
-    name:
-    - php{{ php.version }}-fpm
-    - php{{ php.version }}-common
-    - php{{ php.version }}-gd
-    - php{{ php.version }}-pgsql
-    - php{{ php.version }}-curl
-    - php{{ php.version }}-mbstring
-    - php{{ php.version }}-xml
-    - php{{ php.version }}-intl
-    - php{{ php.version }}-zip
-    - php{{ php.version }}-gmp
-    - php{{ php.version }}-redis
-    - php{{ php.version }}-bcmath
-    - php{{ php.version }}-imagick
-    state: present
-    update_cache: yes
-
 - name: Is already installed ?
   stat:
     path: "/opt/nextcloud/config/config.php"
@@ -265,7 +233,7 @@
 
 - name: Configure Maintenance frame (in config/config.php) - maintenance_window_start
   shell: 
-    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4'
+    cmd: "sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4"
     chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: nextcloud service reload/start
