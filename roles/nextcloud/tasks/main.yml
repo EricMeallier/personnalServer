@@ -332,6 +332,32 @@
     name: 'nextcloudTrash.timer'
     enabled: yes
 
+- name: Copy cron service
+  template:
+    src: nextcloudCron.service
+    dest: /etc/systemd/system/nextcloudCron.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy cron timer
+  copy:
+    src: nextcloudCron.timer
+    dest: /etc/systemd/system/nextcloudCron.timer
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enabling emptyCron timer
+  systemd:
+    name: 'nextcloudCron.timer'
+    enabled: yes
+
+- name: Configure maintenance_window_start (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=3
+    chdir: '/opt/nextcloud-{{package.version}}'
+
 - name: logrotate configuration
   copy:
     src: logrotate

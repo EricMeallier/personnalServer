@@ -1,0 +1,8 @@
+[Unit]
+Description=Nextcloud Cron
+
+[Service]
+User=nobody
+ExecCondition=/usr/bin/php{{ php.version }} -f /opt/nextcloud/occ status -e
+ExecStart=/usr/bin/php{{ php.version }} -f /opt/nextcloud/cron.php
+KillMode=process
