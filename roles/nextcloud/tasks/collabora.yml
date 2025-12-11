@@ -31,21 +31,13 @@
     state: 'latest'
     update_cache: yes
 
-- name: Configure Collabora Server
-  template:
-    src: coolwsd.xml
-    dest: /etc/coolwsd/coolwsd.xml
-    owner: cool
-    group: cool
-    mode: '0640'
-
 - name: Collabora config - termination SSL
   shell: 
     cmd: 'coolconfig set ssl.termination true'
 
 - name: Collabora config - enable SSL
   shell: 
-    cmd: 'coolconfig set ssl.enable true'
+    cmd: 'coolconfig set ssl.enable false'
 
 - name: Collabora config - admin username
   shell: 

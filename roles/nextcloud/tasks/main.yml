@@ -88,6 +88,13 @@
     regexp: '^opcache.interned_strings_buffer=.*$'
     line: 'opcache.interned_strings_buffer=16'
 
+- name: Configure acces to php-fpm.sock
+  file:
+    path: /run/php/php{{ php.version }}-fpm.sock
+    state: file
+    owner: 'nobody'
+    group: 'nogroup'
+
 - name: create data directory
   file:
     path: /data/nextcloud
