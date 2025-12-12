@@ -56,6 +56,21 @@
     name: 'coolwsd'
     state: restarted
 
+- name: generate office certificate
+  shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
+  when: not redmine_unsecured
+
+# finish installation with ssl termination
+- name: Copy full nginx ssl configuration file
+  template:
+    src: office.conf
+    dest: /opt/nginx/conf/server/office.conf
+
+- name: nextcloud service reload/start
+  systemd:
+    name: 'nginx'
+    state: restarted
+
 - name: Wopi public config URL secure
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ config:app:set richdocuments public_wopi_url --value="https://{{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }}"'
@@ -90,13 +105,4 @@
   shell: 
     cmd: 'sudo -u nobody php{{ php.version }} occ richdocuments:activate-config'
     chdir: '/opt/nextcloud-{{package.version}}'
-
-- name: generate office certificate
-  shell: /usr/bin/certbot certonly -d {{ office.domain.suffix }}.{{ server.domain.sub}}{{server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html  --keep-until-expiring --non-interactive
-  when: not redmine_unsecured
-
-# finish installation with ssl termination
-- name: Copy full nginx ssl configuration file
-  template:
-    src: office.conf
-    dest: /opt/nginx/conf/server/office.conf
+  
