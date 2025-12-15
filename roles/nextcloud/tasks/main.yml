@@ -8,10 +8,12 @@
     targetIP: '{{ansible_default_ipv4.address}}'
   when: not redmine_unsecured
 
-- name: install php installation pre requisites
+- name: install nextcloud installation pre requisites
   apt: 
     name:
     - apt-transport-https
+    - redis
+    state: present
 
 - name: adding php repository
   shell: 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
@@ -37,6 +39,7 @@
     - php{{ php.version }}-redis
     - php{{ php.version }}-bcmath
     - php{{ php.version }}-imagick
+    - php{{ php.version }}-apcu
     state: present
     update_cache: yes
 
@@ -212,6 +215,30 @@
     chdir: '/opt/nextcloud-{{package.version}}'
   when: not redmine_unsecured
 
+- name: Configure memcache local (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.local --value=\\OC\\Memcache\\APCu'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure memcache distributed (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.distributed --value=\OC\Memcache\Redis'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure memcache locking (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set memcache.locking --value=\OC\Memcache\Redis'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure memcache redis host (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set redis.host --value=localhost'
+    chdir: '/opt/nextcloud-{{package.version}}'
+
+- name: Configure memcache redis port (in config/config.php)
+  shell: 
+    cmd: 'sudo -u nobody php{{ php.version }} occ config:system:set redis.port --value=6379'
+    chdir: '/opt/nextcloud-{{package.version}}'
 
 - name: Configure Mail (in config/config.php) - mail_smtpmode
   shell: 
