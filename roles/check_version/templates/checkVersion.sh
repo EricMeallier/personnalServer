@@ -51,7 +51,7 @@ RUSTDESK_CURRENT_VERSION=`apt show rustdesk-server-hbbr 2> /dev/null | grep Vers
 RUSTDESK_VERSION=`curl -sL https://github.com/rustdesk/rustdesk-server/releases | grep "tag/[0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\"" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Rustdesk" $RUSTDESK_CURRENT_VERSION $RUSTDESK_VERSION
 
-PASSENGER_CURRENT_VERSION='6.1.2'
+PASSENGER_CURRENT_VERSION='6.1.3'
 PASSENGER_VERSION=`curl -sL https://github.com/phusion/passenger/releases | grep "tag/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Passenger" $PASSENGER_CURRENT_VERSION $PASSENGER_VERSION
 
