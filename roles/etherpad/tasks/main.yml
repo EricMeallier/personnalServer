@@ -31,61 +31,37 @@
     name: etherpad
     group: etherpad
 
-- name: Download etherpad files
+- name: Download etherpad package
   ansible.builtin.get_url:
-    url: https://github.com/ether/etherpad/archive/{{ package.version }}.zip
-    dest: '/tmp/etherpad-{{ package.version }}.zip'
+    url: https://github.com/ether/etherpad/releases/download/v{{ package.version }}/etherpad-latest_amd64.deb
+    dest: '/tmp/etherpad-{{ package.version }}.deb'
     timeout: 30
     owner: root
     group: root
     mode: '0644'
 
-- name: Extract etherpad files into /opt
-  ansible.builtin.unarchive:
-    src: '/tmp/etherpad-{{ package.version }}.zip'
-    dest: /opt
-    remote_src: 'yes'
-    owner: etherpad
-    group: etherpad
-
-- name: Link to current version
-  ansible.builtin.file:
-    src: /opt/etherpad-{{ package.version }}
-    dest: /opt/etherpad
-    state: 'link'
-    owner: 'etherpad'
-    group: 'etherpad'
+- name: Install etherpad package
+  ansible.builtin.apt:
+    deb: '/tmp/etherpad-{{ package.version }}.deb'
 
 - name: Copy database configuration file
   ansible.builtin.template:
     src: settings.json
-    dest: /opt/etherpad/settings.json
+    dest: /etc/etherpad/settings.json
     owner: etherpad
     group: etherpad
     mode: '0644'
 
-- name: Retrieve dependencies
-  ansible.builtin.shell:
-    cmd: bash /opt/etherpad/bin/installDeps.sh
-    chdir: '/opt/etherpad'
-
-- name: Etherpad owner for node_modules
-  ansible.builtin.shell: chown -R etherpad:etherpad /opt/etherpad-{{ package.version }}
-
-- name: Install etherpad service script
-  ansible.builtin.copy:
-    src: etherpad.service
-    dest: /etc/systemd/system/etherpad.service
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Etherpad service reload/start
+- name: Etherpad service enabled
   ansible.builtin.systemd:
     name: 'etherpad'
     daemon_reload: true
-    state: restarted
     enabled: true
+
+- name: Etherpad service restarted
+  ansible.builtin.systemd:
+    name: 'etherpad'
+    state: restarted
 
 - name: Is certificate already installed ?
   ansible.builtin.stat:

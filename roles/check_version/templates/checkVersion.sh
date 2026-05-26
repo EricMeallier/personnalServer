@@ -43,7 +43,8 @@ check_delta "Whiteboard" $WHITEBOARD_CURRENT_VERSION $WHITEBOARD_VERSION
 #PICOCMS_VERSION=`curl -sL https://github.com/picocms/Pico/releases/latest | grep "tag/v*" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/"`
 #check_delta "PicoCMS" $PICOCMS_CURRENT_VERSION $PICOCMS_VERSION
 
-ETHERPAD_CURRENT_VERSION=`ls -l /opt/etherpad | sed -e 's/.*etherpad-\(.*\)/\1/'`
+tempo=`apt info etherpad 2> /dev/null | grep Version`
+ETHERPAD_CURRENT_VERSION=$(echo ${tempo##*:} | cut -d '-' -f 1)
 ETHERPAD_VERSION=`curl -sL https://github.com/ether/etherpad/releases | grep "tag/v[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "EtherPad" $ETHERPAD_CURRENT_VERSION $ETHERPAD_VERSION
 
