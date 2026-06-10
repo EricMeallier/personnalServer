@@ -53,12 +53,12 @@ RUSTDESK_VERSION=`curl -sL https://github.com/rustdesk/rustdesk-server/releases 
 check_delta "Rustdesk" $RUSTDESK_CURRENT_VERSION $RUSTDESK_VERSION
 
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
-NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v22\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(22.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
-check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
+NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v24\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(24.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
+check_delta "NodeJS" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
 
 RUBY_CURRENT_VERSION=`ls -l /usr/local/rvm/gems| grep 'ruby-[0-9]*\.[0-9]*\.[0-9]*$' | sed -e 's/.*ruby-\(.*\)/\1/' | sort --version-sort | tail -1`
 RUBY_VERSION=`curl -sL https://www.ruby-lang.org/en/downloads/releases/ | grep 'Ruby 3\.4\.[0-9]*<' | sed -e 's/.*Ruby \([0-9]*\.[0-9]*\.[0-9]*\)<.*/\1/' | sort --version-sort | tail -1`
-check_delta "RUBY" $RUBY_CURRENT_VERSION $RUBY_VERSION
+check_delta "Ruby" $RUBY_CURRENT_VERSION $RUBY_VERSION
 
 # NGINX_CURRENT_VERSION=`/opt/nginx/sbin/nginx -v 2>&1 | sed -e 's/nginx version: nginx\/\([0-9]\.[0-9]*\.[0-9]*\)$/\1/'`
 # NGINX_VERSION=`curl -sL https://github.com/nginx/nginx/tags | grep "tag\/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
