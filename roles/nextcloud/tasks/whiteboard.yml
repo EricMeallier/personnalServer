@@ -99,3 +99,8 @@
   ansible.builtin.systemd:
     name: 'whiteboard'
     state: restarted
+
+- name: Cleanup installation
+  ansible.builtin.file:
+    path: '/tmp/whiteboard-{{ package.whiteboard.version }}.zip'
+    state: 'absent'
