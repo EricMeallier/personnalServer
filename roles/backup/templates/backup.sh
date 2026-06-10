@@ -5,7 +5,7 @@ timestamp='last'
 targetDir='/backup'
 
 systemctl stop nginx
-systemctl stop etherpad ethercalc
+systemctl stop etherpad
 systemctl stop gogs gitea spliit
 systemctl stop php{{ php.version }}-fpm.service
 
