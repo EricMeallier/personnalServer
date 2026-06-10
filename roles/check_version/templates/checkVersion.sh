@@ -51,10 +51,6 @@ RUSTDESK_CURRENT_VERSION=`apt show rustdesk-server-hbbr 2> /dev/null | grep Vers
 RUSTDESK_VERSION=`curl -sL https://github.com/rustdesk/rustdesk-server/releases | grep "tag/[0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\"" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*-*[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "Rustdesk" $RUSTDESK_CURRENT_VERSION $RUSTDESK_VERSION
 
-PASSENGER_CURRENT_VERSION='6.1.4'
-PASSENGER_VERSION=`curl -sL https://github.com/phusion/passenger/releases | grep "tag/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
-check_delta "Passenger" $PASSENGER_CURRENT_VERSION $PASSENGER_VERSION
-
 NODEJS_CURRENT_VERSION=`/usr/bin/nodejs -v| tr -d 'v'`
 NODEJS_VERSION=`curl -sL https://github.com/nodejs/node/tags | grep "tag\/v22\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/v\(22.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
 check_delta "NODEJS (apt)" $NODEJS_CURRENT_VERSION $NODEJS_VERSION
@@ -82,4 +78,10 @@ if [ `echo -n ${IS_APT_UP_TODATE} | wc -w` != "0" ]; then
 else
     echo "System up to date"
 fi
+
+PATH=/usr/local/rvm/gems/ruby-{{ ruby.version }}/bin:/usr/local/rvm/gems/ruby-{{ ruby.version }}@global/bin:/usr/local/rvm/rubies/ruby-{{ ruby.version }}/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/local/rvm/bin
+tempo=`/usr/local/rvm/rubies/default/bin/passenger version`
+PASSENGER_CURRENT_VERSION=${tempo##* }
+PASSENGER_VERSION=`curl -sL https://github.com/phusion/passenger/releases | grep "tag/release-[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/release-\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
+check_delta "Passenger" $PASSENGER_CURRENT_VERSION $PASSENGER_VERSION
 
