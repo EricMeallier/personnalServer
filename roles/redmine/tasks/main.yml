@@ -11,9 +11,6 @@
 - name: Install redmine pre requisites
   ansible.builtin.apt:
     name:
-    - curl
-    - gnupg2
-    - libcurl4-openssl-dev
     - libmagickwand-dev
     - postgresql-client-{{ postgresql.version }}
     - postgresql-server-dev-{{ postgresql.version }}
@@ -40,64 +37,8 @@
     pg_new_fresh_database_pg_database: '{{ dbschema.redmine.database }}'
   when: not already_installed.stat.exists is defined or not already_installed.stat.exists
 
-- name: adding gpg key for rvm mpapis
-  ansible.builtin.shell: set -o pipefail && curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-
-- name: adding gpg key for rvm pkuczynski
-  ansible.builtin.shell: set -o pipefail && curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
-
-- name: check is rvm already installed
-  ansible.builtin.stat:
-    path: /usr/local/rvm
-  register: rvm_exists
-
-- name: install rvm
-  ansible.builtin.shell: set -o pipefail && curl -sSL https://get.rvm.io | bash -s stable
-  when: not rvm_exists.stat.isdir is defined or not rvm_exists.stat.isdir
-
-- name: Adding user root to rvm users
-  ansible.builtin.user:
-    name: 'root'
-    groups:
-      - 'rvm'
-    append: yes
-
-- name: Check if nginx already exists
-  ansible.builtin.stat:
-    path: /opt/nginx/sbin/nginx
-  register: nginx_exists
-
-- name: Install ruby {{ ruby.version }}
-  ansible.builtin.shell: /usr/local/rvm/bin/rvm install {{ ruby.version }}
-
-- name: Use ruby version {{ ruby.version }}
-  ansible.builtin.shell: /usr/local/rvm/bin/rvm alias create default ruby-{{ ruby.version }}
-
 - name: Install pg client
   ansible.builtin.shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ ruby.version }}/bin; gem install pg -v '{{ package.gems.pg }}'
-
-- name: Install passenger
-  ansible.builtin.shell: PATH=$PATH:/usr/local/rvm/rubies/ruby-{{ ruby.version }}/bin; gem install passenger -v '{{ package.gems.passenger }}'
-  when: not nginx_exists.stat.exists
-
-- name: Install nginx with passenger
-  ansible.builtin.shell: passenger-install-nginx-module --auto --auto-download --prefix=/opt/nginx --languages ruby
-  environment:
-    GEM_PATH: '/usr/local/rvm/gems/ruby-{{ ruby.version }}:/usr/local/rvm/gems/ruby-{{ ruby.version }}@global'
-    GEM_HOME: '/usr/local/rvm/gems/ruby-{{ ruby.version }}'
-    PATH: '/usr/local/rvm/gems/ruby-{{ ruby.version }}/bin:/usr/local/rvm/gems/ruby-{{ ruby.version }}@global/bin:/usr/local/rvm/rubies/ruby-{{ ruby.version }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/rvm/bin'
-  when: not nginx_exists.stat.exists
-
-- name: Rvm group for rubies folders
-  ansible.builtin.shell: chown -R root:rvm /usr/local/rvm/rubies
-
-- name: Add mjs extension to javascript files
-  ansible.builtin.lineinfile:
-    dest: /opt/nginx/conf/mime.types
-    insertafter: '^\[Service\]'
-    regexp: '    application/javascript.*'
-    line: '    application/javascript                           js mjs;'
-  when: not nginx_exists.stat.exists
 
 - name: Ensure group "redmine" exists
   ansible.builtin.group:
@@ -221,11 +162,6 @@
     owner: 'nobody'
     group: 'nogroup'
 
-- name: Directory for logs
-  ansible.builtin.file:
-    path: /var/log/nginx
-    state: 'directory'
-
 - name: Remove default files directory
   ansible.builtin.file:
     path: /opt/redmine-{{ package.version }}/files
@@ -247,35 +183,6 @@
     owner: 'nobody'
     group: 'nogroup'
     recurse: true
-
-- name: Install nginx service script
-  ansible.builtin.copy:
-    src: nginx.service
-    dest: /etc/systemd/system/nginx.service
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Copy minimal nginx configuration file
-  ansible.builtin.template:
-    src: minimal.conf
-    dest: /opt/nginx/conf/nginx.conf
-    owner: 'nobody'
-    group: 'nogroup'
-    mode: '0644'
-
-- name: Create external configuration for nginx
-  ansible.builtin.file:
-    path: /opt/nginx/conf/server
-    state: 'directory'
-    mode: '0755'
-
-- name: Nginx service reload/start
-  ansible.builtin.systemd:
-    name: 'nginx'
-    daemon_reload: true
-    state: started
-    enabled: true
 
 - name: Generate redmine certificate
   ansible.builtin.shell: /usr/bin/certbot certonly -d {{ redmine.domain.suffix }}.{{ server.domain.sub }}{{ server.domain.main }} -m {{ server.domain.contact }} --agree-tos --webroot --no-eff-email --webroot-path /opt/nginx/html --keep-until-expiring --non-interactive

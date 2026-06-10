@@ -1,5 +1,4 @@
-/opt/redmine/log/production.log {
-    su redmine redmine
+/var/log/nginx/*.log {
     weekly
     rotate 5
     copytruncate
