@@ -19,6 +19,10 @@ check_delta () {
 
 }
 
+SPLIIT_CURRENT_VERSION=`ls -l /opt/spliit | sed -e 's/.*spliit-\(.*\)/\1/'`
+SPLIIT_VERSION=`{ curl -sL https://github.com/spliit-app/spliit/releases ; curl -sL https://github.com/spliit-app/spliit/releases?page=2 ; } | grep "tag/[0-9]*\.[0-9]*\.[0-9]*\"" | sed -e "s/.*tag\/\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/" | sort --version-sort | tail -1`
+check_delta "Spliit" $SPLIIT_CURRENT_VERSION $SPLIIT_VERSION
+
 REDMINE_CURRENT_VERSION=`ls -l /opt/redmine | sed -e 's/.*redmine-\(.*\)/\1/'`
 REDMINE_VERSION=`curl -s https://www.redmine.org/ | grep "wiki-page" | grep "Download\"" | sed -e "s/.*Download\">\([0-9]*\.[0-9]*\.[0-9]*\)\ .*/\1/"`
 check_delta "Redmine" $REDMINE_CURRENT_VERSION $REDMINE_VERSION
