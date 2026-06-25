@@ -51,6 +51,11 @@ sudo -u nobody php8.4 occ db:add-missing-indices
 sudo -u nobody php8.4 occ db:add-missing-primary-keys
 sudo -u nobody php8.4 occ db:add-missing-columns
 
+# Update applications and configuration
+sudo -u nobody php8.4 occ app:update --all
+sudo -u nobody php8.4 occ maintenance:repair --include-expensive
+sudo -u nobody php8.4 occ db:convert-filecache-bigint
+
 # sweep old versions
 cd /opt
 sudo mkdir -p toBeRemoved

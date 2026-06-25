@@ -217,6 +217,16 @@
     cmd: "sudo -u nobody php{{ php.version }} occ config:system:set maintenance_window_start --type=integer --value=4"
     chdir: '/opt/nextcloud-{{ package.version }}'
 
+- name: Configure Twofactor Enforce (in config/config.php) - twofactor_enforced
+  ansible.builtin.shell:
+    cmd: "sudo -u nobody php{{ php.version }} occ twofactorauth:enforce --on"
+    chdir: '/opt/nextcloud-{{ package.version }}'
+
+- name: Server Id (in config/config.php) - serverid
+  ansible.builtin.shell:
+    cmd: "sudo -u nobody php{{ php.version }} occ config:system:set serverid --type=integer --value=12"
+    chdir: '/opt/nextcloud-{{ package.version }}'
+
 - name: nextcloud service reload/start
   ansible.builtin.systemd:
     name: 'nginx'
