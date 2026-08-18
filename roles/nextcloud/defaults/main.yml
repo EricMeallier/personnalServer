@@ -1,7 +1,7 @@
 ---
 
 package:
-  version: 34.0.2
+  version: 34.0.3
   whiteboard:
     version: 1.5.9
   appsToRestore:
