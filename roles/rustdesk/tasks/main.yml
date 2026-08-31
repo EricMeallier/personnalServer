@@ -99,6 +99,11 @@
     - rustdesk-hbbr
     - rustdesk-hbbs
 
+- name: Logrotate configuration
+  ansible.builtin.copy:
+    src: logrotate
+    dest: /etc/logrotate.d/rustdesk
+
 - name: Slurp hosts key
   ansible.builtin.slurp:
     src: /var/lib/rustdesk-server/id_ed25519.pub
